@@ -20,20 +20,20 @@
         };
 
         const defaultResidents = [
-            { id: "CD-001", name: "Nguyễn Văn Dân", dob: "12/05/1980", cccd: "066080004452", phone: "0912345001", relation: "Chủ hộ", group: "Tổ 3", association: "Hội Nông dân", isHouseholder: true, familyId: "FAM-082" },
-            { id: "CD-002", name: "Trần Thị Hoa", dob: "20/08/1983", cccd: "066183002241", phone: "0912345002", relation: "Vợ", group: "Tổ 3", association: "Hội Phụ nữ", isHouseholder: false, familyId: "FAM-082" },
-            { id: "CD-003", name: "Nguyễn Trần Tiến", dob: "03/11/2008", cccd: "066208009912", phone: "0912345003", relation: "Con", group: "Tổ 3", association: "Chi đoàn", isHouseholder: false, familyId: "FAM-082" },
-            { id: "CD-004", name: "Nguyễn Thị Mai", dob: "17/02/2012", cccd: "066312005678", phone: "", relation: "Con", group: "Tổ 3", association: "None", isHouseholder: false, familyId: "FAM-082" },
-            { id: "CD-005", name: "Phan Thị Sương", dob: "09/04/1975", cccd: "066075003344", phone: "0912345005", relation: "Chủ hộ", group: "Tổ 1", association: "Hội Phụ nữ", isHouseholder: true, familyId: "FAM-001" },
-            { id: "CD-006", name: "Lê Nhật Lâm", dob: "25/07/1994", cccd: "066094005566", phone: "0912345006", relation: "Chủ hộ", group: "Tổ 3", association: "Chi đoàn", isHouseholder: true, familyId: "FAM-002" },
-            { id: "CD-007", name: "Nguyễn Văn Giang", dob: "01/01/1955", cccd: "066055007788", phone: "0912345007", relation: "Chủ hộ", group: "Tổ 2", association: "Hội Người cao tuổi", isHouseholder: true, familyId: "FAM-003" },
-            { id: "CD-008", name: "Hồ Ngọc Tiêu", dob: "14/09/1952", cccd: "066052008899", phone: "0912345008", relation: "Chủ hộ", group: "Tổ 1", association: "Hội Cựu chiến binh", isHouseholder: true, familyId: "FAM-004" },
-            { id: "CD-009", name: "Trần Quốc Đạo", dob: "22/06/1973", cccd: "066073009900", phone: "0912345009", relation: "Chủ hộ", group: "Tổ 2", association: "Hội Nông dân", isHouseholder: true, familyId: "FAM-005" },
-            { id: "CD-010", name: "Phạm Văn Thành", dob: "30/03/1979", cccd: "066079012345", phone: "0912345010", relation: "Chủ hộ", group: "Tổ 2", association: "None", isHouseholder: true, familyId: "FAM-006" },
-            { id: "CD-011", name: "Trần Thị Lan", dob: "05/12/1985", cccd: "066185098765", phone: "0912345011", relation: "Con", group: "Tổ 1", association: "Hội Phụ nữ", isHouseholder: false, familyId: "FAM-001" },
-            { id: "CD-012", name: "Bùi Quốc Khánh", dob: "18/10/2002", cccd: "066202024681", phone: "0912345012", relation: "Con", group: "Tổ 3", association: "Chi đoàn", isHouseholder: false, familyId: "FAM-082" },
-            { id: "CD-013", name: "Đinh Văn Thông", dob: "10/10/1970", cccd: "066070001234", phone: "0978190440", relation: "Chủ hộ", group: "Tổ 1", association: "None", isHouseholder: true, familyId: "FAM-007" },
-            { id: "CD-014", name: "Nguyễn Quốc Tài", dob: "12/03/1988", cccd: "066088004321", phone: "0987533112", relation: "Chủ hộ", group: "Tổ 3", association: "None", isHouseholder: true, familyId: "FAM-008" }
+            { id: "CD-001", name: "Nguyễn Văn Dân", dob: "12/05/1980", cccd: "066080004452", phone: "0912345001", relation: "Chủ hộ", group: "Đoàn Kết cũ", association: "Hội Nông dân", isHouseholder: true, familyId: "FAM-082" },
+            { id: "CD-002", name: "Trần Thị Hoa", dob: "20/08/1983", cccd: "066183002241", phone: "0912345002", relation: "Vợ", group: "Đoàn Kết cũ", association: "Hội Phụ nữ", isHouseholder: false, familyId: "FAM-082" },
+            { id: "CD-003", name: "Nguyễn Trần Tiến", dob: "03/11/2008", cccd: "066208009912", phone: "0912345003", relation: "Con", group: "Đoàn Kết cũ", association: "Chi đoàn", isHouseholder: false, familyId: "FAM-082" },
+            { id: "CD-004", name: "Nguyễn Thị Mai", dob: "17/02/2012", cccd: "066312005678", phone: "", relation: "Con", group: "Đoàn Kết cũ", association: "None", isHouseholder: false, familyId: "FAM-082" },
+            { id: "CD-005", name: "Phan Thị Sương", dob: "09/04/1975", cccd: "066075003344", phone: "0912345005", relation: "Chủ hộ", group: "Đoàn Kết cũ", association: "Hội Phụ nữ", isHouseholder: true, familyId: "FAM-001" },
+            { id: "CD-006", name: "Lê Nhật Lâm", dob: "25/07/1994", cccd: "066094005566", phone: "0912345006", relation: "Chủ hộ", group: "Đoàn Kết cũ", association: "Chi đoàn", isHouseholder: true, familyId: "FAM-002" },
+            { id: "CD-007", name: "Nguyễn Văn Giang", dob: "01/01/1955", cccd: "066055007788", phone: "0912345007", relation: "Chủ hộ", group: "Yên Khánh cũ", association: "Hội Người cao tuổi", isHouseholder: true, familyId: "FAM-003" },
+            { id: "CD-008", name: "Hồ Ngọc Tiêu", dob: "14/09/1952", cccd: "066052008899", phone: "0912345008", relation: "Chủ hộ", group: "Đoàn Kết cũ", association: "Hội Cựu chiến binh", isHouseholder: true, familyId: "FAM-004" },
+            { id: "CD-009", name: "Trần Quốc Đạo", dob: "22/06/1973", cccd: "066073009900", phone: "0912345009", relation: "Chủ hộ", group: "Yên Khánh cũ", association: "Hội Nông dân", isHouseholder: true, familyId: "FAM-005" },
+            { id: "CD-010", name: "Phạm Văn Thành", dob: "30/03/1979", cccd: "066079012345", phone: "0912345010", relation: "Chủ hộ", group: "Yên Khánh cũ", association: "None", isHouseholder: true, familyId: "FAM-006" },
+            { id: "CD-011", name: "Trần Thị Lan", dob: "05/12/1985", cccd: "066185098765", phone: "0912345011", relation: "Con", group: "Đoàn Kết cũ", association: "Hội Phụ nữ", isHouseholder: false, familyId: "FAM-001" },
+            { id: "CD-012", name: "Bùi Quốc Khánh", dob: "18/10/2002", cccd: "066202024681", phone: "0912345012", relation: "Con", group: "Đoàn Kết cũ", association: "Chi đoàn", isHouseholder: false, familyId: "FAM-082" },
+            { id: "CD-013", name: "Đinh Văn Thông", dob: "10/10/1970", cccd: "066070001234", phone: "0978190440", relation: "Chủ hộ", group: "Đoàn Kết cũ", association: "None", isHouseholder: true, familyId: "FAM-007" },
+            { id: "CD-014", name: "Nguyễn Quốc Tài", dob: "12/03/1988", cccd: "066088004321", phone: "0987533112", relation: "Chủ hộ", group: "Đoàn Kết cũ", association: "None", isHouseholder: true, familyId: "FAM-008" }
         ];
 
         // Village-wide fund obligation templates ("khoản thu") — the amount/hộ that
@@ -250,11 +250,11 @@
                 { id: "VC-003", desc: "Chi mua sắm trang thiết bị Nhà văn hóa thôn", amount: 45000000, date: "01/03/2026" }
             ],
             unpaidHouseholdsList: [
-                { familyId: "FAM-006", representative: "Phạm Văn Thành", dob: "30/03/1979", group: "Tổ 2", unpaidAmount: 750000 },
-                { familyId: "FAM-014", representative: "Lê Thị Bích", dob: "22/06/1988", group: "Tổ 1", unpaidAmount: 750000 },
-                { familyId: "FAM-027", representative: "Nguyễn Văn Hùng", dob: "14/11/1982", group: "Tổ 3", unpaidAmount: 750000 },
-                { familyId: "FAM-033", representative: "Trần Văn Sáu", dob: "07/08/1975", group: "Tổ 2", unpaidAmount: 750000 },
-                { familyId: "FAM-041", representative: "Hoàng Thị Nga", dob: "19/04/1990", group: "Tổ 1", unpaidAmount: 750000 }
+                { familyId: "FAM-006", representative: "Phạm Văn Thành", dob: "30/03/1979", group: "Yên Khánh cũ", unpaidAmount: 750000 },
+                { familyId: "FAM-014", representative: "Lê Thị Bích", dob: "22/06/1988", group: "Đoàn Kết cũ", unpaidAmount: 750000 },
+                { familyId: "FAM-027", representative: "Nguyễn Văn Hùng", dob: "14/11/1982", group: "Đoàn Kết cũ", unpaidAmount: 750000 },
+                { familyId: "FAM-033", representative: "Trần Văn Sáu", dob: "07/08/1975", group: "Yên Khánh cũ", unpaidAmount: 750000 },
+                { familyId: "FAM-041", representative: "Hoàng Thị Nga", dob: "19/04/1990", group: "Đoàn Kết cũ", unpaidAmount: 750000 }
             ]
         };
 
@@ -853,7 +853,7 @@
                                     <th class="p-3 font-semibold">Mã hộ</th>
                                     <th class="p-3 font-semibold">Chủ hộ</th>
                                     <th class="p-3 font-semibold">Ngày sinh</th>
-                                    <th class="p-3 font-semibold">Tổ</th>
+                                    <th class="p-3 font-semibold">Địa bàn</th>
                                     <th class="p-3 font-semibold text-right">Số tiền chưa đóng</th>
                                 </tr>
                             </thead>
@@ -1117,7 +1117,7 @@
                         <div class="space-y-1.5 pt-2">
                             <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Số nhà / Địa chỉ cụ thể</label>
                             <div class="flex items-center gap-2">
-                                <input type="text" id="house-number-input" value="${villageDb.houseNumbers[familyId] || ''}" placeholder="VD: Số 12, ngõ 3, Tổ 3" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                                <input type="text" id="house-number-input" value="${villageDb.houseNumbers[familyId] || ''}" placeholder="VD: Số 12, ngõ 3" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
                                 <button onclick="saveHouseNumber()" class="px-3 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-xs font-bold shrink-0"><i class="fa-solid fa-floppy-disk"></i></button>
                             </div>
                         </div>
@@ -1872,7 +1872,7 @@
                                 <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
                                     <th class="p-3 font-semibold">Thành viên</th>
                                     <th class="p-3 font-semibold">Ngày sinh</th>
-                                    <th class="p-3 font-semibold">Địa bàn (Tổ)</th>
+                                    <th class="p-3 font-semibold">Địa bàn</th>
                                     <th class="p-3 font-semibold">Số điện thoại</th>
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
@@ -2735,7 +2735,7 @@
                                     <th class="p-3 font-semibold">Căn Cước</th>
                                     <th class="p-3 font-semibold">Số điện thoại</th>
                                     <th class="p-3 font-semibold">Mã hộ</th>
-                                    <th class="p-3 font-semibold">Tổ dân cư</th>
+                                    <th class="p-3 font-semibold">Địa bàn</th>
                                     <th class="p-3 font-semibold">Khối đoàn thể</th>
                                     <th class="p-3 font-semibold text-right">Quản lý dữ liệu</th>
                                 </tr>
@@ -3452,7 +3452,7 @@
                                     <th class="p-3 font-semibold">Mã hộ</th>
                                     <th class="p-3 font-semibold">Chủ hộ</th>
                                     <th class="p-3 font-semibold">Ngày sinh</th>
-                                    <th class="p-3 font-semibold">Tổ</th>
+                                    <th class="p-3 font-semibold">Địa bàn</th>
                                     <th class="p-3 font-semibold text-right">Số tiền chưa đóng</th>
                                 </tr>
                             </thead>
@@ -5268,7 +5268,7 @@
                                     <th class="p-3 font-semibold">Ngày sinh</th>
                                     <th class="p-3 font-semibold">Số điện thoại</th>
                                     <th class="p-3 font-semibold">Mã hộ</th>
-                                    <th class="p-3 font-semibold">Tổ dân cư</th>
+                                    <th class="p-3 font-semibold">Địa bàn</th>
                                     <th class="p-3 font-semibold text-right">Vị trí</th>
                                 </tr>
                             </thead>
