@@ -51,48 +51,67 @@
     </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-stone-950 text-stone-100 font-sans antialiased overflow-x-hidden">
+<body class="bg-stone-50 text-stone-800 font-sans antialiased overflow-x-hidden">
 
     <!-- -->
     <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
-    <button id="music-toggle-btn" onclick="toggleBgMusic()" title="Bật/Tắt nhạc nền" class="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-stone-900/90 border border-stone-800 premium-blur flex items-center justify-center text-primary-400 hover:text-white hover:border-primary-500 shadow-lg transition-all">
+    <button id="music-toggle-btn" onclick="toggleBgMusic()" title="Bật/Tắt nhạc nền" class="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-white border border-stone-200 shadow-lg flex items-center justify-center text-primary-600 hover:text-primary-700 hover:border-primary-300 transition-all">
         <i class="fa-solid fa-music" id="music-toggle-icon"></i>
     </button>
 
-    <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-300 premium-blur bg-stone-950/80 border-b border-stone-900" id="main-nav">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <!-- Logo & Brand -->
-                <div class="flex items-center gap-3">
-                    <img src="logo.png" alt="Logo Thôn Đoàn Kết" class="w-11 h-11 rounded-full object-cover shadow-lg shadow-primary-900/20">
-                    <div>
-                        <span class="font-serif text-lg font-black tracking-wide text-white block uppercase">Đoàn Kết</span>
-                        <span class="text-[9px] font-bold tracking-widest text-primary-400 block uppercase">Dliê Ya • Đắk Lắk</span>
-                    </div>
+    <!-- Header: brand + contact actions -->
+    <header class="bg-white border-b border-stone-200">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="Logo Thôn Đoàn Kết" class="w-14 h-14 rounded-full object-cover ring-2 ring-primary-100 shadow-sm">
+                <div class="text-center lg:text-left">
+                    <p class="text-[11px] font-bold uppercase tracking-widest text-primary-600">Cổng Thông Tin Điện Tử</p>
+                    <h1 class="font-sans text-lg md:text-2xl font-bold text-red-600 uppercase leading-tight">Thôn Đoàn Kết – Xã Dliê Ya, Đắk Lắk</h1>
+                    <p class="text-[11px] text-primary-600 uppercase tracking-wide">Nền tảng số cho một cộng đồng mới</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a href="https://fb.me/thondoanket" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors">
+                    <i class="fa-brands fa-facebook text-lg"></i> Fanpage Facebook
+                </a>
+                <a href="tel:0987533112" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold uppercase tracking-wide shadow-sm hover:bg-red-700 transition-colors">
+                    <i class="fa-solid fa-phone"></i> Đường Dây Nóng 24/7 · 0987.533.112
+                </a>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm"></i>
+                    <input id="site-search-input" type="text" placeholder="Tìm kiếm thông tin..." onkeydown="if(event.key==='Enter') runSiteSearch()" class="w-56 pl-9 pr-3 py-2.5 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white transition-all">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sticky navigation -->
+    <nav class="sticky top-0 left-0 w-full z-50 bg-primary-700 transition-shadow duration-300" id="main-nav">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-14">
+                <div class="hidden md:flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-primary-50">
+                    <a href="#home" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Trang chủ</a>
+                    <a href="#about" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Giới thiệu</a>
+                    <a href="#news" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Tin tức - Thông báo</a>
+                    <a href="#nong-san" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Sản vật đất lành</a>
+                    <a href="#system" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Ban tự quản</a>
+                    <a href="#security" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">An ninh trật tự</a>
+                    <a href="#services" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Dịch vụ công</a>
+                    <a href="#gallery" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Liên hệ</a>
                 </div>
 
-                <!-- Desktop Navigation Menu -->
-                <div class="hidden md:flex items-center gap-8 text-sm font-medium">
-                    <a href="#about" class="text-stone-300 hover:text-primary-400 transition-colors">Tầm Vóc Mới</a>
-                    <a href="#news" class="text-stone-300 hover:text-primary-400 transition-colors">Thông Báo</a>
-                    <a href="#nong-san" class="text-stone-300 hover:text-primary-400 transition-colors">Nông Sản</a>
-                    <a href="#system" class="text-stone-300 hover:text-primary-400 transition-colors">Ban Tự Quản</a>
-                    <a href="#security" class="text-stone-300 hover:text-primary-400 transition-colors">An Ninh</a>
-                </div>
-
-                <!-- Action Button -->
                 <div class="hidden md:block">
-                    <a href="dang-nhap.html" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold text-xs tracking-wider uppercase hover:from-primary-500 hover:to-primary-600 shadow-md shadow-primary-950/50 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
-                        <i class="fa-solid fa-fingerprint"></i> Đăng Nhập Hệ Thống
+                    <a href="dang-nhap.html" class="px-5 py-2.5 rounded-xl bg-white text-primary-700 font-bold text-xs tracking-wider uppercase hover:bg-primary-50 shadow-sm transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-fingerprint"></i> Đăng Nhập <i class="fa-solid fa-chevron-down text-[9px]"></i>
                     </a>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center gap-3">
-                    <a href="dang-nhap.html" class="p-2 rounded-lg bg-primary-600/20 text-primary-400 text-sm">
+                <div class="md:hidden flex items-center gap-3 text-white">
+                    <a href="dang-nhap.html" class="p-2 rounded-lg bg-primary-600/60 text-sm">
                         <i class="fa-solid fa-user-lock"></i>
                     </a>
-                    <button id="mobile-menu-btn" class="text-stone-300 hover:text-white p-2">
+                    <button id="mobile-menu-btn" class="p-2">
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
                 </div>
@@ -100,304 +119,195 @@
         </div>
 
         <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden bg-stone-950 border-b border-stone-900 px-4 pt-2 pb-6 space-y-3">
-            <a href="#about" class="block py-2 px-3 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-all">Tầm Vóc Mới</a>
-            <a href="#news" class="block py-2 px-3 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-all">Thông Báo & Tin Tức</a>
-            <a href="#nong-san" class="block py-2 px-3 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-all">Nông Sản Đặc Sản</a>
-            <a href="#system" class="block py-2 px-3 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-all">Ban Tự Quản Thôn</a>
-            <a href="#security" class="block py-2 px-3 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-all">An Ninh Trật Tự</a>
+        <div id="mobile-menu" class="hidden md:hidden bg-primary-800 border-t border-primary-600/50 px-4 pt-2 pb-6 space-y-1 text-xs font-bold uppercase tracking-wide text-primary-50">
+            <a href="#home" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Trang chủ</a>
+            <a href="#about" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Giới thiệu</a>
+            <a href="#news" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Tin tức - Thông báo</a>
+            <a href="#nong-san" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Sản vật đất lành</a>
+            <a href="#system" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Ban tự quản</a>
+            <a href="#security" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">An ninh trật tự</a>
+            <a href="#services" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Dịch vụ công</a>
+            <a href="#gallery" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Liên hệ</a>
         </div>
     </nav>
 
+    <main>
+        <!-- Hero + Bảng tin -->
+        <section id="home" class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- -->
-    <section class="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-950/40 z-10"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-stone-950 via-transparent to-stone-950 z-10"></div>
-            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600" alt="Cánh đồng Tây Nguyên" class="w-full h-full object-cover scale-105 filter brightness-50 contrast-115">
-        </div>
-
-        <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-950/80 border border-primary-500/30 text-primary-300 text-xs font-bold uppercase tracking-widest mx-auto animate-pulse premium-blur">
-                <span class="w-2 h-2 rounded-full bg-primary-400"></span> Đắk Lắk • Việt Nam
-            </div>
-
-            <div class="space-y-4">
-                <h1 class="text-glow font-serif text-5xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight">
-                    THÔN ĐOÀN KẾT
-                </h1>
-                <p class="font-serif text-xl md:text-2xl lg:text-3xl font-medium text-amber-400 italic">
-                    "Tầm vóc mới, sức mạnh mới, tương lai mới"
-                </p>
-            </div>
-
-            <p class="text-glow max-w-2xl mx-auto text-sm md:text-base text-stone-300 leading-relaxed font-light">
-                Địa chỉ chính thức: <span class="text-white font-semibold">Thôn Đoàn Kết, Xã Dliê Ya, Tỉnh Đắk Lắk</span>.<br class="hidden sm:block">
-                Định hướng phát triển nông nghiệp công nghệ cao và xây dựng hệ thống chính trị cơ sở vững mạnh sau dấu mốc lịch sử sáp nhập.
-            </p>
-
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                <a href="#about" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-800 text-white font-bold text-sm tracking-wider uppercase hover:from-primary-500 hover:to-primary-700 transition-all shadow-lg shadow-primary-950/40 text-center">
-                    Khám Phá Bản Sắc Thôn
-                </a>
-                <a href="dang-nhap.html" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-stone-900/90 border border-stone-800 text-stone-200 font-bold text-sm tracking-wider uppercase hover:bg-stone-800 hover:text-white transition-all text-center premium-blur">
-                    Cổng Dịch Vụ Công Dân Số
-                </a>
-            </div>
-        </div>
-
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-stone-500 hover:text-white transition-colors">
-            <span class="text-[10px] tracking-widest uppercase">Cuộn để xem</span>
-            <i class="fa-solid fa-chevron-down animate-bounce text-sm"></i>
-        </div>
-    </section>
-
-
-    <!-- -->
-    <section id="about" class="py-24 border-t border-stone-900 bg-gradient-to-b from-stone-950 via-stone-900/20 to-stone-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <h2 class="font-serif text-3xl md:text-5xl font-extrabold text-white">TẦM VÓC MỚI, SỨC MẠNH MỚI</h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-primary-600 to-amber-500 mx-auto rounded-full"></div>
-                <p class="text-stone-400 text-sm md:text-base">
-                    Nghị quyết lịch sử sáp nhập toàn diện giữa <span class="text-white font-semibold">Thôn Đoàn Kết (cũ)</span> và <span class="text-white font-semibold">Thôn Yên Khánh (cũ)</span> đã kiến tạo một cộng đồng mới với quy mô vượt trội, mở ra cơ hội đột phá kinh tế - xã hội.
-                </p>
-            </div>
-
-            <!-- Stats Grid (populated by renderHomeStats() from villageDb.homeContent.stats) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="home-stats-grid"></div>
-        </div>
-    </section>
-
-
-    <!-- -->
-    <section id="news" class="py-24 border-t border-stone-900 bg-stone-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-                <div class="max-w-xl space-y-4 text-left">
-                    <h2 class="font-serif text-3xl md:text-5xl font-extrabold text-white">BẢNG TIN & THÔNG BÁO</h2>
-                    <div class="w-20 h-1 bg-gradient-to-r from-primary-600 to-amber-500 rounded-full"></div>
-                    <p class="text-stone-400 text-sm">Các chỉ thị, chủ trưởng, hoạt động chung của Ban quản lý và Đoàn thể thôn Đoàn Kết.</p>
-                </div>
-                <!-- Search & Filters -->
-                <div class="flex flex-wrap items-center gap-2">
-                    <button onclick="filterNews('all')" id="btn-news-all" class="px-4 py-2 rounded-xl text-xs font-semibold bg-primary-600 text-white transition-all">Tất cả</button>
-                    <button onclick="filterNews('hanh-chinh')" id="btn-news-hanh-chinh" class="px-4 py-2 rounded-xl text-xs font-semibold bg-stone-900 text-stone-400 hover:text-white transition-all">Hành chính</button>
-                    <button onclick="filterNews('san-xuat')" id="btn-news-san-xuat" class="px-4 py-2 rounded-xl text-xs font-semibold bg-stone-900 text-stone-400 hover:text-white transition-all">Sản xuất</button>
-                    <button onclick="filterNews('doan-the')" id="btn-news-doan-the" class="px-4 py-2 rounded-xl text-xs font-semibold bg-stone-900 text-stone-400 hover:text-white transition-all">Đoàn thể</button>
-                </div>
-            </div>
-
-            <!-- News Grid (populated by renderHomeNews() from villageDb.homeContent.news) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="news-grid"></div>
-        </div>
-    </section>
-
-
-    <!-- -->
-    <section id="nong-san" class="py-24 border-t border-stone-900 bg-gradient-to-b from-stone-950 via-stone-900/10 to-stone-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <h2 class="font-serif text-3xl md:text-5xl font-extrabold text-white">SẢN VẬT ĐẤT LÀNH</h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-primary-600 to-amber-500 mx-auto rounded-full"></div>
-                <p class="text-stone-400 text-sm md:text-base">
-                    Nhờ nguồn đất bazan màu mỡ cùng công nghệ sản xuất VietGAP, 5 nông sản chủ lực của thôn Đoàn Kết luôn đạt chứng nhận chất lượng vượt trội.
-                </p>
-            </div>
-
-            <!-- Products Grid (populated by renderHomeProducts() from villageDb.homeContent.products) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6" id="products-grid"></div>
-        </div>
-    </section>
-
-
-    <!-- -->
-    <section id="system" class="py-24 border-t border-stone-900 bg-stone-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <h2 class="font-serif text-3xl md:text-5xl font-extrabold text-white">BAN TỰ QUẢN & HỆ THỐNG CHÍNH TRỊ</h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-primary-600 to-amber-500 mx-auto rounded-full"></div>
-                <p class="text-stone-400 text-sm md:text-base">
-                    Các đồng chí chỉ huy, lãnh đạo các khối ban ngành đồng lòng chung sức chèo lái đưa phong trào thôn Đoàn Kết phát triển vững chắc.
-                </p>
-            </div>
-
-            <!-- Leadership Grid (populated by renderHomeLeadership() from villageDb.homeContent.leadership) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="leadership-grid"></div>
-        </div>
-    </section>
-
-
-    <!-- -->
-    <section id="security" class="py-24 border-t border-stone-900 bg-gradient-to-b from-stone-950 via-stone-900/15 to-stone-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <div class="w-12 h-12 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-900/50 flex items-center justify-center mx-auto text-xl shadow-lg">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <h2 class="font-serif text-3xl md:text-5xl font-extrabold text-white">TỔ AN NINH TRẬT TỰ CƠ SỞ</h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-primary-600 to-amber-500 mx-auto rounded-full"></div>
-                <p class="text-stone-400 text-sm md:text-base">
-                    Lực lượng bảo vệ trực chốt 24/7, duy trì nếp sống văn minh, đảm bảo bình yên từng ngõ xóm thuộc địa bàn thôn Đoàn Kết.
-                </p>
-            </div>
-
-            <!-- Content Split -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                <!-- Left Column: Image Asset representation (verbatim "image_4741c9.png") -->
-                <div class="lg:col-span-5 flex flex-col items-center">
-                    <div class="relative bg-stone-900/60 border border-stone-800/80 p-4 rounded-2xl shadow-xl shadow-stone-950/80 group">
-                        <div class="absolute inset-0 bg-gradient-to-t from-stone-950/50 to-transparent pointer-events-none rounded-2xl z-10"></div>
-                        <img src="/logo-antt.png" alt="Sơ đồ danh sách thành viên Tổ An ninh trật tự thôn Đoàn Kết" class="rounded-xl w-full max-w-sm mx-auto h-auto object-cover group-hover:scale-[1.02] transition-transform duration-300">
+                <!-- Hero banner -->
+                <div class="lg:col-span-8 relative rounded-3xl overflow-hidden shadow-lg min-h-[460px] flex items-end">
+                    <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600" alt="Cánh đồng Tây Nguyên" class="absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/40 to-transparent"></div>
+                    <div class="relative z-10 p-8 md:p-10 pb-16 lg:pb-20 space-y-4 max-w-xl">
+                        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-500/20 border border-primary-300/40 text-primary-100 text-[11px] font-bold uppercase tracking-widest">
+                            <span class="w-1.5 h-1.5 rounded-full bg-primary-300"></span> Đắk Lắk · Việt Nam
+                        </span>
+                        <h2 class="font-serif text-3xl md:text-4xl font-black text-white leading-tight">TẦM VÓC MỚI – KHÁT VỌNG MỚI</h2>
+                        <p class="text-stone-200 text-sm leading-relaxed">
+                            Sau dấu mốc lịch sử sáp nhập giữa Thôn Đoàn Kết (cũ) và Thôn Yên Khánh (cũ), chúng ta cùng xây dựng một cộng đồng đoàn kết - phát triển - văn minh - bền vững, hướng tới nông nghiệp công nghệ cao và hệ thống chính trị cơ sở vững mạnh.
+                        </p>
+                        <a href="#about" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-xs font-bold uppercase tracking-wide transition-colors shadow-lg">
+                            Xem chi tiết <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </a>
                     </div>
-                    <p class="text-stone-500 text-[10px] tracking-wider uppercase mt-4 text-center">Hình ảnh: Sơ đồ phân nhiệm & Danh sách Tổ ANTT Thôn Đoàn Kết</p>
                 </div>
 
-                <!-- Right Column: Interactive Contact List -->
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-amber-950/20 border border-amber-900/30 text-amber-300">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-circle-exclamation text-xl animate-pulse"></i>
-                            <div class="text-xs">
-                                <span class="font-bold block uppercase tracking-wide">Đường Dây Nóng Khẩn Cấp (24/7)</span>
-                                <span>Liên hệ ngay với Tổ trưởng hoặc thành viên trực ban khi phát hiện sự việc nghi vấn.</span>
-                            </div>
+                <!-- Bảng tin & thông báo -->
+                <div id="news" class="lg:col-span-4 bg-white border border-stone-200 rounded-3xl shadow-sm flex flex-col scroll-mt-20">
+                    <div class="p-5 border-b border-stone-100 space-y-3">
+                        <h3 class="font-serif text-lg font-bold text-stone-900">Bảng Tin & Thông Báo</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterNews('all')" id="btn-news-all" class="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-primary-600 text-white transition-all">Tất cả</button>
+                            <button onclick="filterNews('hanh-chinh')" id="btn-news-hanh-chinh" class="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-500 hover:bg-stone-200 transition-all">Hành chính</button>
+                            <button onclick="filterNews('san-xuat')" id="btn-news-san-xuat" class="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-500 hover:bg-stone-200 transition-all">Sản xuất</button>
+                            <button onclick="filterNews('doan-the')" id="btn-news-doan-the" class="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-500 hover:bg-stone-200 transition-all">Đoàn thể</button>
                         </div>
-                        <a id="security-hotline-banner-link" href="tel:0987533112" class="w-full sm:w-auto px-4 py-2 text-center text-xs font-extrabold uppercase rounded bg-amber-500 hover:bg-amber-600 text-stone-950 transition-colors">
-                            <i class="fa-solid fa-phone mr-1"></i> Gọi Tiếp Nhận: 0987.533.112
-                        </a>
                     </div>
 
-                    <!-- Member Table (populated by renderHomeSecurity() from villageDb.homeContent.security) -->
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/50">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="border-b border-stone-800 bg-stone-900/30 text-stone-400">
-                                    <th class="p-4 font-bold uppercase tracking-wider text-[10px]">Chức danh</th>
-                                    <th class="p-4 font-bold uppercase tracking-wider text-[10px]">Họ và tên</th>
-                                    <th class="p-4 font-bold uppercase tracking-wider text-[10px] text-right">Số điện thoại</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-stone-800/60 text-stone-300" id="security-members-tbody"></tbody>
-                        </table>
-                    </div>
+                    <!-- News list (populated by renderHomeNews() from villageDb.homeContent.news) -->
+                    <div id="news-grid" class="divide-y divide-stone-100 flex-1 overflow-y-auto max-h-[420px]"></div>
 
-                    <div class="flex items-center justify-between text-xs text-stone-500 pt-2">
-                        <span>Phương châm: <strong id="security-slogan-text">"Đoàn kết - Chủ động - Kỷ cương - An toàn"</strong></span>
-                        <a href="https://fb.me/thondoanket" target="_blank" rel="noopener noreferrer" class="text-primary-400 hover:underline flex items-center gap-1.5">
-                            <i class="fa-brands fa-facebook"></i> Theo dõi Fanpage chính thức
+                    <div class="p-4 border-t border-stone-100 text-right">
+                        <a href="#news" class="text-xs font-semibold text-primary-600 hover:text-primary-700 inline-flex items-center gap-1.5">
+                            Xem tất cả tin tức <i class="fa-solid fa-arrow-right-long text-[10px]"></i>
                         </a>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-
-    <!-- -->
-    <section class="py-24 border-t border-stone-900 bg-stone-950 relative overflow-hidden">
-        <!-- Abstract gradient shapes -->
-        <div class="absolute -left-48 bottom-0 w-96 h-96 bg-primary-900/10 rounded-full filter blur-3xl pointer-events-none"></div>
-        <div class="absolute -right-48 top-0 w-96 h-96 bg-amber-950/10 rounded-full filter blur-3xl pointer-events-none"></div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="bg-gradient-to-r from-stone-900 to-stone-950 border border-stone-800 rounded-3xl p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center justify-between gap-12 shadow-2xl">
-                <div class="space-y-6 max-w-xl text-left">
-                    <span class="px-3 py-1.5 rounded bg-primary-950/70 border border-primary-500/30 text-primary-400 text-xs font-bold uppercase tracking-wider">Cơ Sở Dữ Liệu Quốc Gia</span>
-                    <h2 class="font-serif text-3xl md:text-4xl font-extrabold text-white">CỔNG TRA CỨU & DỊCH VỤ CÔNG DÂN SỐ</h2>
-                    <p class="text-stone-400 text-sm leading-relaxed">
-                        Hệ thống định danh điện tử mức cơ sở, phục vụ công tác tra cứu chỉ tiêu nông thôn mới, phản ánh kiến nghị trực tiếp tới Trưởng thôn, và theo dõi các khoản đóng góp tự nguyện công khai minh bạch.
-                    </p>
-                    <ul class="space-y-3 text-xs text-stone-300">
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-primary-400"></i> Tra cứu số hộ khẩu, nhân khẩu mới sau sáp nhập</li>
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-primary-400"></i> Xem báo cáo quyết toán quỹ xây dựng nông thôn mới</li>
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-primary-400"></i> Gửi phiếu phản ánh an ninh trật tự trực tuyến</li>
-                    </ul>
-                </div>
-
-                <div class="w-full lg:max-w-md bg-stone-900 border border-stone-800 rounded-2xl p-8 space-y-6">
-                    <h3 class="font-serif text-xl font-bold text-white text-center border-b border-stone-800 pb-4">ĐĂNG NHẬP NHANH</h3>
-                    <div class="bg-amber-950/30 border border-amber-900/30 rounded-xl p-3.5 text-xs text-amber-300 flex gap-3">
-                        <i class="fa-solid fa-circle-info text-base mt-0.5"></i>
-                        <span>Sử dụng bảng chọn tài khoản thử nghiệm nhanh trong cửa sổ đăng nhập bên dưới để khám phá mọi phân hệ.</span>
-                    </div>
-                    <a href="dang-nhap.html" class="w-full py-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-key"></i> Đăng Nhập Cổng Điều Hành Thôn
-                    </a>
+                <!-- Stats strip overlapping the hero's bottom edge -->
+                <div id="about" class="lg:col-span-8 relative -mt-14 lg:-mt-16 z-20 scroll-mt-24">
+                    <!-- Stats (populated by renderHomeStats() from villageDb.homeContent.stats) -->
+                    <div id="home-stats-grid" class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-stone-100 bg-white border border-stone-200 rounded-2xl shadow-lg"></div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
 
-    <!-- -->
-    <footer class="bg-stone-950 border-t border-stone-900 text-xs text-stone-400 pt-20 pb-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-16 border-b border-stone-900">
-                <!-- Branding column -->
-                <div class="lg:col-span-5 space-y-6">
+        <!-- 4 cột: Sản vật / Ban tự quản / An ninh / Dịch vụ công -->
+        <section class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+
+                <!-- Sản vật đất lành -->
+                <div id="nong-san" class="bg-white border border-stone-200 rounded-3xl shadow-sm p-6 space-y-4 scroll-mt-20">
                     <div class="flex items-center gap-3">
-                        <img src="logo.png" alt="Logo Thôn Đoàn Kết" class="w-12 h-12 rounded-full object-cover shadow-inner">
-                        <div>
-                            <span class="font-serif text-xl font-black text-white block">THÔN ĐOÀN KẾT</span>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-primary-400 block">Liên hệ Ban Tự Quản Thôn</span>
-                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-seedling"></i></div>
+                        <h3 class="font-serif text-base font-bold text-stone-900">Sản Vật Đất Lành</h3>
                     </div>
-                    <p class="text-xs text-stone-400 leading-relaxed">
-                        Thôn Đoàn Kết mới sau sáp nhập định hướng phát triển nông nghiệp công nghệ cao gắn kết hệ thống chính trị cơ sở vững mạnh. Mọi ý kiến đóng góp hoặc nhu cầu đặt mua nông sản sỉ lẻ, xin liên hệ với chúng tôi.
-                    </p>
-                    <div class="space-y-3.5 text-xs text-stone-300">
-                        <p class="flex items-center gap-3">
-                            <i class="fa-solid fa-map-location-dot text-primary-400 text-sm"></i>
-                            <span>Địa chỉ chính thức: Thôn Đoàn Kết, Xã Dliê Ya, Tỉnh Đắk Lắk</span>
-                        </p>
-                        <p class="flex items-center gap-3">
-                            <i class="fa-solid fa-phone text-primary-400 text-sm"></i>
-                            <span>SĐT Thôn Trưởng (Đinh Văn Thông): <a href="tel:0978190440" class="hover:text-primary-400 font-bold underline">0978.190.440</a></span>
-                        </p>
-                    </div>
+                    <p class="text-xs text-stone-500">5 nông sản chủ lực đạt chuẩn VietGAP</p>
+                    <!-- Products Grid (populated by renderHomeProducts()) -->
+                    <div id="products-grid" class="grid grid-cols-3 gap-3"></div>
+                    <a href="#nong-san" class="block text-xs font-semibold text-primary-600 hover:text-primary-700 text-center pt-3 border-t border-stone-100">Xem thêm sản phẩm →</a>
                 </div>
 
-                <!-- Navigation link list columns -->
-                <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
-                    <div class="space-y-4">
-                        <h4 class="font-bold text-white uppercase tracking-wider text-[10px]">Cơ cấu & Bản sắc</h4>
-                        <ul class="space-y-2.5">
-                            <li><a href="#about" class="hover:text-white transition-colors">Tầm Vóc Sáp Nhập</a></li>
-                            <li><a href="#system" class="hover:text-white transition-colors">Ban Tự Quản Thôn</a></li>
-                            <li><a href="#security" class="hover:text-white transition-colors">Lực Lượng ANTT</a></li>
-                            <li><a href="https://fb.me/thondoanket" target="_blank" class="hover:text-white transition-colors">Fanpage Cộng Đồng</a></li>
-                        </ul>
+                <!-- Ban tự quản -->
+                <div id="system" class="bg-white border border-stone-200 rounded-3xl shadow-sm p-6 space-y-4 scroll-mt-20">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-landmark"></i></div>
+                        <h3 class="font-serif text-base font-bold text-stone-900">Ban Tự Quản</h3>
                     </div>
+                    <!-- Leadership list (populated by renderHomeLeadership()) -->
+                    <div id="leadership-grid" class="text-xs"></div>
+                    <a href="#system" class="block text-xs font-semibold text-primary-600 hover:text-primary-700 text-center pt-3 border-t border-stone-100">Xem đầy đủ →</a>
+                </div>
 
-                    <div class="space-y-4">
-                        <h4 class="font-bold text-white uppercase tracking-wider text-[10px]">Đặc sản nông thôn</h4>
-                        <ul class="space-y-2.5">
-                            <li><a href="#nong-san" class="hover:text-white transition-colors">Cà Phê Robusta</a></li>
-                            <li><a href="#nong-san" class="hover:text-white transition-colors">Sầu Riêng Ri6</a></li>
-                            <li><a href="#nong-san" class="hover:text-white transition-colors">Hồ Tiêu VietGAP</a></li>
-                            <li><a href="#nong-san" class="hover:text-white transition-colors">Hạt Mắc Ca Sấy</a></li>
-                            <li><a href="#nong-san" class="hover:text-white transition-colors">Chanh Dây Tím</a></li>
-                        </ul>
+                <!-- Tổ An ninh trật tự -->
+                <div id="security" class="bg-white border border-stone-200 rounded-3xl shadow-sm p-6 space-y-4 scroll-mt-20">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h3 class="font-serif text-base font-bold text-stone-900">Tổ An Ninh Trật Tự</h3>
                     </div>
+                    <p class="text-[11px] text-stone-400 text-center uppercase tracking-wide">Sơ đồ phân nhiệm</p>
+                    <!-- Org chart (populated by renderHomeSecurity()) -->
+                    <div id="security-org-chart" class="py-1"></div>
+                    <a id="security-hotline-banner-link" href="tel:0987533112" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wide transition-colors">
+                        <i class="fa-solid fa-phone"></i> Đường Dây Nóng 24/7
+                    </a>
+                    <p class="text-center text-[11px] text-stone-400">Tiếp nhận thông tin – Xử lý kịp thời</p>
+                    <a href="#security" class="block text-xs font-semibold text-primary-600 hover:text-primary-700 text-center pt-3 border-t border-stone-100">Xem chi tiết →</a>
+                </div>
 
-                    <div class="space-y-4 col-span-2 sm:col-span-1">
-                        <h4 class="font-bold text-white uppercase tracking-wider text-[10px]">Thông tin & Thủ tục</h4>
-                        <ul class="space-y-2.5">
-                            <li><a href="#news" class="hover:text-white transition-colors">Bảng Tin Chỉ Đạo</a></li>
-                            <li><a href="dang-nhap.html" class="hover:text-white transition-colors text-left">Định Danh Công Dân</a></li>
-                            <li><a href="#security" class="hover:text-white transition-colors text-left">Đăng Ký Lưu Trú Tạm Vắng</a></li>
-                        </ul>
+                <!-- Cổng tra cứu & dịch vụ công dân số -->
+                <div id="services" class="bg-white border border-stone-200 rounded-3xl shadow-sm p-6 space-y-4 scroll-mt-20">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-address-card"></i></div>
+                        <h3 class="font-serif text-base font-bold text-stone-900">Dịch Vụ Công Dân Số</h3>
+                    </div>
+                    <ul class="space-y-3 text-xs text-stone-600">
+                        <li><a href="dang-nhap.html" class="flex items-center gap-2.5 hover:text-primary-600 transition-colors"><i class="fa-solid fa-people-roof text-primary-500 w-4"></i> Tra cứu hộ khẩu, nhân khẩu</a></li>
+                        <li><a href="dang-nhap.html" class="flex items-center gap-2.5 hover:text-primary-600 transition-colors"><i class="fa-solid fa-chart-column text-primary-500 w-4"></i> Xem báo cáo quyết toán quỹ nông thôn mới</a></li>
+                        <li><a href="dang-nhap.html" class="flex items-center gap-2.5 hover:text-primary-600 transition-colors"><i class="fa-solid fa-triangle-exclamation text-primary-500 w-4"></i> Gửi phản ánh an ninh trật tự trực tuyến</a></li>
+                        <li><a href="dang-nhap.html" class="flex items-center gap-2.5 hover:text-primary-600 transition-colors"><i class="fa-solid fa-file-lines text-primary-500 w-4"></i> Các thủ tục hành chính khác</a></li>
+                    </ul>
+                    <a href="dang-nhap.html" class="block text-xs font-semibold text-primary-600 hover:text-primary-700 text-center pt-3 border-t border-stone-100">Xem tất cả dịch vụ →</a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Hình ảnh hoạt động + Liên kết nhanh -->
+        <section id="gallery" class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-16 scroll-mt-20">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 bg-white border border-stone-200 rounded-3xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-serif text-base font-bold text-stone-900 uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-images text-primary-500"></i> Hình Ảnh Hoạt Động
+                        </h3>
+                        <div class="flex gap-2">
+                            <button onclick="scrollGallery(-1)" class="w-8 h-8 rounded-full border border-stone-200 hover:bg-stone-50 text-stone-500 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <button onclick="scrollGallery(1)" class="w-8 h-8 rounded-full border border-stone-200 hover:bg-stone-50 text-stone-500 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
+                    <!-- Gallery track (populated by renderHomeGallery() from villageDb.homeContent.gallery) -->
+                    <div id="gallery-track" class="flex gap-4 overflow-x-auto scroll-smooth pb-1 no-scrollbar"></div>
+                </div>
+
+                <div class="lg:col-span-4 bg-white border border-stone-200 rounded-3xl shadow-sm p-6 space-y-4">
+                    <h3 class="font-serif text-base font-bold text-stone-900 uppercase">Liên Kết Nhanh</h3>
+                    <div class="grid grid-cols-2 gap-3 text-xs font-bold">
+                        <a href="#news" onclick="filterNews('hanh-chinh')" class="quick-link-btn bg-red-50 text-red-600 hover:bg-red-100">
+                            <i class="fa-solid fa-bullhorn text-lg"></i> Văn bản chỉ đạo
+                        </a>
+                        <a href="javascript:void(0)" onclick="showCustomAlert('info','Lịch công tác','Tính năng đang được Ban tự quản cập nhật, vui lòng quay lại sau.')" class="quick-link-btn bg-blue-50 text-blue-600 hover:bg-blue-100">
+                            <i class="fa-solid fa-calendar-days text-lg"></i> Lịch công tác
+                        </a>
+                        <a href="javascript:void(0)" onclick="showCustomAlert('info','Biểu mẫu đơn từ','Tính năng đang được Ban tự quản cập nhật, vui lòng quay lại sau.')" class="quick-link-btn bg-primary-50 text-primary-700 hover:bg-primary-100">
+                            <i class="fa-solid fa-file-signature text-lg"></i> Biểu mẫu đơn từ
+                        </a>
+                        <a href="javascript:void(0)" onclick="showCustomAlert('info','Hỏi đáp thường gặp','Tính năng đang được Ban tự quản cập nhật, vui lòng quay lại sau.')" class="quick-link-btn bg-amber-50 text-amber-600 hover:bg-amber-100">
+                            <i class="fa-solid fa-circle-question text-lg"></i> Hỏi đáp thường gặp
+                        </a>
                     </div>
                 </div>
             </div>
+        </section>
+    </main>
 
-            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-stone-500">
-                <p>&copy; 2026 Bản quyền thuộc về Thôn Đoàn Kết, Xã Dliê Ya, Tỉnh Đắk Lắk. Phát triển bền vững vì Tổ quốc Việt Nam.</p>
-                <div class="flex gap-4">
-                    <a href="https://fb.me/thondoanket" target="_blank" class="w-8 h-8 rounded-full bg-stone-900 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-primary-500 transition-all"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#" class="w-8 h-8 rounded-full bg-stone-900 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-primary-500 transition-all"><i class="fa-solid fa-envelope"></i></a>
+
+    <!-- Footer -->
+    <footer class="bg-primary-900 text-primary-100">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-3 gap-5 items-center text-xs">
+            <div class="space-y-2 text-center lg:text-left">
+                <p class="flex items-center justify-center lg:justify-start gap-2"><i class="fa-solid fa-map-location-dot text-primary-300"></i> Thôn Đoàn Kết – Xã Dliê Ya – Tỉnh Đắk Lắk</p>
+                <p class="flex items-center justify-center lg:justify-start gap-2"><i class="fa-solid fa-phone text-primary-300"></i> Trưởng thôn: <a href="tel:0978190440" class="hover:text-white underline">0978.190.440</a></p>
+                <p class="flex items-center justify-center lg:justify-start gap-2"><i class="fa-solid fa-envelope text-primary-300"></i> doanket.dlieya@daklak.gov.vn</p>
+            </div>
+
+            <div class="text-center space-y-1.5">
+                <p class="font-semibold text-white">Cổng Thông Tin Điện Tử Thôn Đoàn Kết</p>
+                <p class="text-primary-300">&copy; 2026. All rights reserved.</p>
+                <p class="flex items-center justify-center gap-2 text-primary-200">
+                    <i class="fa-solid fa-eye"></i> Hôm nay: <span id="visit-today" class="font-bold text-white">0</span> · Tổng: <span id="visit-total" class="font-bold text-white">0</span>
+                </p>
+            </div>
+
+            <div class="flex flex-col items-center lg:items-end gap-2">
+                <span class="text-primary-300">Kết nối với chúng tôi</span>
+                <div class="flex gap-3">
+                    <a href="https://fb.me/thondoanket" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-primary-800 hover:bg-primary-700 flex items-center justify-center text-white transition-colors"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-primary-800 hover:bg-primary-700 flex items-center justify-center text-white transition-colors"><i class="fa-solid fa-comment"></i></a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-primary-800 hover:bg-primary-700 flex items-center justify-center text-white transition-colors"><i class="fa-brands fa-youtube"></i></a>
                 </div>
             </div>
         </div>
@@ -405,24 +315,24 @@
 
 
     <!-- -->
-    <div id="news-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 premium-blur hidden">
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl relative transition-all scale-95 duration-300">
-            <div class="p-6 border-b border-stone-800 flex items-center justify-between">
+    <div id="news-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 premium-blur hidden">
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl relative transition-all scale-95 duration-300">
+            <div class="p-6 border-b border-stone-100 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <span id="news-modal-category" class="px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider"></span>
-                    <span id="news-modal-date" class="text-xs text-stone-500 font-mono"></span>
+                    <span id="news-modal-date" class="text-xs text-stone-400 font-mono"></span>
                 </div>
-                <button onclick="closeNewsDetail()" class="w-8 h-8 rounded-full bg-stone-950/80 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-red-500 transition-colors">
+                <button onclick="closeNewsDetail()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-400 hover:text-red-500 hover:border-red-200 transition-colors">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <div class="p-6 space-y-4">
-                <h3 id="news-modal-title" class="font-serif text-xl font-bold text-white leading-snug"></h3>
+                <h3 id="news-modal-title" class="font-serif text-xl font-bold text-stone-900 leading-snug"></h3>
                 <div class="w-16 h-0.5 bg-primary-500 rounded"></div>
-                <p id="news-modal-content" class="text-stone-300 text-xs md:text-sm leading-relaxed whitespace-pre-line"></p>
+                <p id="news-modal-content" class="text-stone-600 text-xs md:text-sm leading-relaxed whitespace-pre-line"></p>
             </div>
-            <div class="p-6 border-t border-stone-800/80 bg-stone-950/20 text-right">
-                <button onclick="closeNewsDetail()" class="px-4 py-2 rounded-xl bg-stone-950 border border-stone-800 hover:bg-stone-800 text-stone-300 text-xs font-bold transition-all">
+            <div class="p-6 border-t border-stone-100 bg-stone-50/60 text-right">
+                <button onclick="closeNewsDetail()" class="px-4 py-2 rounded-xl bg-white border border-stone-200 hover:bg-stone-100 text-stone-600 text-xs font-bold transition-all">
                     Đã đọc và đóng
                 </button>
             </div>
@@ -431,13 +341,13 @@
 
 
     <!-- -->
-    <div id="custom-alert-box" class="fixed top-6 right-6 z-[100] max-w-sm w-full p-4 rounded-2xl bg-stone-900 border border-stone-800 shadow-2xl flex items-start gap-3 transition-all transform translate-x-96 hidden">
+    <div id="custom-alert-box" class="fixed top-6 right-6 z-[100] max-w-sm w-full p-4 rounded-2xl bg-white border border-stone-200 shadow-2xl flex items-start gap-3 transition-all transform translate-x-96 hidden">
         <div id="alert-box-icon" class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"></div>
         <div class="space-y-1">
-            <h4 id="alert-box-title" class="font-bold text-white text-xs">Thông báo</h4>
-            <p id="alert-box-message" class="text-[11px] text-stone-400 leading-normal"></p>
+            <h4 id="alert-box-title" class="font-bold text-stone-900 text-xs">Thông báo</h4>
+            <p id="alert-box-message" class="text-[11px] text-stone-500 leading-normal"></p>
         </div>
-        <button onclick="closeCustomAlert()" class="text-stone-500 hover:text-stone-300 text-sm ml-auto shrink-0"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="closeCustomAlert()" class="text-stone-400 hover:text-stone-600 text-sm ml-auto shrink-0"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
     <!-- -->

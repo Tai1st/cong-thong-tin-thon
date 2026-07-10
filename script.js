@@ -173,10 +173,10 @@
                 { id: "ST-003", icon: "fa-people-group", label: "Tổng Số Nhân Khẩu", value: "1.647", unit: "người", breakdown: [{ label: "Thôn Đoàn Kết cũ:", value: "851 người" }, { label: "Thôn Yên Khánh cũ:", value: "796 người" }] }
             ],
             news: [
-                { id: "NEWS-001", categorySlug: "hanh-chinh", category: "Hành chính", colorClass: "bg-red-950/70 text-red-400 border border-red-900/40", date: "07/07/2026", title: "Lịch tiếp công dân của Ban tự quản và giải quyết thủ tục sáp nhập mới", summary: "Nhằm tạo điều kiện cho bà con cập nhật giấy tờ hành chính liên quan sau sáp nhập, Ban tự quản tổ chức tiếp nhận...", content: "Nhằm giải quyết nhanh chóng và đồng bộ các thay đổi về hồ sơ cư trú của bà con sau khi sáp nhập hai thôn, Ban tự quản Thôn Đoàn Kết kính báo lịch làm việc như sau:\n\n- Thời gian tiếp dân: Sáng thứ Ba và thứ Năm hàng tuần (Từ 8:00 đến 11:30).\n- Địa điểm: Văn phòng Nhà Văn Hóa Thôn Đoàn Kết mới.\n- Nội dung thực hiện: Hỗ trợ người dân đăng ký đính chính thông tin hộ khẩu, cập nhật cơ sở dữ liệu đất đai, cấp giấy chứng nhận định danh số mức độ cơ sở, giải quyết các thủ tục liên quan đến sản xuất nông nghiệp và hộ tịch.\n- Người chịu trách nhiệm: Ông Đinh Văn Thông - Trưởng thôn trực tiếp chỉ đạo tiếp nhận phối hợp cùng cán bộ UBND xã Dliê Ya.", createdBy: "Admin" },
-                { id: "NEWS-002", categorySlug: "san-xuat", category: "Sản xuất", colorClass: "bg-emerald-950/70 text-emerald-400 border border-emerald-900/40", date: "05/07/2026", title: "Hội thảo chuyển đổi số trong sản xuất Sầu riêng chất lượng cao", summary: "Đồng hành cùng bà con nâng cao giá trị trái Sầu riêng xuất khẩu, phối hợp cùng các kỹ sư nông nghiệp đầu ngành...", content: "Với định hướng nông nghiệp là bệ phóng bứt phá kinh tế cho Thôn Đoàn Kết mới, Chi hội Nông dân phối hợp cùng Doanh nghiệp Đối tác tổ chức khóa tập huấn chuyên sâu chuyển đổi số:\n\n- Chủ đề: Áp dụng mã vùng trồng, ghi chép nhật ký điện tử và sử dụng chế phẩm sinh học chuẩn xuất khẩu cho Sầu riêng Ri6.\n- Địa điểm tập trung: Hội trường Nhà văn hóa Thôn Đoàn Kết.\n- Lợi ích tham dự: Bà con được hướng dẫn tạo tài khoản quản lý mã số vườn trồng, được kết nối với đơn vị thu mua chính ngạch xuất khẩu không qua trung gian.\n- Diễn giả: Thạc sĩ Nông nghiệp Nguyễn Hoàng Nam - Viện khoa học kỹ thuật nông lâm nghiệp Tây Nguyên (WASI).\n\nĐề nghị bà con đăng ký sớm qua đồng chí Trần Quốc Đạo - Chi hội trưởng Hội Nông dân.", createdBy: "Admin" },
-                { id: "NEWS-003", categorySlug: "doan-the", category: "Đoàn thể", colorClass: "bg-amber-950/70 text-amber-400 border border-amber-900/40", date: "28/06/2026", title: "Phát động ngày \"Chủ Nhật Xanh\" trồng hoa dọc trục giao thông thôn", summary: "Bí thư Chi đoàn và Hội Phụ nữ phát động toàn dân tham gia dọn dẹp vệ sinh đường làng và trồng thêm dải hoa ngũ sắc...", content: "Thực hiện tiêu chí Xanh - Sạch - Đẹp trong bộ tiêu chí xây dựng Nông thôn mới nâng cao năm 2026, Chi đoàn Thanh niên phối hợp với Hội Liên hiệp Phụ nữ phát động chiến dịch ra quân tình nguyện:\n\n- Nội dung: Dọn dẹp hành lang lộ giới đường trục chính, nhổ cỏ hoang, dọn rác thải nhựa và tiến hành trồng 500 cây hoa ngũ sắc dọc 2km tuyến đường hoa kiểu mẫu.\n- Lực lượng nòng cốt: Đoàn viên thanh niên và toàn thể hội viên phụ nữ, đồng thời trân trọng kính mời toàn thể bà con nhân dân thu xếp công việc cùng tham gia đóng góp ngày công.\n- Thời gian xuất phát: Đúng 6h30 sáng Chủ Nhật tuần này tại trục nhà văn hóa.\n- Chỉ huy chiến dịch: Anh Lê Nhật Lâm - Bí thư Chi đoàn kiêm Thôn đội trưởng.", createdBy: "Admin" },
-                { id: "NEWS-004", categorySlug: "hanh-chinh", category: "Hành chính", colorClass: "bg-red-950/70 text-red-400 border border-red-900/40", date: "25/06/2026", title: "Triển khai chương trình hỗ trợ sinh kế và vốn vay ưu đãi sản xuất năm 2026", summary: "Hội Nông dân tổ chức rà soát nhu cầu hỗ trợ về vốn đầu tư phân bón, hệ thống tưới nước cho các hộ khó khăn...", content: "Thực hiện chủ trương xóa nghèo bền vững và đồng hành cùng bà con phát triển kinh tế tập thể, Ban quản lý thôn phối hợp với Ngân hàng Chính sách Xã hội huyện tổ chức triển khai vốn vay ưu đãi:\n\n- Đối tượng áp dụng: Các hộ gia đình trong diện chính sách, hộ có nhu cầu mở rộng quy mô trồng mắc ca, sầu riêng hữu cơ hoặc đầu tư máy móc chế biến sấy hạt cà phê, sấy tiêu.\n- Mức vay hỗ trợ: Tối đa lên đến 100 triệu đồng/hộ với lãi suất đặc biệt ưu đãi và thời gian ân hạn dài.\n- Quy trình: Hội đồng bình xét của thôn do đ/c Phan Thị Sương - Trưởng ban Công tác Mặt trận kết hợp với Hội Nông dân thẩm định công khai, dân chủ, đúng đối tượng.\n- Mọi thắc mắc và nộp hồ sơ xin liên hệ trực tiếp văn phòng thôn.", createdBy: "Admin" }
+                { id: "NEWS-001", categorySlug: "hanh-chinh", category: "Hành chính", colorClass: "bg-red-100 text-red-600", date: "07/07/2026", title: "Lịch tiếp công dân của Ban tự quản và giải quyết thủ tục sáp nhập mới", summary: "Nhằm tạo điều kiện cho bà con cập nhật giấy tờ hành chính liên quan sau sáp nhập, Ban tự quản tổ chức tiếp nhận...", content: "Nhằm giải quyết nhanh chóng và đồng bộ các thay đổi về hồ sơ cư trú của bà con sau khi sáp nhập hai thôn, Ban tự quản Thôn Đoàn Kết kính báo lịch làm việc như sau:\n\n- Thời gian tiếp dân: Sáng thứ Ba và thứ Năm hàng tuần (Từ 8:00 đến 11:30).\n- Địa điểm: Văn phòng Nhà Văn Hóa Thôn Đoàn Kết mới.\n- Nội dung thực hiện: Hỗ trợ người dân đăng ký đính chính thông tin hộ khẩu, cập nhật cơ sở dữ liệu đất đai, cấp giấy chứng nhận định danh số mức độ cơ sở, giải quyết các thủ tục liên quan đến sản xuất nông nghiệp và hộ tịch.\n- Người chịu trách nhiệm: Ông Đinh Văn Thông - Trưởng thôn trực tiếp chỉ đạo tiếp nhận phối hợp cùng cán bộ UBND xã Dliê Ya.", createdBy: "Admin" },
+                { id: "NEWS-002", categorySlug: "san-xuat", category: "Sản xuất", colorClass: "bg-emerald-100 text-emerald-600", date: "05/07/2026", title: "Hội thảo chuyển đổi số trong sản xuất Sầu riêng chất lượng cao", summary: "Đồng hành cùng bà con nâng cao giá trị trái Sầu riêng xuất khẩu, phối hợp cùng các kỹ sư nông nghiệp đầu ngành...", content: "Với định hướng nông nghiệp là bệ phóng bứt phá kinh tế cho Thôn Đoàn Kết mới, Chi hội Nông dân phối hợp cùng Doanh nghiệp Đối tác tổ chức khóa tập huấn chuyên sâu chuyển đổi số:\n\n- Chủ đề: Áp dụng mã vùng trồng, ghi chép nhật ký điện tử và sử dụng chế phẩm sinh học chuẩn xuất khẩu cho Sầu riêng Ri6.\n- Địa điểm tập trung: Hội trường Nhà văn hóa Thôn Đoàn Kết.\n- Lợi ích tham dự: Bà con được hướng dẫn tạo tài khoản quản lý mã số vườn trồng, được kết nối với đơn vị thu mua chính ngạch xuất khẩu không qua trung gian.\n- Diễn giả: Thạc sĩ Nông nghiệp Nguyễn Hoàng Nam - Viện khoa học kỹ thuật nông lâm nghiệp Tây Nguyên (WASI).\n\nĐề nghị bà con đăng ký sớm qua đồng chí Trần Quốc Đạo - Chi hội trưởng Hội Nông dân.", createdBy: "Admin" },
+                { id: "NEWS-003", categorySlug: "doan-the", category: "Đoàn thể", colorClass: "bg-amber-100 text-amber-600", date: "28/06/2026", title: "Phát động ngày \"Chủ Nhật Xanh\" trồng hoa dọc trục giao thông thôn", summary: "Bí thư Chi đoàn và Hội Phụ nữ phát động toàn dân tham gia dọn dẹp vệ sinh đường làng và trồng thêm dải hoa ngũ sắc...", content: "Thực hiện tiêu chí Xanh - Sạch - Đẹp trong bộ tiêu chí xây dựng Nông thôn mới nâng cao năm 2026, Chi đoàn Thanh niên phối hợp với Hội Liên hiệp Phụ nữ phát động chiến dịch ra quân tình nguyện:\n\n- Nội dung: Dọn dẹp hành lang lộ giới đường trục chính, nhổ cỏ hoang, dọn rác thải nhựa và tiến hành trồng 500 cây hoa ngũ sắc dọc 2km tuyến đường hoa kiểu mẫu.\n- Lực lượng nòng cốt: Đoàn viên thanh niên và toàn thể hội viên phụ nữ, đồng thời trân trọng kính mời toàn thể bà con nhân dân thu xếp công việc cùng tham gia đóng góp ngày công.\n- Thời gian xuất phát: Đúng 6h30 sáng Chủ Nhật tuần này tại trục nhà văn hóa.\n- Chỉ huy chiến dịch: Anh Lê Nhật Lâm - Bí thư Chi đoàn kiêm Thôn đội trưởng.", createdBy: "Admin" },
+                { id: "NEWS-004", categorySlug: "hanh-chinh", category: "Hành chính", colorClass: "bg-red-100 text-red-600", date: "25/06/2026", title: "Triển khai chương trình hỗ trợ sinh kế và vốn vay ưu đãi sản xuất năm 2026", summary: "Hội Nông dân tổ chức rà soát nhu cầu hỗ trợ về vốn đầu tư phân bón, hệ thống tưới nước cho các hộ khó khăn...", content: "Thực hiện chủ trương xóa nghèo bền vững và đồng hành cùng bà con phát triển kinh tế tập thể, Ban quản lý thôn phối hợp với Ngân hàng Chính sách Xã hội huyện tổ chức triển khai vốn vay ưu đãi:\n\n- Đối tượng áp dụng: Các hộ gia đình trong diện chính sách, hộ có nhu cầu mở rộng quy mô trồng mắc ca, sầu riêng hữu cơ hoặc đầu tư máy móc chế biến sấy hạt cà phê, sấy tiêu.\n- Mức vay hỗ trợ: Tối đa lên đến 100 triệu đồng/hộ với lãi suất đặc biệt ưu đãi và thời gian ân hạn dài.\n- Quy trình: Hội đồng bình xét của thôn do đ/c Phan Thị Sương - Trưởng ban Công tác Mặt trận kết hợp với Hội Nông dân thẩm định công khai, dân chủ, đúng đối tượng.\n- Mọi thắc mắc và nộp hồ sơ xin liên hệ trực tiếp văn phòng thôn.", createdBy: "Admin" }
             ],
             products: [
                 { id: "PRD-001", name: "Cà Phê Robusta", badge: "Chủ Lực", image: "https://file3.qdnd.vn/data/images/0/2026/01/16/upload_2080/gia%20ca%20phe%20congluan%20vn.jpg?dpi=150&quality=100&w=870", desc: "Hạt cà phê Robusta đậm đà đặc sản Tây Nguyên, trồng hữu cơ cho hương thơm thuần khiết và vị đậm mạnh mẽ.", footerLabel: "Sản lượng năm:", footerValue: "~ 900 Tấn" },
@@ -207,7 +207,15 @@
                     { id: "SEC-005", title: "Tổ Viên", name: "Đinh Văn Cường", phone: "0368444449", phoneDisplay: "0368 444 449" },
                     { id: "SEC-006", title: "Tổ Viên", name: "Nguyễn Văn Tú", phone: "0977354354", phoneDisplay: "0977 354 354" }
                 ]
-            }
+            },
+            gallery: [
+                { id: "GAL-001", image: "https://placehold.co/400x260/dcfce7/15803d?text=Hop+trien+khai", caption: "Họp triển khai kế hoạch sản xuất vụ Hè Thu 2026" },
+                { id: "GAL-002", image: "https://placehold.co/400x260/fef3c7/b45309?text=Thu+hoach+ca+phe", caption: "Bà con thu hoạch cà phê Robusta đầu vụ" },
+                { id: "GAL-003", image: "https://placehold.co/400x260/bbf7d0/166534?text=Chu+Nhat+Xanh", caption: "Ra quân \"Chủ Nhật Xanh\" dọn vệ sinh đường làng" },
+                { id: "GAL-004", image: "https://placehold.co/400x260/fee2e2/b91c1c?text=Trong+hoa+duong+lang", caption: "Chi đoàn thanh niên trồng hoa dọc tuyến đường kiểu mẫu" },
+                { id: "GAL-005", image: "https://placehold.co/400x260/dbeafe/1d4ed8?text=Giao+luu+the+thao", caption: "Giao lưu thể thao chào mừng thôn Đoàn Kết mới" },
+                { id: "GAL-006", image: "https://placehold.co/400x260/fce7f3/a21caf?text=Nha+sach+vuon+dep", caption: "Hội Phụ nữ phát động phong trào \"Nhà sạch, vườn đẹp\"" }
+            ]
         };
 
         // Village-wide fund ledger (separate from a household's own dues and
@@ -271,16 +279,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             initDatabase();
             renderHomeContent();
+            trackVisit();
 
             const nav = document.getElementById('main-nav');
             if (nav) {
                 window.addEventListener('scroll', function() {
-                    if (window.scrollY > 40) {
-                        nav.classList.add('bg-stone-950/95', 'shadow-xl');
-                        nav.classList.remove('bg-stone-950/80');
+                    if (window.scrollY > 20) {
+                        nav.classList.add('shadow-lg');
                     } else {
-                        nav.classList.add('bg-stone-950/80');
-                        nav.classList.remove('bg-stone-950/95', 'shadow-xl');
+                        nav.classList.remove('shadow-lg');
                     }
                 });
             }
@@ -452,6 +459,15 @@
                 villageDb.homeContent = localStorage.getItem('village_home_content_db')
                     ? JSON.parse(localStorage.getItem('village_home_content_db'))
                     : JSON.parse(JSON.stringify(defaultHomeContent));
+                // Backfill any homeContent fields added after a visitor's copy was
+                // already cached in localStorage (e.g. the "gallery" section),
+                // so returning visitors get new sections without losing edits
+                // Admin already made to the cached stats/news/products/etc.
+                Object.keys(defaultHomeContent).forEach(key => {
+                    if (!(key in villageDb.homeContent)) {
+                        villageDb.homeContent[key] = JSON.parse(JSON.stringify(defaultHomeContent[key]));
+                    }
+                });
                 villageDb.incidentReports = localStorage.getItem('village_incident_reports_db')
                     ? JSON.parse(localStorage.getItem('village_incident_reports_db'))
                     : [];
@@ -521,13 +537,13 @@
             msgEl.innerText = message;
 
             if (type === 'success') {
-                icon.className = "w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 bg-emerald-950/50 border border-emerald-900/40 text-emerald-400";
+                icon.className = "w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 bg-emerald-50 text-emerald-600";
                 icon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
             } else if (type === 'error') {
-                icon.className = "w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 bg-red-950/50 border border-red-900/40 text-red-400";
+                icon.className = "w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 bg-red-50 text-red-600";
                 icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
             } else {
-                icon.className = "w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 bg-blue-950/50 border border-blue-900/40 text-blue-400";
+                icon.className = "w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 bg-blue-50 text-blue-600";
                 icon.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
             }
 
@@ -5296,21 +5312,21 @@
             if (!container) return;
             const stats = (villageDb.homeContent && villageDb.homeContent.stats) || [];
             container.innerHTML = stats.map(s => `
-                <div class="bg-stone-900/40 border border-stone-800/80 rounded-2xl p-8 relative overflow-hidden group hover:border-primary-500/30 transition-all">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 rounded-xl bg-primary-900/30 flex items-center justify-center text-primary-400">
-                            <i class="fa-solid ${s.icon} text-xl"></i>
+                <div class="p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-11 h-11 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600">
+                            <i class="fa-solid ${s.icon}"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-stone-200">${s.label}</h3>
+                        <h3 class="text-sm font-bold text-stone-700">${s.label}</h3>
                     </div>
-                    <div class="text-4xl lg:text-5xl font-black text-white font-serif mb-4 flex items-baseline gap-1">
-                        ${s.value} <span class="text-lg text-primary-400 font-sans font-semibold">${s.unit}</span>
+                    <div class="text-3xl font-black text-stone-900 font-serif mb-3 flex items-baseline gap-1">
+                        ${s.value} <span class="text-base text-primary-600 font-sans font-semibold">${s.unit}</span>
                     </div>
-                    <div class="space-y-2 text-xs text-stone-400 border-t border-stone-800 pt-4">
+                    <div class="space-y-1.5 text-xs text-stone-500 border-t border-stone-100 pt-3">
                         ${(s.breakdown || []).map(b => `
                             <div class="flex justify-between">
                                 <span>${b.label}</span>
-                                <span class="text-stone-200 font-mono">${b.value}</span>
+                                <span class="text-stone-700 font-medium">${b.value}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -5325,22 +5341,16 @@
             const news = (villageDb.homeContent && villageDb.homeContent.news) || [];
             const visible = homeNewsFilter === 'all' ? news : news.filter(n => n.categorySlug === homeNewsFilter);
             grid.innerHTML = visible.map(n => `
-                <div class="bg-stone-900/50 border border-stone-800/80 rounded-2xl overflow-hidden group hover:border-primary-500/30 transition-all flex flex-col justify-between">
-                    <div class="p-6 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${n.colorClass}">${n.category}</span>
-                            <span class="text-xs text-stone-500 font-mono"><i class="fa-regular fa-calendar-check mr-1.5"></i>${n.date}</span>
-                        </div>
-                        <h3 class="font-semibold text-stone-100 group-hover:text-primary-400 transition-colors line-clamp-2">${n.title}</h3>
-                        <p class="text-xs text-stone-400 line-clamp-3">${n.summary}</p>
+                <button onclick="openNewsDetail('${n.id}')" class="w-full text-left px-5 py-4 hover:bg-stone-50 transition-colors flex gap-3 items-start">
+                    <div class="w-9 h-9 rounded-lg ${n.colorClass} flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-bullhorn text-xs"></i>
                     </div>
-                    <div class="px-6 pb-6 pt-0 border-t border-stone-800/50">
-                        <button onclick="openNewsDetail('${n.id}')" class="w-full mt-4 py-2 text-center text-xs font-semibold text-primary-400 hover:text-primary-300 transition-colors flex items-center justify-center gap-1.5">
-                            Xem chi tiết thông báo <i class="fa-solid fa-arrow-right-long text-[10px]"></i>
-                        </button>
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-stone-800 leading-snug line-clamp-2">${n.title}</p>
+                        <p class="text-[11px] text-stone-400 mt-1">${n.category} · ${n.date}</p>
                     </div>
-                </div>
-            `).join('') || '<p class="text-stone-500 text-sm col-span-full text-center py-8">Chưa có thông báo nào.</p>';
+                </button>
+            `).join('') || '<p class="text-stone-400 text-sm text-center py-8">Chưa có thông báo nào.</p>';
         }
 
         function filterNews(category) {
@@ -5350,10 +5360,39 @@
                 const b = document.getElementById(`btn-news-${btn}`);
                 if (!b) return;
                 b.className = btn === category
-                    ? "px-4 py-2 rounded-xl text-xs font-semibold bg-primary-600 text-white transition-all"
-                    : "px-4 py-2 rounded-xl text-xs font-semibold bg-stone-900 text-stone-400 hover:text-white transition-all";
+                    ? "px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-primary-600 text-white transition-all"
+                    : "px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-500 hover:bg-stone-200 transition-all";
             });
             renderHomeNews();
+        }
+
+        function runSiteSearch() {
+            const input = document.getElementById('site-search-input');
+            if (!input) return;
+            const q = input.value.trim().toLowerCase();
+            const newsSection = document.getElementById('news');
+            if (!q) {
+                if (newsSection) newsSection.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+            filterNews('all');
+            const news = (villageDb.homeContent && villageDb.homeContent.news) || [];
+            const matches = news.filter(n => n.title.toLowerCase().includes(q) || n.summary.toLowerCase().includes(q));
+            const grid = document.getElementById('news-grid');
+            if (grid) {
+                grid.innerHTML = matches.length ? matches.map(n => `
+                    <button onclick="openNewsDetail('${n.id}')" class="w-full text-left px-5 py-4 hover:bg-stone-50 transition-colors flex gap-3 items-start">
+                        <div class="w-9 h-9 rounded-lg ${n.colorClass} flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-bullhorn text-xs"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-stone-800 leading-snug line-clamp-2">${n.title}</p>
+                            <p class="text-[11px] text-stone-400 mt-1">${n.category} · ${n.date}</p>
+                        </div>
+                    </button>
+                `).join('') : '<p class="text-stone-400 text-sm text-center py-8">Không tìm thấy kết quả phù hợp.</p>';
+            }
+            if (newsSection) newsSection.scrollIntoView({ behavior: 'smooth' });
         }
 
         function openNewsDetail(id) {
@@ -5376,23 +5415,13 @@
             if (!container) return;
             const products = (villageDb.homeContent && villageDb.homeContent.products) || [];
             container.innerHTML = products.map(p => `
-                <div class="bg-stone-900/40 border border-stone-800/80 rounded-2xl overflow-hidden group hover:border-primary-500/40 transition-all flex flex-col h-full">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="${p.image}" onerror="this.src='https://placehold.co/600x480/1a1a1a/22c55e?text=${encodeURIComponent(p.name)}'" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute top-3 left-3 px-2.5 py-1 rounded bg-stone-950/80 border border-primary-500/30 text-primary-400 text-[10px] font-bold uppercase tracking-wider premium-blur">${p.badge}</div>
+                <a href="#nong-san" class="group flex flex-col items-center gap-1.5 text-center" title="${p.name}">
+                    <div class="w-full aspect-square rounded-xl overflow-hidden border border-stone-100">
+                        <img src="${p.image}" onerror="this.src='https://placehold.co/200x200/f0fdf4/16a34a?text=${encodeURIComponent(p.name)}'" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     </div>
-                    <div class="p-5 flex-grow flex flex-col justify-between">
-                        <div class="space-y-2">
-                            <h3 class="font-bold text-lg text-white group-hover:text-primary-400 transition-colors">${p.name}</h3>
-                            <p class="text-xs text-stone-400 leading-relaxed">${p.desc}</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-stone-800/50 flex justify-between items-center text-xs">
-                            <span class="text-stone-500">${p.footerLabel}</span>
-                            <span class="text-stone-200 font-bold">${p.footerValue}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('') || '<p class="text-stone-500 text-sm col-span-full text-center py-8">Chưa có nông sản nào.</p>';
+                    <span class="text-[11px] font-semibold text-stone-600 group-hover:text-primary-600 leading-tight">${p.name}</span>
+                </a>
+            `).join('') || '<p class="text-stone-400 text-xs col-span-3 text-center py-4">Chưa có nông sản nào.</p>';
         }
 
         function renderHomeLeadership() {
@@ -5400,53 +5429,83 @@
             if (!container) return;
             const list = (villageDb.homeContent && villageDb.homeContent.leadership) || [];
             container.innerHTML = list.map(l => {
-                const action = l.actionType === 'phone'
-                    ? `<a href="tel:${l.phone}" class="px-3 py-1.5 rounded-lg bg-primary-600/10 text-primary-400 font-bold hover:bg-primary-600 hover:text-white transition-all text-xs flex items-center gap-1.5"><i class="fa-solid fa-phone"></i> ${l.phoneDisplay}</a>`
-                    : `<span class="px-3 py-1.5 rounded-lg bg-${l.colorTheme}-950/60 text-${l.colorTheme}-400 font-bold text-xs"><i class="fa-solid ${l.tagIcon}"></i> ${l.tagLabel}</span>`;
+                const name = l.actionType === 'phone'
+                    ? `<a href="tel:${l.phone}" class="hover:text-primary-600 transition-colors">${l.name}</a>`
+                    : l.name;
                 return `
-                    <div class="bg-stone-900/40 border border-stone-800/80 rounded-2xl p-6 hover:border-primary-500/30 transition-all flex flex-col justify-between relative group">
-                        ${l.decorIcon ? `<div class="absolute top-4 right-4 text-3xl text-primary-500/10"><i class="fa-solid ${l.decorIcon}"></i></div>` : ''}
-                        <div class="space-y-4">
-                            <div class="w-14 h-14 rounded-full bg-${l.colorTheme}-950/40 text-${l.colorTheme}-400 border border-${l.colorTheme}-900/30 flex items-center justify-center font-bold text-xl font-serif">${l.initials}</div>
-                            <div>
-                                <span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider block">${l.role}</span>
-                                <h3 class="font-bold text-white text-base mt-1">${l.name}</h3>
-                            </div>
-                            <p class="text-xs text-stone-400 leading-relaxed">${l.desc}</p>
-                        </div>
-                        <div class="pt-6 mt-6 border-t border-stone-800/60 flex items-center justify-between">
-                            <span class="text-[10px] text-stone-500 uppercase">${l.actionType === 'phone' ? 'Liên hệ trực tiếp:' : 'Hành động:'}</span>
-                            ${action}
-                        </div>
+                    <div class="flex items-center justify-between gap-2 py-2 border-b border-stone-100 last:border-0">
+                        <span class="text-stone-500">${l.role}:</span>
+                        <span class="font-semibold text-stone-800 text-right">${name}</span>
                     </div>
                 `;
-            }).join('') || '<p class="text-stone-500 text-sm col-span-full text-center py-8">Chưa có nhân sự nào.</p>';
+            }).join('') || '<p class="text-stone-400 text-center py-4">Chưa có nhân sự nào.</p>';
         }
 
         function renderHomeSecurity() {
             const sec = (villageDb.homeContent && villageDb.homeContent.security) || { hotline: '', hotlineDisplay: '', slogan: '', members: [] };
+            const members = sec.members || [];
+            const chief = members.find(m => m.title === 'Tổ Trưởng');
+            const deputies = members.filter(m => m.title === 'Tổ Phó');
+            const others = members.filter(m => m.title !== 'Tổ Trưởng' && m.title !== 'Tổ Phó');
+
+            const chart = document.getElementById('security-org-chart');
+            if (chart) {
+                chart.innerHTML = `
+                    <div class="flex flex-col items-center gap-2">
+                        ${chief ? `<div class="px-3 py-2 rounded-lg bg-primary-600 text-white text-[11px] font-bold text-center shadow-sm">${chief.title}<br><span class="font-normal">${chief.name}</span></div>` : ''}
+                        ${deputies.length ? `
+                        <div class="w-px h-3 bg-stone-300"></div>
+                        <div class="flex items-start gap-3">
+                            ${deputies.map(d => `<div class="px-3 py-2 rounded-lg bg-primary-50 text-primary-700 border border-primary-100 text-[11px] font-bold text-center">${d.title}<br><span class="font-normal">${d.name}</span></div>`).join('')}
+                        </div>` : ''}
+                        ${others.length ? `<div class="text-[11px] text-stone-400 pt-1">Tổ viên (${others.length} người)</div>` : ''}
+                        ${sec.slogan ? `<p class="text-[11px] text-stone-400 italic pt-1 text-center">"${sec.slogan}"</p>` : ''}
+                    </div>
+                `;
+            }
 
             const bannerLink = document.getElementById('security-hotline-banner-link');
             if (bannerLink) {
                 bannerLink.href = `tel:${sec.hotline}`;
-                bannerLink.innerHTML = `<i class="fa-solid fa-phone mr-1"></i> Gọi Tiếp Nhận: ${sec.hotlineDisplay}`;
+                bannerLink.innerHTML = `<i class="fa-solid fa-phone"></i> ${sec.hotlineDisplay}`;
             }
+        }
 
-            const sloganEl = document.getElementById('security-slogan-text');
-            if (sloganEl) sloganEl.innerText = `"${sec.slogan}"`;
+        function renderHomeGallery() {
+            const track = document.getElementById('gallery-track');
+            if (!track) return;
+            const items = (villageDb.homeContent && villageDb.homeContent.gallery) || [];
+            track.innerHTML = items.map(g => `
+                <div class="shrink-0 w-56 rounded-2xl overflow-hidden border border-stone-100 group">
+                    <div class="h-36 overflow-hidden">
+                        <img src="${g.image}" alt="${g.caption}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <p class="p-3 text-xs font-medium text-stone-600 leading-snug">${g.caption}</p>
+                </div>
+            `).join('') || '';
+        }
 
-            const tbody = document.getElementById('security-members-tbody');
-            if (tbody) {
-                tbody.innerHTML = (sec.members || []).map((m, idx) => `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-4 font-bold ${idx === 0 ? 'text-primary-400' : idx === 1 ? 'text-primary-400/80' : 'text-stone-400'}">${m.title}</td>
-                        <td class="p-4 font-medium text-white">${m.name}</td>
-                        <td class="p-4 text-right">
-                            <a href="tel:${m.phone}" class="hover:text-primary-400 font-mono font-bold"><i class="fa-solid fa-phone mr-1.5 text-stone-500"></i>${m.phoneDisplay}</a>
-                        </td>
-                    </tr>
-                `).join('') || '<tr><td colspan="3" class="p-4 text-center text-stone-500">Chưa có thành viên nào.</td></tr>';
+        function scrollGallery(direction) {
+            const track = document.getElementById('gallery-track');
+            if (!track) return;
+            track.scrollBy({ left: direction * 240, behavior: 'smooth' });
+        }
+
+        function trackVisit() {
+            const todayEl = document.getElementById('visit-today');
+            const totalEl = document.getElementById('visit-total');
+            if (!todayEl && !totalEl) return;
+            const todayKey = new Date().toISOString().slice(0, 10);
+            const stats = JSON.parse(localStorage.getItem('village_visit_stats') || 'null') || { date: '', today: 0, total: 156789 };
+            if (stats.date !== todayKey) {
+                stats.date = todayKey;
+                stats.today = 0;
             }
+            stats.today += 1;
+            stats.total += 1;
+            localStorage.setItem('village_visit_stats', JSON.stringify(stats));
+            if (todayEl) todayEl.innerText = stats.today.toLocaleString('vi-VN');
+            if (totalEl) totalEl.innerText = stats.total.toLocaleString('vi-VN');
         }
 
         function renderHomeContent() {
@@ -5455,4 +5514,5 @@
             renderHomeProducts();
             renderHomeLeadership();
             renderHomeSecurity();
+            renderHomeGallery();
         }
