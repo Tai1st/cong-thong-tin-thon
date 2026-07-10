@@ -45,6 +45,32 @@
         .quick-link-btn:hover {
             transform: translateY(-2px);
         }
+        /* Responsive table scroll affordance: every data table on the
+           dashboards sits inside a .table-scroll wrapper (horizontal scroll
+           on mobile instead of a full card-per-row rebuild). Momentum
+           scrolling plus a fading edge shadow make it obvious there's more
+           to see without touching each table's own render function. */
+        .table-scroll {
+            -webkit-overflow-scrolling: touch;
+            background:
+                linear-gradient(to right, #fafaf9 30%, rgba(250, 250, 249, 0)),
+                linear-gradient(to right, rgba(250, 250, 249, 0), #fafaf9 70%) 100% 0,
+                linear-gradient(to right, rgba(28, 25, 23, 0.12), rgba(28, 25, 23, 0)),
+                linear-gradient(to left, rgba(28, 25, 23, 0.12), rgba(28, 25, 23, 0)) 100% 0;
+            background-repeat: no-repeat;
+            background-color: #fafaf9;
+            background-size: 32px 100%, 32px 100%, 12px 100%, 12px 100%;
+            background-attachment: local, local, scroll, scroll;
+        }
+        .table-scroll table {
+            min-width: max-content;
+        }
+        @media (max-width: 640px) {
+            .table-scroll th,
+            .table-scroll td {
+                white-space: nowrap;
+            }
+        }
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }

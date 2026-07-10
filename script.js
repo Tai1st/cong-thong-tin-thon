@@ -208,6 +208,11 @@
                     { id: "SEC-006", title: "Tổ Viên", name: "Nguyễn Văn Tú", phone: "0977354354", phoneDisplay: "0977 354 354" }
                 ]
             },
+            schedule: [
+                { id: "SCH-001", day: "25", month: "Tháng 5", title: "Hội nghị nhân dân quý II/2026", location: "Nhà văn hóa thôn", time: "07:30" },
+                { id: "SCH-002", day: "28", month: "Tháng 5", title: "Tập huấn kỹ thuật trồng sầu riêng", location: "Vườn mẫu thôn", time: "08:00" },
+                { id: "SCH-003", day: "05", month: "Tháng 6", title: "Ngày Chủ nhật xanh", location: "Toàn thôn", time: "07:00" }
+            ],
             gallery: [
                 { id: "GAL-001", image: "https://placehold.co/400x260/dcfce7/15803d?text=Hop+trien+khai", caption: "Họp triển khai kế hoạch sản xuất vụ Hè Thu 2026" },
                 { id: "GAL-002", image: "https://placehold.co/400x260/fef3c7/b45309?text=Thu+hoach+ca+phe", caption: "Bà con thu hoạch cà phê Robusta đầu vụ" },
@@ -294,11 +299,8 @@
             }
 
             const menuBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (menuBtn && mobileMenu) {
-                menuBtn.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                });
+            if (menuBtn) {
+                menuBtn.addEventListener('click', toggleMobileMenu);
             }
 
             // Background music (index.html only): browsers block autoplay with
@@ -314,6 +316,25 @@
                 });
             }
         });
+
+        // index.html's mobile nav drawer (half-width slide-in, mirrors the
+        // dashboards' toggleSidebar() pattern but with its own element ids
+        // since this page has no logged-in session/portal-tabs).
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobile-menu');
+            const backdrop = document.getElementById('mobile-menu-backdrop');
+            if (!panel) return;
+            const isOpen = panel.classList.contains('translate-x-0');
+            if (isOpen) {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('-translate-x-full');
+                if (backdrop) backdrop.classList.add('hidden');
+            } else {
+                panel.classList.add('translate-x-0');
+                panel.classList.remove('-translate-x-full');
+                if (backdrop) backdrop.classList.remove('hidden');
+            }
+        }
 
         function updateMusicToggleIcon(isPlaying) {
             const icon = document.getElementById('music-toggle-icon');
@@ -682,9 +703,12 @@
             const container = document.getElementById(containerId || 'portal-tabs');
 
             container.innerHTML = groups.map(group => `
-                <span class="text-[9px] font-bold text-stone-500 uppercase tracking-widest block px-2 mb-2 mt-4 first:mt-0">${group.label}</span>
+                <div class="flex items-center gap-2 px-2 mb-2 mt-6 pt-4 border-t border-stone-100 first:mt-0 first:pt-0 first:border-0">
+                    <span class="w-1 h-3 rounded-full bg-primary-300"></span>
+                    <span class="text-[9px] font-bold text-stone-400 uppercase tracking-widest">${group.label}</span>
+                </div>
                 ${group.tabs.map(tab => `
-                    <button onclick="switchPortalTab('${tab.id}')" id="tab-btn-${tab.id}" class="w-full py-2.5 px-3 rounded-xl text-stone-400 hover:text-stone-200 hover:bg-stone-850 text-left text-xs font-semibold flex items-center gap-2.5 transition-all">
+                    <button onclick="switchPortalTab('${tab.id}')" id="tab-btn-${tab.id}" class="w-full py-2.5 px-3 rounded-2xl text-stone-500 hover:bg-stone-50 hover:text-stone-900 text-left text-xs font-semibold flex items-center gap-3 transition-all">
                         <i class="fa-solid ${tab.icon} w-4 text-center"></i>
                         <span>${tab.label}</span>
                     </button>
@@ -700,9 +724,9 @@
                 const btn = document.getElementById(`tab-btn-${tab.id}`);
                 if (btn) {
                     if (tab.id === tabId) {
-                        btn.className = "w-full py-2.5 px-3 rounded-xl bg-primary-600 text-white text-left text-xs font-semibold flex items-center gap-2.5 transition-all";
+                        btn.className = "w-full py-2.5 px-3 rounded-2xl bg-primary-50 text-primary-700 text-left text-xs font-bold flex items-center gap-3 transition-all";
                     } else {
-                        btn.className = "w-full py-2.5 px-3 rounded-xl text-stone-400 hover:text-stone-200 hover:bg-stone-850 text-left text-xs font-semibold flex items-center gap-2.5 transition-all";
+                        btn.className = "w-full py-2.5 px-3 rounded-2xl text-stone-500 hover:bg-stone-50 hover:text-stone-900 text-left text-xs font-semibold flex items-center gap-3 transition-all";
                     }
                 }
             });
@@ -790,6 +814,40 @@
         // -----------------------------------------------------------------------------------
         // 1. CƯ DÂN TABS RENDERERS & LOGIC
         // -----------------------------------------------------------------------------------
+        // Household-info card pinned to the bottom of the resident sidebar
+        // (chủ hộ / địa chỉ / sĩ số), plus the header notification-bell badge
+        // showing how many of the current user's requests are still pending.
+        function renderResidentSidebarInfo() {
+            const infoBox = document.getElementById('resident-sidebar-info');
+            const familyId = getCurrentUserFamilyId();
+            const household = familyId ? villageDb.residents.filter(r => r.familyId === familyId) : [];
+            const head = household.find(r => r.isHouseholder) || getCurrentUserResident();
+
+            if (infoBox) {
+                infoBox.innerHTML = `
+                    <div class="p-4 rounded-2xl bg-primary-50 border border-primary-100 space-y-2.5 text-xs">
+                        <span class="text-[10px] font-bold text-primary-700 uppercase tracking-widest block">Thông Tin Hộ Gia Đình</span>
+                        <div class="flex justify-between gap-2"><span class="text-stone-500">Chủ hộ:</span><span class="font-semibold text-stone-800 text-right">${head ? head.name : 'Chưa xác định'}</span></div>
+                        <div class="flex justify-between gap-2"><span class="text-stone-500">Địa chỉ:</span><span class="font-semibold text-stone-800 text-right">Thôn Đoàn Kết</span></div>
+                        <div class="flex justify-between gap-2"><span class="text-stone-500">Số nhân khẩu:</span><span class="font-semibold text-stone-800 text-right">${household.length} người</span></div>
+                        <button onclick="switchPortalTab('family')" class="w-full py-2 rounded-lg bg-white border border-primary-200 text-primary-700 font-bold text-[11px] hover:bg-primary-100 transition-colors">Xem chi tiết hộ gia đình</button>
+                    </div>
+                `;
+            }
+
+            const badge = document.getElementById('resident-notif-badge');
+            if (badge) {
+                const pendingCount = villageDb.memberEditRequests.filter(r => r.submittedBy === currentUser.name && r.status === 'Chờ duyệt').length
+                    + villageDb.newMemberRequests.filter(r => r.submittedBy === currentUser.name && r.status === 'Chờ duyệt').length;
+                if (pendingCount > 0) {
+                    badge.innerText = pendingCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        }
+
         function renderResidentDashboard() {
             const container = document.getElementById('tab-content-container');
             const familyId = getCurrentUserFamilyId();
@@ -797,87 +855,186 @@
             const funds = (familyId && villageDb.funds[familyId]) || [];
 
             let paidTotal = 0;
-            let unpaidCount = 0;
+            let obligatedTotal = 0;
             funds.forEach(f => {
+                obligatedTotal += f.amount;
                 if (f.status === "Đã đóng") paidTotal += f.amount;
-                else unpaidCount++;
             });
+            const paidPct = obligatedTotal > 0 ? Math.round((paidTotal / obligatedTotal) * 100) : 0;
 
-            const vf = villageDb.villageFund;
-            const villageThuTotal = vf.thu.reduce((sum, t) => sum + t.amount, 0);
-            const villageChiTotal = vf.chi.reduce((sum, t) => sum + t.amount, 0);
+            const news = ((villageDb.homeContent && villageDb.homeContent.news) || []).slice(0, 4);
+            const schedule = (villageDb.homeContent && villageDb.homeContent.schedule) || [];
+            const products = ((villageDb.homeContent && villageDb.homeContent.products) || []).slice(0, 5);
+            const sec = (villageDb.homeContent && villageDb.homeContent.security) || { hotline: '', hotlineDisplay: '', members: [] };
+            const chief = (sec.members || []).find(m => m.title === 'Tổ Trưởng');
 
-            const unpaidRows = (vf.unpaidHouseholdsList || []).map(h => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-3 font-mono text-stone-400">${h.familyId}</td>
-                    <td class="p-3 font-semibold text-white">${h.representative}</td>
-                    <td class="p-3 font-mono text-stone-400">${h.dob || 'Chưa cập nhật'}</td>
-                    <td class="p-3 text-stone-300">${h.group}</td>
-                    <td class="p-3 text-right font-mono font-bold text-amber-400">${(h.unpaidAmount || 0).toLocaleString('vi-VN')} đ</td>
-                </tr>
-            `).join('');
+            const myRequests = [
+                ...villageDb.memberEditRequests.filter(r => r.submittedBy === currentUser.name).map(r => ({ desc: `Sửa thông tin: ${r.residentName}`, time: r.time, status: r.status })),
+                ...villageDb.newMemberRequests.filter(r => r.submittedBy === currentUser.name).map(r => ({ desc: `Đăng ký thêm thành viên: ${r.name}`, time: r.time, status: r.status }))
+            ].slice(-4).reverse();
+
+            const statusBadge = (status) => status === 'Đã duyệt'
+                ? `<span class="px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-extrabold uppercase tracking-wider shrink-0">Đã duyệt</span>`
+                : status === 'Từ chối'
+                    ? `<span class="px-2 py-1 rounded-full bg-red-50 text-red-600 text-[9px] font-extrabold uppercase tracking-wider shrink-0">Từ chối</span>`
+                    : `<span class="px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-[9px] font-extrabold uppercase tracking-wider shrink-0">Đang chờ duyệt</span>`;
 
             container.innerHTML = `
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
-                    <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Tổng quan Hộ gia đình cá nhân</h4>
-                        <p class="text-xs text-stone-400">Xem và đối soát thông tin thường trú của hộ gia đình bạn.</p>
+                <!-- Welcome banner -->
+                <div class="bg-gradient-to-r from-primary-700 to-primary-600 rounded-3xl p-6 sm:p-8 text-white flex items-center gap-6 overflow-hidden relative">
+                    <div class="relative z-10 space-y-2 flex-1">
+                        <h4 class="font-serif text-xl sm:text-2xl font-black">Chào mừng, ${currentUser.name}!</h4>
+                        <p class="text-primary-100 text-xs sm:text-sm max-w-lg">Đây là không gian dành riêng cho cư dân thôn Đoàn Kết. Bạn có thể tra cứu thông tin, gửi yêu cầu và theo dõi các hoạt động của thôn một cách dễ dàng.</p>
                     </div>
-                    <div class="text-right text-xs">
-                        <span class="text-stone-500">Đối soát hệ thống:</span>
-                        <span class="text-emerald-400 font-mono font-bold block">Đồng bộ tự động</span>
+                    <div class="hidden sm:flex w-20 h-20 rounded-full bg-white/15 items-center justify-center text-4xl shrink-0 relative z-10"><i class="fa-solid fa-people-roof"></i></div>
+                    <div class="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10"></div>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="space-y-3">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Thao Tác Nhanh</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <button onclick="switchPortalTab('family')" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm hover:border-primary-300 transition-colors">
+                            <span class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-user-pen"></i></span>
+                            <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight px-1">Gửi yêu cầu chỉnh sửa thông tin</span>
+                        </button>
+                        <button onclick="openAddMemberModal()" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm hover:border-blue-300 transition-colors">
+                            <span class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-people-group"></i></span>
+                            <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight px-1">Đăng ký, cập nhật thành viên hộ</span>
+                        </button>
+                        <button onclick="switchPortalTab('contributions')" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm hover:border-amber-300 transition-colors">
+                            <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-hand-holding-dollar"></i></span>
+                            <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight px-1">Đóng góp quỹ, hội phí</span>
+                        </button>
+                        <button onclick="switchPortalTab('bao-antt')" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm hover:border-purple-300 transition-colors">
+                            <span class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-bullhorn"></i></span>
+                            <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight px-1">Gửi phản ánh, kiến nghị</span>
+                        </button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
-                    <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
-                        <span class="text-[10px] font-bold text-primary-400 uppercase tracking-widest block">Mã định danh hộ</span>
-                        <span class="text-lg font-mono font-bold text-white block mt-1">${familyId || 'Chưa xác định'}</span>
-                        <span class="text-[10px] text-stone-500 block mt-0.5">Số hộ khẩu điện tử thôn mới</span>
-                    </div>
-                    <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
-                        <span class="text-[10px] font-bold text-primary-400 uppercase tracking-widest block">Sĩ số thành viên</span>
-                        <span class="text-lg font-bold text-white block mt-1">${household.length} Nhân khẩu</span>
-                        <span class="text-[10px] text-stone-500 block mt-0.5">Mọi cập nhật cần được Trưởng thôn phê duyệt</span>
-                    </div>
-                    <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
-                        <span class="text-[10px] font-bold text-primary-400 uppercase tracking-widest block">Đã đóng góp năm 2026</span>
-                        <span class="text-lg font-bold text-emerald-400 block mt-1">${paidTotal.toLocaleString('vi-VN')} đ</span>
-                        <span class="text-[10px] text-stone-500 block mt-0.5">${unpaidCount > 0 ? `Còn ${unpaidCount} khoản chưa hoàn thành` : 'Đã hoàn thành mọi nghĩa vụ!'}</span>
-                    </div>
-                </div>
-
-                <div class="space-y-3 text-left pt-6 border-t border-stone-800">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Quỹ Thôn Toàn Xã</span>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
-                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">Tổng đã thu</span>
-                            <span class="text-lg font-bold text-white block mt-1">${villageThuTotal.toLocaleString('vi-VN')} đ</span>
+                <!-- News + Schedule -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-white border border-stone-200 rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Thông Báo Mới Nhất</span>
+                            <button onclick="switchPortalTab('bao-antt')" class="text-[11px] font-semibold text-primary-600 hover:text-primary-700">Xem tất cả</button>
                         </div>
-                        <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
-                            <span class="text-[10px] font-bold text-red-400 uppercase tracking-widest block">Tổng đã chi</span>
-                            <span class="text-lg font-bold text-white block mt-1">${villageChiTotal.toLocaleString('vi-VN')} đ</span>
+                        <div class="divide-y divide-stone-100">
+                            ${news.map(n => `
+                                <div class="py-2.5 flex items-center justify-between gap-3">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <i class="fa-solid fa-bullhorn text-primary-500 text-xs shrink-0"></i>
+                                        <span class="text-xs font-medium text-stone-700 truncate">${n.title}</span>
+                                    </div>
+                                    <span class="text-[10px] text-stone-400 shrink-0">${n.date}</span>
+                                </div>
+                            `).join('') || '<p class="text-stone-400 text-xs text-center py-4">Chưa có thông báo nào.</p>'}
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-stone-200 rounded-2xl p-5 space-y-3">
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Lịch Công Tác Sắp Tới</span>
+                        <div class="divide-y divide-stone-100">
+                            ${schedule.map(s => `
+                                <div class="py-2.5 flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-xl bg-primary-50 text-primary-700 flex flex-col items-center justify-center shrink-0 leading-none">
+                                        <span class="text-sm font-black">${s.day}</span>
+                                        <span class="text-[8px] font-semibold">${s.month}</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-semibold text-stone-800 truncate">${s.title}</p>
+                                        <p class="text-[10px] text-stone-400"><i class="fa-solid fa-location-dot mr-1"></i>${s.location} · ${s.time}</p>
+                                    </div>
+                                </div>
+                            `).join('') || '<p class="text-stone-400 text-xs text-center py-4">Chưa có lịch công tác nào.</p>'}
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Danh Sách Hộ Chưa Đóng Quỹ Thôn (${vf.unpaidHouseholds} hộ)</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
-                                    <th class="p-3 font-semibold">Mã hộ</th>
-                                    <th class="p-3 font-semibold">Chủ hộ</th>
-                                    <th class="p-3 font-semibold">Ngày sinh</th>
-                                    <th class="p-3 font-semibold">Địa bàn</th>
-                                    <th class="p-3 font-semibold text-right">Số tiền chưa đóng</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
-                                ${unpaidRows}
-                            </tbody>
-                        </table>
+                <!-- Dues progress + My requests -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-white border border-stone-200 rounded-2xl p-5 space-y-4">
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Tình Hình Đóng Góp Năm 2026</span>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-stone-500">Đã đóng</span>
+                                <span class="font-bold text-stone-900">${paidTotal.toLocaleString('vi-VN')} đ / ${obligatedTotal.toLocaleString('vi-VN')} đ</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-stone-100 overflow-hidden">
+                                <div class="h-full bg-primary-600 rounded-full" style="width:${paidPct}%"></div>
+                            </div>
+                            <p class="text-[10px] text-stone-400 text-right">${paidPct}% hoàn thành</p>
+                        </div>
+                        <div class="divide-y divide-stone-100">
+                            ${funds.map(f => `
+                                <div class="py-2 flex items-center justify-between gap-2">
+                                    <span class="text-xs text-stone-600 truncate">${f.name}</span>
+                                    ${f.status === 'Đã đóng'
+                                        ? `<span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-extrabold uppercase shrink-0">Đã đóng</span>`
+                                        : `<span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-extrabold uppercase shrink-0">Chưa đóng</span>`}
+                                </div>
+                            `).join('') || '<p class="text-stone-400 text-xs text-center py-4">Chưa có khoản thu nào.</p>'}
+                        </div>
+                        <button onclick="switchPortalTab('contributions')" class="w-full py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-600 font-bold text-[11px] hover:bg-stone-100 transition-colors">Xem lịch sử đóng góp</button>
+                    </div>
+
+                    <div class="bg-white border border-stone-200 rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Yêu Cầu Của Tôi</span>
+                            <button onclick="switchPortalTab('family')" class="text-[11px] font-semibold text-primary-600 hover:text-primary-700">Xem tất cả</button>
+                        </div>
+                        <div class="divide-y divide-stone-100">
+                            ${myRequests.map(r => `
+                                <div class="py-2.5 space-y-1">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <span class="text-xs font-medium text-stone-700">${r.desc}</span>
+                                        ${statusBadge(r.status)}
+                                    </div>
+                                    <p class="text-[10px] text-stone-400">Ngày gửi: ${r.time}</p>
+                                </div>
+                            `).join('') || '<p class="text-stone-400 text-xs text-center py-4">Bạn chưa gửi yêu cầu nào.</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sản vật đất lành -->
+                <div class="bg-white border border-stone-200 rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Sản Vật Đất Lành</span>
+                        <a href="index.html#nong-san" target="_blank" class="text-[11px] font-semibold text-primary-600 hover:text-primary-700">Xem thêm</a>
+                    </div>
+                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                        ${products.map(p => `
+                            <div class="text-center space-y-1.5">
+                                <div class="w-full aspect-square rounded-xl overflow-hidden border border-stone-100">
+                                    <img src="${p.image}" onerror="this.src='https://placehold.co/200x200/f0fdf4/16a34a?text=${encodeURIComponent(p.name)}'" alt="${p.name}" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-[11px] font-semibold text-stone-600 leading-tight block">${p.name}</span>
+                            </div>
+                        `).join('') || '<p class="text-stone-400 text-xs col-span-full text-center py-4">Chưa có nông sản nào.</p>'}
+                    </div>
+                </div>
+
+                <!-- ANTT contact banner -->
+                <div class="bg-white border border-stone-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-shield-halved"></i></span>
+                        <div>
+                            <h5 class="text-xs font-bold text-stone-900 uppercase tracking-wide">Tổ An Ninh Trật Tự Cơ Sở</h5>
+                            <p class="text-[11px] text-stone-500">Mọi thông tin về an ninh trật tự, vui lòng liên hệ Tổ ANTT hoặc gọi đường dây nóng 24/7.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6 shrink-0">
+                        <a href="tel:${sec.hotline}" class="text-left">
+                            <span class="text-[9px] font-bold text-red-500 uppercase tracking-wide block">Trực ban 24/7</span>
+                            <span class="text-sm font-black text-stone-900">${sec.hotlineDisplay}</span>
+                        </a>
+                        ${chief ? `
+                        <div class="text-left hidden sm:block">
+                            <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-wide block">Tổ trưởng ANTT</span>
+                            <span class="text-sm font-black text-stone-900">${chief.name}</span>
+                        </div>` : ''}
                     </div>
                 </div>
             `;
@@ -896,81 +1053,81 @@
             const isMyOwnMembership = me && me.association === assocName;
             const myFees = (isMyOwnMembership && quota.memberFunds && quota.memberFunds[me.id]) || [];
             const myFeesStatusBadge = (status) => status === "Đã đóng"
-                ? `<span class="px-2 py-1 rounded-full bg-emerald-950 border border-emerald-900/40 text-emerald-400 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-check mr-1"></i> Đã hoàn thành</span>`
+                ? `<span class="px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-check mr-1"></i> Đã hoàn thành</span>`
                 : status === "Chờ duyệt"
-                    ? `<span class="px-2 py-1 rounded-full bg-blue-950 border border-blue-900/40 text-blue-400 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-clock mr-1"></i> Chờ duyệt</span>`
-                    : `<span class="px-2 py-1 rounded-full bg-amber-950 border border-amber-900/40 text-amber-400 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-circle-exclamation mr-1"></i> Chưa thanh toán</span>`;
+                    ? `<span class="px-2 py-1 rounded-full bg-blue-50 text-blue-600 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-clock mr-1"></i> Chờ duyệt</span>`
+                    : `<span class="px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-circle-exclamation mr-1"></i> Chưa thanh toán</span>`;
             const myFeesRows = myFees.map((f, idx) => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
+                <tr class="hover:bg-stone-50 transition-colors">
                     <td class="p-3">
-                        <span class="font-bold text-white block">${f.name}</span>
-                        <span class="text-[10px] text-stone-500 font-mono">${f.memo}</span>
+                        <span class="font-bold text-stone-900 block">${f.name}</span>
+                        <span class="text-[10px] text-stone-400 font-mono">${f.memo}</span>
                     </td>
-                    <td class="p-3 text-stone-300">${f.period}</td>
-                    <td class="p-3 text-right font-mono text-white font-bold">${f.amount.toLocaleString('vi-VN')} đ</td>
+                    <td class="p-3 text-stone-600">${f.period}</td>
+                    <td class="p-3 text-right font-mono text-stone-900 font-bold">${f.amount.toLocaleString('vi-VN')} đ</td>
                     <td class="p-3 text-center">${myFeesStatusBadge(f.status)}</td>
                     <td class="p-3 text-right">
-                        ${f.status === "Đã đóng" ? `<span class="text-stone-500 font-mono text-[10px]">${f.date}</span>`
-                            : f.status === "Chờ duyệt" ? `<span class="text-blue-400 text-[10px] font-semibold">Đang chờ hội trưởng duyệt</span>`
+                        ${f.status === "Đã đóng" ? `<span class="text-stone-400 font-mono text-[10px]">${f.date}</span>`
+                            : f.status === "Chờ duyệt" ? `<span class="text-blue-600 text-[10px] font-semibold">Đang chờ hội trưởng duyệt</span>`
                             : `<button onclick="payAssocMemberFund(${idx})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] uppercase transition-all shadow-md">Đóng Qua QR</button>`}
                     </td>
                 </tr>
-            `).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Chưa có khoản hội phí nào.</td></tr>';
+            `).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Chưa có khoản hội phí nào.</td></tr>';
 
             const thuRows = thuItems.map(tx => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-3 font-semibold text-white">${tx.member ? `${tx.member} - ${tx.desc}` : tx.desc}</td>
-                    <td class="p-3 text-right font-mono font-bold text-emerald-400">${tx.amount.toLocaleString('vi-VN')} đ</td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="p-3 font-semibold text-stone-900">${tx.member ? `${tx.member} - ${tx.desc}` : tx.desc}</td>
+                    <td class="p-3 text-right font-mono font-bold text-emerald-600">${tx.amount.toLocaleString('vi-VN')} đ</td>
                 </tr>
-            `).join('') || '<tr><td colspan="2" class="p-3 text-center text-stone-500">Chưa có khoản thu nào.</td></tr>';
+            `).join('') || '<tr><td colspan="2" class="p-3 text-center text-stone-400">Chưa có khoản thu nào.</td></tr>';
 
             const chiRows = chiItems.map(tx => `
                 <div class="flex items-center justify-between py-2 text-xs">
                     <div>
-                        <span class="text-stone-300 block">${tx.desc}</span>
-                        <span class="text-stone-500 font-mono text-[11px]">${tx.date}</span>
+                        <span class="text-stone-600 block">${tx.desc}</span>
+                        <span class="text-stone-400 font-mono text-[11px]">${tx.date}</span>
                     </div>
-                    <span class="text-red-400 font-mono font-bold">-${tx.amount.toLocaleString('vi-VN')} đ</span>
+                    <span class="text-red-600 font-mono font-bold">-${tx.amount.toLocaleString('vi-VN')} đ</span>
                 </div>
-            `).join('') || '<p class="text-xs text-stone-500 py-2">Chưa có khoản chi nào.</p>';
+            `).join('') || '<p class="text-xs text-stone-400 py-2">Chưa có khoản chi nào.</p>';
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">${assocName}</h4>
-                        <p class="text-xs text-stone-400">Hội trưởng: <span class="text-primary-400 font-semibold">${leaderAcc ? leaderAcc.name : 'Chưa có tài khoản phụ trách'}</span></p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">${assocName}</h4>
+                        <p class="text-xs text-stone-500">Hội trưởng: <span class="text-primary-400 font-semibold">${leaderAcc ? leaderAcc.name : 'Chưa có tài khoản phụ trách'}</span></p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                    <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
-                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">Tổng thu</span>
-                        <span class="text-lg font-bold text-white block mt-1">${assocThuTotal.toLocaleString('vi-VN')} đ</span>
+                    <div class="p-4 rounded-xl bg-stone-50 border border-stone-200">
+                        <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest block">Tổng thu</span>
+                        <span class="text-lg font-bold text-stone-900 block mt-1">${assocThuTotal.toLocaleString('vi-VN')} đ</span>
                     </div>
-                    <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
-                        <span class="text-[10px] font-bold text-red-400 uppercase tracking-widest block">Tổng chi</span>
-                        <span class="text-lg font-bold text-white block mt-1">${assocChiTotal.toLocaleString('vi-VN')} đ</span>
+                    <div class="p-4 rounded-xl bg-stone-50 border border-stone-200">
+                        <span class="text-[10px] font-bold text-red-600 uppercase tracking-widest block">Tổng chi</span>
+                        <span class="text-lg font-bold text-stone-900 block mt-1">${assocChiTotal.toLocaleString('vi-VN')} đ</span>
                     </div>
                 </div>
 
                 ${quota.bankInfo ? `
-                <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800 text-left">
+                <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 text-left">
                     <span class="text-[10px] font-bold text-primary-400 uppercase tracking-widest block mb-2">Thông tin chuyển khoản đóng hội phí</span>
                     <div class="space-y-1.5 text-xs">
-                        <div class="flex justify-between"><span class="text-stone-500">Ngân hàng:</span><span class="text-white font-bold">${quota.bankInfo.bankName}</span></div>
-                        <div class="flex justify-between"><span class="text-stone-500">Số tài khoản:</span><span class="text-white font-bold font-mono">${quota.bankInfo.accountNumber}</span></div>
-                        <div class="flex justify-between"><span class="text-stone-500">Chủ tài khoản:</span><span class="text-white font-bold">${quota.bankInfo.accountHolder}</span></div>
+                        <div class="flex justify-between"><span class="text-stone-400">Ngân hàng:</span><span class="text-stone-900 font-bold">${quota.bankInfo.bankName}</span></div>
+                        <div class="flex justify-between"><span class="text-stone-400">Số tài khoản:</span><span class="text-stone-900 font-bold font-mono">${quota.bankInfo.accountNumber}</span></div>
+                        <div class="flex justify-between"><span class="text-stone-400">Chủ tài khoản:</span><span class="text-stone-900 font-bold">${quota.bankInfo.accountHolder}</span></div>
                     </div>
                 </div>
                 ` : ''}
 
                 ${isMyOwnMembership ? `
-                <div class="space-y-3 text-left pt-2 border-t border-stone-800">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Nghĩa vụ hội phí của tôi</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                <div class="space-y-3 text-left pt-2 border-t border-stone-200">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Nghĩa vụ hội phí của tôi</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-4 font-semibold">Khoản hội phí</th>
                                     <th class="p-4 font-semibold">Chu kỳ</th>
                                     <th class="p-4 font-semibold text-right">Số tiền</th>
@@ -978,7 +1135,7 @@
                                     <th class="p-4 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${myFeesRows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${myFeesRows}</tbody>
                         </table>
                     </div>
                 </div>
@@ -989,12 +1146,12 @@
                             <i class="fa-solid fa-qrcode text-lg"></i>
                             <h5 class="text-sm font-bold uppercase tracking-wider">Thanh toán hội phí qua QR chuẩn</h5>
                         </div>
-                        <p class="text-xs text-stone-300 leading-relaxed">
+                        <p class="text-xs text-stone-600 leading-relaxed">
                             Quét mã QR để hoàn thành nghĩa vụ hội phí. Hội trưởng sẽ xét duyệt xác nhận chuyển khoản của bạn.
                         </p>
-                        <div class="p-3.5 rounded-xl bg-stone-950/80 border border-stone-800 space-y-2 text-xs">
+                        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-2 text-xs">
                             <div class="flex justify-between">
-                                <span class="text-stone-500">Mã giao dịch đối soát:</span>
+                                <span class="text-stone-400">Mã giao dịch đối soát:</span>
                                 <span class="text-primary-400 font-mono font-bold" id="assoc-qr-memo-field"></span>
                             </div>
                         </div>
@@ -1009,16 +1166,16 @@
                 ` : ''}
 
                 <div class="space-y-2 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Chi tiết thu theo hội viên</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Chi tiết thu theo hội viên</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Tên thành viên</th>
                                     <th class="p-3 font-semibold text-right">Số tiền đóng</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
                                 ${thuRows}
                             </tbody>
                         </table>
@@ -1026,8 +1183,8 @@
                 </div>
 
                 <div class="space-y-2 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Các khoản chi của hội</span>
-                    <div class="rounded-xl border border-stone-800 bg-stone-950/40 divide-y divide-stone-800/40 px-4">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Các khoản chi của hội</span>
+                    <div class="rounded-xl border border-stone-200 bg-stone-50 divide-y divide-stone-200/40 px-4">
                         ${chiRows}
                     </div>
                 </div>
@@ -1043,16 +1200,16 @@
             let familyRows = household.map(m => {
                 const pendingReq = villageDb.memberEditRequests.find(r => r.residentId === m.id && r.status === 'Chờ duyệt');
                 const action = pendingReq
-                    ? `<span class="px-2 py-1 rounded-full bg-amber-950 border border-amber-900/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> Chờ Admin duyệt</span>`
-                    : `<button onclick="openRequestMemberEditModal('${m.id}')" class="px-2.5 py-1 rounded bg-stone-900 hover:bg-stone-800 text-stone-300 text-[11px] font-semibold transition-all"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>`;
+                    ? `<span class="px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> Chờ Admin duyệt</span>`
+                    : `<button onclick="openRequestMemberEditModal('${m.id}')" class="px-2.5 py-1 rounded bg-white hover:bg-stone-100 text-stone-600 text-[11px] font-semibold transition-all"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-4 font-bold text-white">${m.name}</td>
-                        <td class="p-4 text-stone-300">${m.relation || (m.isHouseholder ? "Chủ hộ" : "Thành viên")}</td>
-                        <td class="p-4 font-mono text-stone-400">${m.dob}</td>
-                        <td class="p-4 font-mono text-stone-500">${m.cccd}</td>
-                        <td class="p-4 font-mono text-stone-400">${m.phone || 'Chưa có SĐT'}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-4 font-bold text-stone-900">${m.name}</td>
+                        <td class="p-4 text-stone-600">${m.relation || (m.isHouseholder ? "Chủ hộ" : "Thành viên")}</td>
+                        <td class="p-4 font-mono text-stone-500">${m.dob}</td>
+                        <td class="p-4 font-mono text-stone-400">${m.cccd}</td>
+                        <td class="p-4 font-mono text-stone-500">${m.phone || 'Chưa có SĐT'}</td>
                         <td class="p-4 text-right">${action}</td>
                     </tr>
                 `;
@@ -1060,14 +1217,14 @@
 
             const pendingNewMembers = villageDb.newMemberRequests.filter(r => r.familyId === familyId && r.status === 'Chờ duyệt');
             let pendingNewMemberRows = pendingNewMembers.map(r => `
-                <tr class="hover:bg-stone-900/20 transition-colors opacity-70">
-                    <td class="p-4 font-bold text-white">${r.name}</td>
-                    <td class="p-4 text-stone-300">${r.relation}</td>
-                    <td class="p-4 font-mono text-stone-400">${r.dob}</td>
-                    <td class="p-4 font-mono text-stone-500">${r.cccd || '-'}</td>
-                    <td class="p-4 font-mono text-stone-400">${r.phone || 'Chưa có SĐT'}</td>
+                <tr class="hover:bg-stone-50 transition-colors opacity-70">
+                    <td class="p-4 font-bold text-stone-900">${r.name}</td>
+                    <td class="p-4 text-stone-600">${r.relation}</td>
+                    <td class="p-4 font-mono text-stone-500">${r.dob}</td>
+                    <td class="p-4 font-mono text-stone-400">${r.cccd || '-'}</td>
+                    <td class="p-4 font-mono text-stone-500">${r.phone || 'Chưa có SĐT'}</td>
                     <td class="p-4 text-right">
-                        <span class="px-2 py-1 rounded-full bg-amber-950 border border-amber-900/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> Chờ Admin duyệt</span>
+                        <span class="px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> Chờ Admin duyệt</span>
                     </td>
                 </tr>
             `).join('');
@@ -1075,16 +1232,16 @@
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Quản lý Thành Viên & Tọa độ Gia đình</h4>
-                        <p class="text-xs text-stone-400">Cơ chế quản lý khép kín, đảm bảo tính bảo mật và toàn vẹn dữ liệu cá nhân.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Quản lý Thành Viên & Tọa độ Gia đình</h4>
+                        <p class="text-xs text-stone-500">Cơ chế quản lý khép kín, đảm bảo tính bảo mật và toàn vẹn dữ liệu cá nhân.</p>
                     </div>
                     <button onclick="openAddMemberModal()" class="px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase shrink-0"><i class="fa-solid fa-user-plus mr-1"></i> Thêm mới</button>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-4 font-semibold">Thành viên</th>
                                 <th class="p-4 font-semibold">Quan hệ với chủ hộ</th>
                                 <th class="p-4 font-semibold">Ngày sinh</th>
@@ -1093,63 +1250,63 @@
                                 <th class="p-4 font-semibold text-right">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">
                             ${familyRows}${pendingNewMemberRows}
                         </tbody>
                     </table>
                 </div>
 
                 <!-- GPS section -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center pt-6 border-t border-stone-800 text-left">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center pt-6 border-t border-stone-200 text-left">
                     <div class="lg:col-span-5 space-y-4">
-                        <span class="px-2 py-1 rounded bg-amber-950/60 border border-amber-900/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider inline-block">Định vị địa bàn nông thôn</span>
-                        <h5 class="text-base font-serif font-bold text-white">Xác định tọa độ GPS hộ gia đình</h5>
-                        <p class="text-xs text-stone-400 leading-relaxed">
+                        <span class="px-2 py-1 rounded bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-wider inline-block">Định vị địa bàn nông thôn</span>
+                        <h5 class="text-base font-serif font-bold text-stone-900">Xác định tọa độ GPS hộ gia đình</h5>
+                        <p class="text-xs text-stone-500 leading-relaxed">
                             Cập nhật chính xác vị trí phục vụ số hóa bản đồ đất đai, cứu hộ khẩn cấp và công tác phát triển an ninh số cơ sở Thôn Đoàn Kết.
                         </p>
                         
-                        <div class="p-3.5 rounded-xl bg-stone-950/80 border border-stone-800 font-mono text-xs text-stone-300 space-y-1.5">
+                        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 font-mono text-xs text-stone-600 space-y-1.5">
                             <div class="flex justify-between">
-                                <span class="text-stone-500">Vĩ độ (Latitude):</span>
-                                <span class="text-white font-bold">${coords ? coords.lat.toFixed(6) + '° N' : 'Chưa định vị'}</span>
+                                <span class="text-stone-400">Vĩ độ (Latitude):</span>
+                                <span class="text-stone-900 font-bold">${coords ? coords.lat.toFixed(6) + '° N' : 'Chưa định vị'}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-stone-500">Kinh độ (Longitude):</span>
-                                <span class="text-white font-bold">${coords ? coords.lng.toFixed(6) + '° E' : 'Chưa định vị'}</span>
+                                <span class="text-stone-400">Kinh độ (Longitude):</span>
+                                <span class="text-stone-900 font-bold">${coords ? coords.lng.toFixed(6) + '° E' : 'Chưa định vị'}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-stone-500">Trạng thái định vị:</span>
-                                <span class="${coords ? 'text-emerald-400' : 'text-amber-400'} font-bold">${coords ? 'Đã định vị bằng GPS thiết bị' : 'Chưa có dữ liệu'}</span>
+                                <span class="text-stone-400">Trạng thái định vị:</span>
+                                <span class="${coords ? 'text-emerald-600' : 'text-amber-600'} font-bold">${coords ? 'Đã định vị bằng GPS thiết bị' : 'Chưa có dữ liệu'}</span>
                             </div>
                         </div>
 
-                        <button onclick="simulateGPSUpdate()" id="gps-update-btn" class="w-full py-3 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-primary-500 text-stone-200 hover:text-white font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2">
+                        <button onclick="simulateGPSUpdate()" id="gps-update-btn" class="w-full py-3 rounded-xl bg-stone-50 hover:bg-stone-100 border border-stone-200 hover:border-primary-500 text-stone-700 hover:text-stone-900 font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2">
                             <i class="fa-solid fa-location-crosshairs animate-pulse text-primary-400"></i> Định vị GPS hiện tại
                         </button>
 
-                        <a href="${coords ? `https://www.google.com/maps?q=${coords.lat},${coords.lng}` : '#'}" ${coords ? 'target="_blank" rel="noopener"' : 'onclick="return false;"'} class="w-full py-3 rounded-xl bg-emerald-950/40 ${coords ? 'hover:bg-emerald-900/50 hover:border-emerald-500 hover:text-emerald-300' : 'opacity-40 cursor-not-allowed'} border border-emerald-900/50 text-emerald-400 font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2">
+                        <a href="${coords ? `https://www.google.com/maps?q=${coords.lat},${coords.lng}` : '#'}" ${coords ? 'target="_blank" rel="noopener"' : 'onclick="return false;"'} class="w-full py-3 rounded-xl bg-emerald-50 ${coords ? 'hover:bg-emerald-100 hover:border-emerald-500 hover:text-emerald-600' : 'opacity-40 cursor-not-allowed'} text-emerald-600 font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2">
                             <i class="fa-brands fa-google"></i> Xem trên Google Maps
                         </a>
 
                         <div class="space-y-1.5 pt-2">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Số nhà / Địa chỉ cụ thể</label>
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Số nhà / Địa chỉ cụ thể</label>
                             <div class="flex items-center gap-2">
-                                <input type="text" id="house-number-input" value="${villageDb.houseNumbers[familyId] || ''}" placeholder="VD: Số 12, ngõ 3" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                                <input type="text" id="house-number-input" value="${villageDb.houseNumbers[familyId] || ''}" placeholder="VD: Số 12, ngõ 3" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                                 <button onclick="saveHouseNumber()" class="px-3 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-xs font-bold shrink-0"><i class="fa-solid fa-floppy-disk"></i></button>
                             </div>
                         </div>
                     </div>
 
                     <div class="lg:col-span-7">
-                        <div class="relative w-full h-48 sm:h-64 rounded-2xl border border-stone-800 bg-stone-950 overflow-hidden flex items-center justify-center">
+                        <div class="relative w-full h-48 sm:h-64 rounded-2xl border border-stone-200 bg-stone-50 overflow-hidden flex items-center justify-center">
                             <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#22c55e_1px,transparent_1px)] [background-size:16px_16px]"></div>
                             <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-stone-950 z-10 pointer-events-none"></div>
 
                             <!-- Flashing Household Marker -->
                             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
                                 <span class="absolute w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500 animate-ping"></span>
-                                <span class="w-4 h-4 rounded-full bg-emerald-500 border-2 border-stone-950 shadow-lg flex items-center justify-center text-[7px] text-white font-bold"><i class="fa-solid fa-house-chimney"></i></span>
-                                <span class="mt-1 px-1.5 py-0.5 rounded bg-emerald-950/90 border border-emerald-500/30 text-[8px] text-emerald-400 font-bold whitespace-nowrap">Hộ gia đình ${familyId || ''}</span>
+                                <span class="w-4 h-4 rounded-full bg-emerald-500 border-2 border-stone-950 shadow-lg flex items-center justify-center text-[7px] text-stone-900 font-bold"><i class="fa-solid fa-house-chimney"></i></span>
+                                <span class="mt-1 px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-500/30 text-[8px] text-emerald-600 font-bold whitespace-nowrap">Hộ gia đình ${familyId || ''}</span>
                             </div>
                         </div>
                     </div>
@@ -1377,38 +1534,38 @@
             }
 
             const ledgerRows = displayLedger.map(t => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-3 font-semibold text-white">${residentFundView === 'thu' ? (t.household || t.desc) : t.desc}</td>
-                    <td class="p-3 text-right font-mono font-bold ${residentFundView === 'thu' ? 'text-emerald-400' : 'text-red-400'}">${residentFundView === 'thu' ? '+' : '-'}${t.amount.toLocaleString('vi-VN')} đ</td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="p-3 font-semibold text-stone-900">${residentFundView === 'thu' ? (t.household || t.desc) : t.desc}</td>
+                    <td class="p-3 text-right font-mono font-bold ${residentFundView === 'thu' ? 'text-emerald-600' : 'text-red-600'}">${residentFundView === 'thu' ? '+' : '-'}${t.amount.toLocaleString('vi-VN')} đ</td>
                 </tr>
-            `).join('') || '<tr><td colspan="2" class="p-4 text-center text-stone-500">Chưa có dữ liệu.</td></tr>';
+            `).join('') || '<tr><td colspan="2" class="p-4 text-center text-stone-400">Chưa có dữ liệu.</td></tr>';
 
             return `
                 <div class="space-y-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Công Khai Quỹ Thôn Toàn Xã</h4>
-                        <p class="text-xs text-stone-400">Minh bạch các khoản thu (đóng góp từ các hộ) và chi (sử dụng quỹ) của toàn thôn.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Công Khai Quỹ Thôn Toàn Xã</h4>
+                        <p class="text-xs text-stone-500">Minh bạch các khoản thu (đóng góp từ các hộ) và chi (sử dụng quỹ) của toàn thôn.</p>
                     </div>
 
-                    <div class="p-3.5 rounded-xl bg-amber-950/20 border border-amber-900/30 flex items-center gap-3 text-amber-300 text-xs">
+                    <div class="p-3.5 rounded-xl bg-amber-50 flex items-center gap-3 text-amber-600 text-xs">
                         <i class="fa-solid fa-house-circle-exclamation text-base"></i>
                         <span><strong>${vf.unpaidHouseholds}</strong> / ${vf.totalHouseholds} hộ chưa đóng quỹ thôn năm 2026</span>
                     </div>
 
-                    <div class="inline-flex p-1 rounded-xl bg-stone-950/60 border border-stone-800/80">
-                        <button onclick="switchResidentFundView('thu')" class="px-5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${residentFundView === 'thu' ? 'bg-primary-600 text-white' : 'text-stone-400 hover:text-white'}">Thu</button>
-                        <button onclick="switchResidentFundView('chi')" class="px-5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${residentFundView === 'chi' ? 'bg-primary-600 text-white' : 'text-stone-400 hover:text-white'}">Chi</button>
+                    <div class="inline-flex p-1 rounded-xl bg-stone-50 border border-stone-200">
+                        <button onclick="switchResidentFundView('thu')" class="px-5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${residentFundView === 'thu' ? 'bg-primary-600 text-white' : 'text-stone-500 hover:text-white'}">Thu</button>
+                        <button onclick="switchResidentFundView('chi')" class="px-5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${residentFundView === 'chi' ? 'bg-primary-600 text-white' : 'text-stone-500 hover:text-white'}">Chi</button>
                     </div>
 
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">${residentFundView === 'thu' ? 'Tên hộ đóng' : 'Nội dung chi'}</th>
                                     <th class="p-3 font-semibold text-right">Số tiền</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
                                 ${ledgerRows}
                             </tbody>
                         </table>
@@ -1424,25 +1581,25 @@
 
             let rows = funds.map((f, idx) => {
                 const statusBadge = f.status === "Đã đóng"
-                    ? `<span class="px-2 py-1 rounded-full bg-emerald-950 border border-emerald-900/40 text-emerald-400 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-check mr-1"></i> Đã hoàn thành</span>`
+                    ? `<span class="px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-check mr-1"></i> Đã hoàn thành</span>`
                     : f.status === "Chờ duyệt"
-                        ? `<span class="px-2 py-1 rounded-full bg-blue-950 border border-blue-900/40 text-blue-400 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-clock mr-1"></i> Chờ duyệt</span>`
-                        : `<span class="px-2 py-1 rounded-full bg-amber-950 border border-amber-900/40 text-amber-400 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-circle-exclamation mr-1"></i> Chưa thanh toán</span>`;
+                        ? `<span class="px-2 py-1 rounded-full bg-blue-50 text-blue-600 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-clock mr-1"></i> Chờ duyệt</span>`
+                        : `<span class="px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-[9px] font-extrabold uppercase tracking-wider block text-center"><i class="fa-solid fa-circle-exclamation mr-1"></i> Chưa thanh toán</span>`;
 
                 const action = f.status === "Đã đóng"
-                    ? `<span class="text-stone-500 font-mono text-[10px]">${f.date}</span>`
+                    ? `<span class="text-stone-400 font-mono text-[10px]">${f.date}</span>`
                     : f.status === "Chờ duyệt"
-                        ? `<span class="text-blue-400 text-[10px] font-semibold">Đang chờ Trưởng thôn duyệt</span>`
+                        ? `<span class="text-blue-600 text-[10px] font-semibold">Đang chờ Trưởng thôn duyệt</span>`
                         : `<button onclick="payResidentFund(${idx})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] uppercase transition-all shadow-md">Đóng Qua QR</button>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
+                    <tr class="hover:bg-stone-50 transition-colors">
                         <td class="p-4">
-                            <span class="font-bold text-white block text-xs">${f.name}</span>
-                            <span class="text-[10px] text-stone-500 font-mono">${f.memo}</span>
+                            <span class="font-bold text-stone-900 block text-xs">${f.name}</span>
+                            <span class="text-[10px] text-stone-400 font-mono">${f.memo}</span>
                         </td>
-                        <td class="p-4 text-stone-300 font-medium">${f.period}</td>
-                        <td class="p-4 text-right font-mono text-white font-bold">${f.amount.toLocaleString('vi-VN')} đ</td>
+                        <td class="p-4 text-stone-600 font-medium">${f.period}</td>
+                        <td class="p-4 text-right font-mono text-stone-900 font-bold">${f.amount.toLocaleString('vi-VN')} đ</td>
                         <td class="p-4 text-center">${statusBadge}</td>
                         <td class="p-4 text-right">${action}</td>
                     </tr>
@@ -1452,17 +1609,17 @@
             container.innerHTML = `
                 ${renderVillageFundLedgerHtml()}
 
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left pt-6 border-t border-stone-800">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left pt-6 border-t border-stone-200">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Sổ Theo Dõi Đóng Góp Của Hộ Gia Đình Bạn</h4>
-                        <p class="text-xs text-stone-400">Minh bạch các hoạt động đóng góp, xây dựng nông thôn mới nâng cao.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Sổ Theo Dõi Đóng Góp Của Hộ Gia Đình Bạn</h4>
+                        <p class="text-xs text-stone-500">Minh bạch các hoạt động đóng góp, xây dựng nông thôn mới nâng cao.</p>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-4 font-semibold">Khoản Đóng Góp</th>
                                 <th class="p-4 font-semibold">Chu kỳ</th>
                                 <th class="p-4 font-semibold text-right">Số tiền</th>
@@ -1470,7 +1627,7 @@
                                 <th class="p-4 font-semibold text-right">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">
                             ${rows}
                         </tbody>
                     </table>
@@ -1482,24 +1639,24 @@
                             <i class="fa-solid fa-qrcode text-lg"></i>
                             <h5 class="text-sm font-bold uppercase tracking-wider">Thanh toán đóng góp nghĩa vụ qua QR chuẩn</h5>
                         </div>
-                        <p class="text-xs text-stone-300 leading-relaxed">
+                        <p class="text-xs text-stone-600 leading-relaxed">
                             Quét mã QR để hoàn thành nghĩa vụ. Ban quản trị sẽ cập nhật tức thời trạng thái đóng góp cho hộ gia đình của bạn ngay khi giao dịch thành công.
                         </p>
-                        <div class="p-3.5 rounded-xl bg-stone-950/80 border border-stone-800 space-y-2 text-xs">
+                        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-2 text-xs">
                             <div class="flex justify-between">
-                                <span class="text-stone-500">Ngân hàng thụ hưởng:</span>
-                                <span class="text-white font-bold">${(villageDb.villageFund.bankInfo && villageDb.villageFund.bankInfo.bankName) || 'Chưa cập nhật'}</span>
+                                <span class="text-stone-400">Ngân hàng thụ hưởng:</span>
+                                <span class="text-stone-900 font-bold">${(villageDb.villageFund.bankInfo && villageDb.villageFund.bankInfo.bankName) || 'Chưa cập nhật'}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-stone-500">Số tài khoản:</span>
-                                <span class="text-white font-bold font-mono">${(villageDb.villageFund.bankInfo && villageDb.villageFund.bankInfo.accountNumber) || 'Chưa cập nhật'}</span>
+                                <span class="text-stone-400">Số tài khoản:</span>
+                                <span class="text-stone-900 font-bold font-mono">${(villageDb.villageFund.bankInfo && villageDb.villageFund.bankInfo.accountNumber) || 'Chưa cập nhật'}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-stone-500">Chủ tài khoản:</span>
-                                <span class="text-white font-bold">${(villageDb.villageFund.bankInfo && villageDb.villageFund.bankInfo.accountHolder) || 'Chưa cập nhật'}</span>
+                                <span class="text-stone-400">Chủ tài khoản:</span>
+                                <span class="text-stone-900 font-bold">${(villageDb.villageFund.bankInfo && villageDb.villageFund.bankInfo.accountHolder) || 'Chưa cập nhật'}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-stone-500">Mã giao dịch đối soát:</span>
+                                <span class="text-stone-400">Mã giao dịch đối soát:</span>
                                 <span class="text-primary-400 font-mono font-bold" id="qr-memo-field"></span>
                             </div>
                         </div>
@@ -1591,45 +1748,45 @@
             const myReports = villageDb.incidentReports.filter(r => r.familyId === familyId).sort((a, b) => b.time.localeCompare(a.time));
 
             const statusBadge = (status) => {
-                if (status === 'Đã xử lý') return `<span class="px-2 py-1 rounded-full bg-emerald-950 border border-emerald-900/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-check mr-1"></i> Đã xử lý</span>`;
-                if (status === 'Đã tiếp nhận') return `<span class="px-2 py-1 rounded-full bg-blue-950 border border-blue-900/40 text-blue-400 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-eye mr-1"></i> Đã tiếp nhận</span>`;
-                return `<span class="px-2 py-1 rounded-full bg-amber-950 border border-amber-900/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> Mới gửi</span>`;
+                if (status === 'Đã xử lý') return `<span class="px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-check mr-1"></i> Đã xử lý</span>`;
+                if (status === 'Đã tiếp nhận') return `<span class="px-2 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-eye mr-1"></i> Đã tiếp nhận</span>`;
+                return `<span class="px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> Mới gửi</span>`;
             };
 
             const rows = myReports.map(r => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
+                <tr class="hover:bg-stone-50 transition-colors">
                     <td class="p-4">
-                        <span class="text-white block text-xs">${r.content}</span>
-                        <span class="text-[10px] text-stone-500 font-mono">${r.locationText || (r.lat ? `${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}` : 'Không kèm vị trí')}</span>
+                        <span class="text-stone-900 block text-xs">${r.content}</span>
+                        <span class="text-[10px] text-stone-400 font-mono">${r.locationText || (r.lat ? `${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}` : 'Không kèm vị trí')}</span>
                     </td>
-                    <td class="p-4 font-mono text-stone-400 text-[11px]">${r.time}</td>
+                    <td class="p-4 font-mono text-stone-500 text-[11px]">${r.time}</td>
                     <td class="p-4 text-center">${statusBadge(r.status)}</td>
                 </tr>
-            `).join('') || '<tr><td colspan="3" class="p-4 text-center text-stone-500">Bạn chưa gửi tin báo nào.</td></tr>';
+            `).join('') || '<tr><td colspan="3" class="p-4 text-center text-stone-400">Bạn chưa gửi tin báo nào.</td></tr>';
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Báo An Ninh Trật Tự</h4>
-                        <p class="text-xs text-stone-400">Gửi tin báo trực tiếp đến Tổ An ninh trật tự thôn kèm vị trí hiện tại của bạn.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Báo An Ninh Trật Tự</h4>
+                        <p class="text-xs text-stone-500">Gửi tin báo trực tiếp đến Tổ An ninh trật tự thôn kèm vị trí hiện tại của bạn.</p>
                     </div>
                 </div>
 
-                <div class="p-5 rounded-2xl bg-stone-950/40 border border-stone-800 text-left space-y-4">
+                <div class="p-5 rounded-2xl bg-stone-50 border border-stone-200 text-left space-y-4">
                     <form onsubmit="submitIncidentReport(event)" class="space-y-3">
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Nội dung sự việc</label>
-                            <textarea id="incident-report-content-input" rows="3" required placeholder="Mô tả ngắn gọn sự việc cần báo..." class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Nội dung sự việc</label>
+                            <textarea id="incident-report-content-input" rows="3" required placeholder="Mô tả ngắn gọn sự việc cần báo..." class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Địa điểm cụ thể (nếu cần)</label>
-                            <input type="text" id="incident-report-location-input" placeholder="VD: Trước cổng Nhà văn hóa thôn" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Địa điểm cụ thể (nếu cần)</label>
+                            <input type="text" id="incident-report-location-input" placeholder="VD: Trước cổng Nhà văn hóa thôn" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                         <div class="flex items-center gap-2 text-xs">
-                            <button type="button" onclick="captureIncidentReportLocation()" id="incident-report-gps-btn" class="px-3 py-2 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 hover:border-primary-500 text-stone-200 hover:text-white font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-2">
+                            <button type="button" onclick="captureIncidentReportLocation()" id="incident-report-gps-btn" class="px-3 py-2 rounded-xl bg-stone-50 hover:bg-stone-100 border border-stone-200 hover:border-primary-500 text-stone-700 hover:text-stone-900 font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-2">
                                 <i class="fa-solid fa-location-crosshairs text-primary-400"></i> Đính kèm vị trí GPS hiện tại
                             </button>
-                            <span id="incident-report-gps-status" class="text-stone-500"></span>
+                            <span id="incident-report-gps-status" class="text-stone-400"></span>
                         </div>
                         <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-red-950/50">
                             <i class="fa-solid fa-paper-plane mr-1"></i> Gửi tin báo đến Tổ ANTT
@@ -1638,17 +1795,17 @@
                 </div>
 
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Tin báo bạn đã gửi</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Tin báo bạn đã gửi</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-4 font-semibold">Nội dung / Vị trí</th>
                                     <th class="p-4 font-semibold">Thời gian gửi</th>
                                     <th class="p-4 font-semibold text-center">Trạng thái</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${rows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${rows}</tbody>
                         </table>
                     </div>
                 </div>
@@ -1716,53 +1873,53 @@
             const myRequests = villageDb.residenceRegistrations.filter(r => r.familyId === familyId).sort((a, b) => b.time.localeCompare(a.time));
 
             const statusBadge = (status) => {
-                if (status === 'Đã duyệt') return `<span class="px-2 py-1 rounded-full bg-emerald-950 border border-emerald-900/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-check mr-1"></i> Đã duyệt</span>`;
-                if (status === 'Từ chối') return `<span class="px-2 py-1 rounded-full bg-red-950 border border-red-900/40 text-red-400 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-xmark mr-1"></i> Từ chối</span>`;
-                return `<span class="px-2 py-1 rounded-full bg-amber-950 border border-amber-900/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> Chờ duyệt</span>`;
+                if (status === 'Đã duyệt') return `<span class="px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-check mr-1"></i> Đã duyệt</span>`;
+                if (status === 'Từ chối') return `<span class="px-2 py-1 rounded-full bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-xmark mr-1"></i> Từ chối</span>`;
+                return `<span class="px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> Chờ duyệt</span>`;
             };
 
             const rows = myRequests.map(r => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-4 font-bold text-white">${r.guestName}</td>
-                    <td class="p-4 text-stone-300">${r.relationship}</td>
-                    <td class="p-4 font-mono text-stone-400">${r.fromDate} → ${r.toDate}</td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="p-4 font-bold text-stone-900">${r.guestName}</td>
+                    <td class="p-4 text-stone-600">${r.relationship}</td>
+                    <td class="p-4 font-mono text-stone-500">${r.fromDate} → ${r.toDate}</td>
                     <td class="p-4 text-center">${statusBadge(r.status)}</td>
                 </tr>
-            `).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-500">Bạn chưa đăng ký lưu trú nào.</td></tr>';
+            `).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-400">Bạn chưa đăng ký lưu trú nào.</td></tr>';
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Đăng Ký Lưu Trú Cho Người Thân</h4>
-                        <p class="text-xs text-stone-400">Gửi đăng ký tạm trú cho khách/người thân đến ở lại nhà bạn để Tổ ANTT duyệt và theo dõi.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Đăng Ký Lưu Trú Cho Người Thân</h4>
+                        <p class="text-xs text-stone-500">Gửi đăng ký tạm trú cho khách/người thân đến ở lại nhà bạn để Tổ ANTT duyệt và theo dõi.</p>
                     </div>
                 </div>
 
-                <div class="p-5 rounded-2xl bg-stone-950/40 border border-stone-800 text-left space-y-4">
+                <div class="p-5 rounded-2xl bg-stone-50 border border-stone-200 text-left space-y-4">
                     <form onsubmit="submitResidenceRequest(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Họ tên người lưu trú</label>
-                            <input type="text" id="residence-guest-name-input" required class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Họ tên người lưu trú</label>
+                            <input type="text" id="residence-guest-name-input" required class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Số Căn Cước</label>
-                            <input type="text" id="residence-guest-cccd-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Số Căn Cước</label>
+                            <input type="text" id="residence-guest-cccd-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Quan hệ với chủ hộ</label>
-                            <input type="text" id="residence-relationship-input" placeholder="VD: Anh/chị, bạn bè..." required class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Quan hệ với chủ hộ</label>
+                            <input type="text" id="residence-relationship-input" placeholder="VD: Anh/chị, bạn bè..." required class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Lý do lưu trú</label>
-                            <input type="text" id="residence-reason-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Lý do lưu trú</label>
+                            <input type="text" id="residence-reason-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Từ ngày</label>
-                            <input type="date" id="residence-from-date-input" required class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Từ ngày</label>
+                            <input type="date" id="residence-from-date-input" required class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Đến ngày</label>
-                            <input type="date" id="residence-to-date-input" required class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Đến ngày</label>
+                            <input type="date" id="residence-to-date-input" required class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                         <button type="submit" class="sm:col-span-2 w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">
                             Gửi đăng ký lưu trú
@@ -1771,18 +1928,18 @@
                 </div>
 
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Đăng ký của hộ bạn</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Đăng ký của hộ bạn</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-4 font-semibold">Người lưu trú</th>
                                     <th class="p-4 font-semibold">Quan hệ</th>
                                     <th class="p-4 font-semibold">Thời gian lưu trú</th>
                                     <th class="p-4 font-semibold text-center">Trạng thái</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${rows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${rows}</tbody>
                         </table>
                     </div>
                 </div>
@@ -1835,18 +1992,18 @@
             let rows = members.map(m => {
                 const isSelf = m.name === currentUser.name;
                 const removeAction = isSelf
-                    ? `<button type="button" disabled title="Bạn không thể tự gỡ chính mình" class="px-2 py-1 rounded bg-stone-900 text-stone-600 border border-stone-800 text-[10px] cursor-not-allowed opacity-60">Gỡ khỏi Hội</button>`
-                    : `<button onclick="removeResidentFromAssoc('${m.id}')" class="px-2 py-1 rounded bg-red-950/40 text-red-400 border border-red-900/30 text-[10px] hover:bg-red-900 hover:text-white transition-all">Gỡ khỏi Hội</button>`;
+                    ? `<button type="button" disabled title="Bạn không thể tự gỡ chính mình" class="px-2 py-1 rounded bg-white text-stone-600 border border-stone-200 text-[10px] cursor-not-allowed opacity-60">Gỡ khỏi Hội</button>`
+                    : `<button onclick="removeResidentFromAssoc('${m.id}')" class="px-2 py-1 rounded bg-red-50 text-red-600 text-[10px] hover:bg-red-600 hover:text-white transition-all">Gỡ khỏi Hội</button>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-bold text-white">${m.name}</td>
-                        <td class="p-3 font-mono text-stone-400">${m.dob}</td>
-                        <td class="p-3 text-stone-300">${m.group}</td>
-                        <td class="p-3 font-mono text-stone-400">${m.phone || 'Chưa có SĐT'}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-bold text-stone-900">${m.name}</td>
+                        <td class="p-3 font-mono text-stone-500">${m.dob}</td>
+                        <td class="p-3 text-stone-600">${m.group}</td>
+                        <td class="p-3 font-mono text-stone-500">${m.phone || 'Chưa có SĐT'}</td>
                         <td class="p-3 text-right space-x-2 whitespace-nowrap">
-                            <button onclick="openViewLocationModal('${m.familyId}')" class="px-2 py-1 rounded bg-stone-900 hover:bg-emerald-900 text-emerald-400 border border-emerald-900/30 text-[10px] font-semibold transition-all"><i class="fa-solid fa-location-dot"></i> Vị trí</button>
-                            <button onclick="openEditMemberModal('${m.id}')" class="px-2 py-1 rounded bg-stone-800 hover:bg-primary-600 text-stone-300 hover:text-white border border-stone-700 text-[10px] font-semibold transition-all"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
+                            <button onclick="openViewLocationModal('${m.familyId}')" class="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white text-[10px] font-semibold transition-all"><i class="fa-solid fa-location-dot"></i> Vị trí</button>
+                            <button onclick="openEditMemberModal('${m.id}')" class="px-2 py-1 rounded bg-stone-100 hover:bg-primary-600 text-stone-600 hover:text-white border border-stone-300 text-[10px] font-semibold transition-all"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
                             ${removeAction}
                         </td>
                     </tr>
@@ -1860,18 +2017,18 @@
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Quản lý Hội viên - ${association}</h4>
-                        <p class="text-xs text-stone-400">Tra cứu, thêm mới hoặc loại bỏ hội viên khỏi hội nhóm.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Quản lý Hội viên - ${association}</h4>
+                        <p class="text-xs text-stone-500">Tra cứu, thêm mới hoặc loại bỏ hội viên khỏi hội nhóm.</p>
                     </div>
                 </div>
 
                 <!-- Add Member Panel -->
-                <div class="p-4 rounded-xl border border-stone-800 bg-stone-950/40 space-y-4 text-left">
-                    <h5 class="text-xs font-bold text-white uppercase tracking-wider">Thêm nhân khẩu vào ${association}</h5>
+                <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-4 text-left">
+                    <h5 class="text-xs font-bold text-stone-900 uppercase tracking-wider">Thêm nhân khẩu vào ${association}</h5>
                     <div class="flex flex-col sm:flex-row gap-3 items-end">
                         <div class="flex-grow space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500">Tìm cư dân chưa tham gia Hội</label>
-                            <input type="text" id="add-member-select" list="add-member-datalist" placeholder="Gõ để tìm cư dân..." autocomplete="off" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400">Tìm cư dân chưa tham gia Hội</label>
+                            <input type="text" id="add-member-select" list="add-member-datalist" placeholder="Gõ để tìm cư dân..." autocomplete="off" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                             <datalist id="add-member-datalist">
                                 ${options}
                             </datalist>
@@ -1882,11 +2039,11 @@
 
                 <!-- Members List -->
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Danh sách Hội viên hiện hành (${members.length} người)</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Danh sách Hội viên hiện hành (${members.length} người)</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Thành viên</th>
                                     <th class="p-3 font-semibold">Ngày sinh</th>
                                     <th class="p-3 font-semibold">Địa bàn</th>
@@ -1894,8 +2051,8 @@
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
-                                ${rows || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Chưa có hội viên nào.</td></tr>'}
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
+                                ${rows || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Chưa có hội viên nào.</td></tr>'}
                             </tbody>
                         </table>
                     </div>
@@ -1992,16 +2149,16 @@
 
             let rows = quota.txs.map(tx => {
                 const typeBadge = tx.type === "Thu"
-                    ? `<span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px] font-bold">Thu</span>`
-                    : `<span class="px-2 py-0.5 rounded bg-red-950 text-red-400 text-[10px] font-bold">Chi</span>`;
+                    ? `<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[10px] font-bold">Thu</span>`
+                    : `<span class="px-2 py-0.5 rounded bg-red-50 text-red-600 text-[10px] font-bold">Chi</span>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
+                    <tr class="hover:bg-stone-50 transition-colors">
                         <td class="p-3">${typeBadge}</td>
-                        <td class="p-3 text-stone-300">${tx.type === 'Thu' ? (tx.member ? `${tx.member} - ${tx.desc}` : tx.desc) : tx.desc}</td>
-                        <td class="p-3 font-mono text-right text-white font-bold">${tx.type === 'Thu' ? '+' : '-'}${tx.amount.toLocaleString('vi-VN')} đ</td>
-                        <td class="p-3 text-stone-400 text-center font-mono">${tx.date}</td>
-                        <td class="p-3 text-stone-500 text-right">${tx.officer}</td>
+                        <td class="p-3 text-stone-600">${tx.type === 'Thu' ? (tx.member ? `${tx.member} - ${tx.desc}` : tx.desc) : tx.desc}</td>
+                        <td class="p-3 font-mono text-right text-stone-900 font-bold">${tx.type === 'Thu' ? '+' : '-'}${tx.amount.toLocaleString('vi-VN')} đ</td>
+                        <td class="p-3 text-stone-500 text-center font-mono">${tx.date}</td>
+                        <td class="p-3 text-stone-400 text-right">${tx.officer}</td>
                     </tr>
                 `;
             }).join('');
@@ -2012,19 +2169,19 @@
                 const isConfirming = homeContentItemToDelete === o.id;
                 const deleteBtn = isConfirming
                     ? `<button onclick="deleteAssocFeeObligation('${o.id}')" class="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[10px] font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận?</button>`
-                    : `<button onclick="deleteAssocFeeObligation('${o.id}')" class="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
+                    : `<button onclick="deleteAssocFeeObligation('${o.id}')" class="px-2.5 py-1 rounded bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-semibold text-white">${o.name}</td>
-                        <td class="p-3 text-stone-300">${o.period}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-semibold text-stone-900">${o.name}</td>
+                        <td class="p-3 text-stone-600">${o.period}</td>
                         <td class="p-3 text-right font-mono font-bold text-primary-400">${o.amount.toLocaleString('vi-VN')} đ</td>
                         <td class="p-3 text-right space-x-2 whitespace-nowrap">
-                            <button onclick="openEditAssocFeeModal('${o.id}')" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
+                            <button onclick="openEditAssocFeeModal('${o.id}')" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
                             ${deleteBtn}
                         </td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-500">Chưa có khoản thu hội phí nào.</td></tr>';
+            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-400">Chưa có khoản thu hội phí nào.</td></tr>';
 
             const pendingFeePayments = [];
             Object.keys(quota.memberFunds || {}).forEach(residentId => {
@@ -2036,69 +2193,69 @@
                 });
             });
             const pendingFeeRows = pendingFeePayments.map(p => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-3 font-bold text-white">${p.memberName}</td>
-                    <td class="p-3 text-stone-300">${p.fund.name}</td>
-                    <td class="p-3 text-right font-mono font-bold text-blue-400">${p.fund.amount.toLocaleString('vi-VN')} đ</td>
-                    <td class="p-3 font-mono text-stone-400 text-[11px]">${p.fund.date}</td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="p-3 font-bold text-stone-900">${p.memberName}</td>
+                    <td class="p-3 text-stone-600">${p.fund.name}</td>
+                    <td class="p-3 text-right font-mono font-bold text-blue-600">${p.fund.amount.toLocaleString('vi-VN')} đ</td>
+                    <td class="p-3 font-mono text-stone-500 text-[11px]">${p.fund.date}</td>
                     <td class="p-3 text-right whitespace-nowrap space-x-1.5">
                         <button onclick="approveAssocFeePayment('${p.residentId}', ${p.fundIdx})" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold">Duyệt</button>
-                        <button onclick="rejectAssocFeePayment('${p.residentId}', ${p.fundIdx})" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-400 border border-stone-800 text-[10px] font-bold">Từ chối</button>
+                        <button onclick="rejectAssocFeePayment('${p.residentId}', ${p.fundIdx})" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-500 border border-stone-200 text-[10px] font-bold">Từ chối</button>
                     </td>
                 </tr>
-            `).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Không có xác nhận chuyển khoản nào đang chờ duyệt.</td></tr>';
+            `).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Không có xác nhận chuyển khoản nào đang chờ duyệt.</td></tr>';
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Quản lý quỹ hội & Sổ sách thu chi - ${association}</h4>
-                        <p class="text-xs text-stone-400">Thống kê chi tiết tài chính, tự động hóa ghi nhật ký hoạt động.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Quản lý quỹ hội & Sổ sách thu chi - ${association}</h4>
+                        <p class="text-xs text-stone-500">Thống kê chi tiết tài chính, tự động hóa ghi nhật ký hoạt động.</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                    <div class="p-5 rounded-2xl bg-gradient-to-r from-stone-900 to-stone-950 border border-stone-800 flex flex-col justify-center">
+                    <div class="p-5 rounded-2xl bg-gradient-to-r from-stone-900 to-stone-950 border border-stone-200 flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-primary-400 uppercase tracking-widest block">Số dư quỹ hội hiện tại</span>
-                        <span class="text-2xl font-serif font-black text-white block mt-1">${quota.balance.toLocaleString('vi-VN')} đ</span>
-                        <span class="text-[10px] text-stone-500 block mt-1">Hệ thống đối soát tự động của chi hội</span>
+                        <span class="text-2xl font-serif font-black text-stone-900 block mt-1">${quota.balance.toLocaleString('vi-VN')} đ</span>
+                        <span class="text-[10px] text-stone-400 block mt-1">Hệ thống đối soát tự động của chi hội</span>
                     </div>
 
                     <!-- Add Transaction Form -->
-                    <div class="p-4 rounded-xl border border-stone-800 bg-stone-950/40 space-y-3 text-left">
-                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Ghi nhận giao dịch mới</span>
+                    <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3 text-left">
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Ghi nhận giao dịch mới</span>
                         <form onsubmit="addAssociationTransaction(event)" class="space-y-2">
                             <input type="hidden" id="tx-type" value="Thu">
-                            <div class="inline-flex p-1 rounded-lg bg-stone-900 border border-stone-800">
+                            <div class="inline-flex p-1 rounded-lg bg-white border border-stone-200">
                                 <button type="button" onclick="setAssocTxType('Thu')" id="tx-type-btn-Thu" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all bg-primary-600 text-white">Thu</button>
-                                <button type="button" onclick="setAssocTxType('Chi')" id="tx-type-btn-Chi" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all text-stone-400 hover:text-white">Chi</button>
+                                <button type="button" onclick="setAssocTxType('Chi')" id="tx-type-btn-Chi" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all text-stone-500 hover:text-stone-900">Chi</button>
                             </div>
 
                             <div id="tx-thu-fields" class="space-y-2">
-                                <input type="text" id="tx-member" list="tx-member-datalist" placeholder="Gõ để tìm hội viên..." autocomplete="off" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                                <input type="text" id="tx-member" list="tx-member-datalist" placeholder="Gõ để tìm hội viên..." autocomplete="off" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                                 <datalist id="tx-member-datalist">
                                     ${memberOptions}
                                 </datalist>
 
-                                <span class="text-[9px] uppercase font-bold text-stone-500 block">Chọn khoản thu áp dụng</span>
+                                <span class="text-[9px] uppercase font-bold text-stone-400 block">Chọn khoản thu áp dụng</span>
                                 <div class="space-y-1 max-h-32 overflow-y-auto">
                                     ${currentFeeObligations.map(o => `
-                                        <label class="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-xs cursor-pointer">
-                                            <span class="flex items-center gap-2 text-stone-300">
+                                        <label class="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-white border border-stone-200 text-xs cursor-pointer">
+                                            <span class="flex items-center gap-2 text-stone-600">
                                                 <input type="checkbox" class="tx-obligation-checkbox" data-amount="${o.amount}" data-name="${o.name}" onchange="updateAssocTxThuTotal()">
                                                 ${o.name}
                                             </span>
-                                            <span class="font-mono text-stone-400">${o.amount.toLocaleString('vi-VN')} đ</span>
+                                            <span class="font-mono text-stone-500">${o.amount.toLocaleString('vi-VN')} đ</span>
                                         </label>
-                                    `).join('') || '<p class="text-[11px] text-stone-500">Chưa có khoản thu nào — hãy tạo ở mục phía dưới.</p>'}
+                                    `).join('') || '<p class="text-[11px] text-stone-400">Chưa có khoản thu nào — hãy tạo ở mục phía dưới.</p>'}
                                 </div>
                                 <div class="flex justify-between items-center pt-1 text-xs">
-                                    <span class="text-stone-500">Tổng tiền:</span>
-                                    <span id="tx-thu-total-display" class="font-mono font-bold text-emerald-400">0 đ</span>
+                                    <span class="text-stone-400">Tổng tiền:</span>
+                                    <span id="tx-thu-total-display" class="font-mono font-bold text-emerald-600">0 đ</span>
                                 </div>
                             </div>
                             <div id="tx-chi-fields" class="hidden space-y-2">
-                                <input type="text" id="tx-desc" placeholder="Nội dung chi" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
-                                <input type="number" id="tx-amount" placeholder="Số tiền" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                                <input type="text" id="tx-desc" placeholder="Nội dung chi" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
+                                <input type="number" id="tx-amount" placeholder="Số tiền" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                             </div>
 
                             <button type="submit" class="w-full py-1.5 rounded bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase">Xác nhận giao dịch</button>
@@ -2107,71 +2264,71 @@
                 </div>
 
                 <!-- Bank account info -->
-                <div class="p-4 rounded-xl border border-stone-800 bg-stone-950/40 space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Thông tin tài khoản ngân hàng nhận chuyển khoản</span>
+                <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3 text-left">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Thông tin tài khoản ngân hàng nhận chuyển khoản</span>
                     <form onsubmit="saveAssociationBankInfo(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Ngân hàng</label>
-                            <select id="assoc-bank-name-input" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Ngân hàng</label>
+                            <select id="assoc-bank-name-input" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                                 <option value="">-- Chọn ngân hàng --</option>
                                 ${VIETNAM_BANKS.map(b => `<option value="${b}" ${quota.bankInfo && quota.bankInfo.bankName === b ? 'selected' : ''}>${b}</option>`).join('')}
                             </select>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Số tài khoản</label>
-                            <input type="text" id="assoc-bank-account-input" value="${(quota.bankInfo && quota.bankInfo.accountNumber) || ''}" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Số tài khoản</label>
+                            <input type="text" id="assoc-bank-account-input" value="${(quota.bankInfo && quota.bankInfo.accountNumber) || ''}" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Chủ tài khoản</label>
-                            <input type="text" id="assoc-bank-holder-input" value="${(quota.bankInfo && quota.bankInfo.accountHolder) || ''}" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Chủ tài khoản</label>
+                            <input type="text" id="assoc-bank-holder-input" value="${(quota.bankInfo && quota.bankInfo.accountHolder) || ''}" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                         </div>
                         <button type="submit" class="sm:col-span-3 w-full py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase">Lưu thông tin ngân hàng</button>
                     </form>
                 </div>
 
                 <!-- Fee obligations -->
-                <div class="p-4 rounded-xl border border-stone-800 bg-stone-950/40 space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Tạo khoản thu hội phí mới (áp dụng cho mọi hội viên)</span>
+                <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3 text-left">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Tạo khoản thu hội phí mới (áp dụng cho mọi hội viên)</span>
                     <form onsubmit="createAssocFeeObligation(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
                         <div class="space-y-1 sm:col-span-2">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Tên khoản thu</label>
-                            <input type="text" id="assoc-fee-name-input" placeholder="VD: Hội phí đợt 2 năm 2026" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Tên khoản thu</label>
+                            <input type="text" id="assoc-fee-name-input" placeholder="VD: Hội phí đợt 2 năm 2026" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Chu kỳ</label>
-                            <select id="assoc-fee-period-input" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">${buildYearSelectOptions()}</select>
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Chu kỳ</label>
+                            <select id="assoc-fee-period-input" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">${buildYearSelectOptions()}</select>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Số tiền / hội viên</label>
-                            <input type="number" id="assoc-fee-amount-input" placeholder="Số tiền" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Số tiền / hội viên</label>
+                            <input type="number" id="assoc-fee-amount-input" placeholder="Số tiền" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                         </div>
                         <button type="submit" class="sm:col-span-4 w-full py-1.5 rounded bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase">Tạo khoản thu hội phí</button>
                     </form>
                 </div>
 
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Danh sách khoản thu hội phí — Tổng mỗi hội viên phải đóng: ${totalFeeObligation.toLocaleString('vi-VN')} đ</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Danh sách khoản thu hội phí — Tổng mỗi hội viên phải đóng: ${totalFeeObligation.toLocaleString('vi-VN')} đ</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Tên khoản thu</th>
                                     <th class="p-3 font-semibold">Chu kỳ</th>
                                     <th class="p-3 font-semibold text-right">Số tiền / hội viên</th>
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${feeObligationRows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${feeObligationRows}</tbody>
                         </table>
                     </div>
                 </div>
 
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Xác nhận chuyển khoản hội phí đang chờ duyệt (${pendingFeePayments.length})</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Xác nhận chuyển khoản hội phí đang chờ duyệt (${pendingFeePayments.length})</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Hội viên</th>
                                     <th class="p-3 font-semibold">Khoản thu</th>
                                     <th class="p-3 font-semibold text-right">Số tiền</th>
@@ -2179,18 +2336,18 @@
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${pendingFeeRows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${pendingFeeRows}</tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- Ledger list -->
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Nhật ký lịch sử giao dịch</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Nhật ký lịch sử giao dịch</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Phân loại</th>
                                     <th class="p-3 font-semibold">Diễn giải nội dung</th>
                                     <th class="p-3 font-semibold text-right">Số tiền</th>
@@ -2198,8 +2355,8 @@
                                     <th class="p-3 font-semibold text-right">Cán bộ lập</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
-                                ${rows || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Chưa có giao dịch phát sinh nào.</td></tr>'}
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
+                                ${rows || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Chưa có giao dịch phát sinh nào.</td></tr>'}
                             </tbody>
                         </table>
                     </div>
@@ -2213,7 +2370,7 @@
             document.getElementById('tx-chi-fields').classList.toggle('hidden', type !== 'Chi');
 
             const activeClass = "px-4 py-1 rounded text-xs font-bold uppercase transition-all bg-primary-600 text-white";
-            const inactiveClass = "px-4 py-1 rounded text-xs font-bold uppercase transition-all text-stone-400 hover:text-white";
+            const inactiveClass = "px-4 py-1 rounded text-xs font-bold uppercase transition-all text-stone-500 hover:text-stone-900";
             document.getElementById('tx-type-btn-Thu').className = type === 'Thu' ? activeClass : inactiveClass;
             document.getElementById('tx-type-btn-Chi').className = type === 'Chi' ? activeClass : inactiveClass;
         }
@@ -2479,60 +2636,60 @@
                 const interest = Math.round(loan.amount * loan.interestRate / 100);
                 const total = loan.amount + interest;
                 const statusBadge = loan.status === 'Đã hoàn thành'
-                    ? `<span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px] font-bold">Đã hoàn thành</span>`
-                    : `<span class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 text-[10px] font-bold">Đang vay</span>`;
+                    ? `<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[10px] font-bold">Đã hoàn thành</span>`
+                    : `<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 text-[10px] font-bold">Đang vay</span>`;
                 const completeBtn = loan.status === 'Đã hoàn thành'
-                    ? `<span class="text-stone-500 font-mono text-[10px]">${loan.completedDate}</span>`
+                    ? `<span class="text-stone-400 font-mono text-[10px]">${loan.completedDate}</span>`
                     : `<button onclick="completeMemberLoan('${loan.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] uppercase transition-all shadow-md">Xác nhận đã đóng lãi + gốc</button>`;
 
                 const isConfirmingDelete = loanToDelete === loan.id;
                 const deleteBtn = isConfirmingDelete
                     ? `<button onclick="deleteMemberLoan('${loan.id}')" class="px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[11px] font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận xóa?</button>`
-                    : `<button onclick="deleteMemberLoan('${loan.id}')" class="px-2.5 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[11px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
+                    : `<button onclick="deleteMemberLoan('${loan.id}')" class="px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[11px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-bold text-white">${loan.member}</td>
-                        <td class="p-3 font-mono text-right text-stone-300">${loan.amount.toLocaleString('vi-VN')} đ</td>
-                        <td class="p-3 text-center text-stone-300">${loan.interestRate}%</td>
-                        <td class="p-3 text-center text-stone-300">${loan.termMonths} tháng</td>
-                        <td class="p-3 font-mono text-right text-stone-400">${total.toLocaleString('vi-VN')} đ</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-bold text-stone-900">${loan.member}</td>
+                        <td class="p-3 font-mono text-right text-stone-600">${loan.amount.toLocaleString('vi-VN')} đ</td>
+                        <td class="p-3 text-center text-stone-600">${loan.interestRate}%</td>
+                        <td class="p-3 text-center text-stone-600">${loan.termMonths} tháng</td>
+                        <td class="p-3 font-mono text-right text-stone-500">${total.toLocaleString('vi-VN')} đ</td>
                         <td class="p-3 text-center">${statusBadge}</td>
                         <td class="p-3 text-right space-x-2 whitespace-nowrap">${completeBtn}${deleteBtn}</td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="7" class="p-4 text-center text-stone-500">Chưa có khoản vay nào.</td></tr>';
+            }).join('') || '<tr><td colspan="7" class="p-4 text-center text-stone-400">Chưa có khoản vay nào.</td></tr>';
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Vay Vốn Hội Viên - ${association}</h4>
-                        <p class="text-xs text-stone-400">Hội viên vay vốn từ quỹ hội; khoản vay tính vào Chi, khi hoàn thành gốc + lãi tự động tính vào Thu.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Vay Vốn Hội Viên - ${association}</h4>
+                        <p class="text-xs text-stone-500">Hội viên vay vốn từ quỹ hội; khoản vay tính vào Chi, khi hoàn thành gốc + lãi tự động tính vào Thu.</p>
                     </div>
                 </div>
 
                 <!-- Create Loan Form -->
-                <div class="p-4 rounded-xl border border-stone-800 bg-stone-950/40 space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Lập khoản vay mới</span>
+                <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3 text-left">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Lập khoản vay mới</span>
                     <form onsubmit="createMemberLoan(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Thành viên</label>
-                            <input type="text" id="loan-member" list="loan-member-datalist" placeholder="Gõ để tìm hội viên..." autocomplete="off" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Thành viên</label>
+                            <input type="text" id="loan-member" list="loan-member-datalist" placeholder="Gõ để tìm hội viên..." autocomplete="off" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                             <datalist id="loan-member-datalist">
                                 ${memberOptions}
                             </datalist>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Số tiền vay</label>
-                            <input type="number" id="loan-amount" placeholder="Số tiền" required class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Số tiền vay</label>
+                            <input type="number" id="loan-amount" placeholder="Số tiền" required class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Lãi suất (%)</label>
-                            <input type="number" id="loan-rate" placeholder="VD: 5" required class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Lãi suất (%)</label>
+                            <input type="number" id="loan-rate" placeholder="VD: 5" required class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Thời hạn (tháng)</label>
-                            <input type="number" id="loan-term" placeholder="VD: 6" required class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Thời hạn (tháng)</label>
+                            <input type="number" id="loan-term" placeholder="VD: 6" required class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                         </div>
                         <button type="submit" class="sm:col-span-4 w-full py-1.5 rounded bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase">Lập khoản vay (tính vào Chi)</button>
                     </form>
@@ -2540,11 +2697,11 @@
 
                 <!-- Loans list -->
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Danh sách khoản vay</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Danh sách khoản vay</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Thành viên</th>
                                     <th class="p-3 font-semibold text-right">Số tiền vay</th>
                                     <th class="p-3 font-semibold text-center">Lãi suất</th>
@@ -2554,7 +2711,7 @@
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
                                 ${loanRows}
                             </tbody>
                         </table>
@@ -2703,22 +2860,22 @@
             let rows = filteredResidents.map(r => {
                 const isPending = villageDb.deleteRequests.some(req => req.residentId === r.id && req.status === 'Chờ duyệt');
                 const actionBtn = isPending
-                    ? `<button type="button" disabled title="Đang chờ Admin phê duyệt" class="px-2 py-1 rounded bg-amber-950 text-amber-400 border border-amber-900/40 text-[10px] cursor-not-allowed opacity-90"><i class="fa-solid fa-spinner animate-spin"></i> Chờ duyệt</button>`
-                    : `<button onclick="openRequestDeleteModal('${r.id}')" class="px-2 py-1 rounded bg-red-950 text-red-400 hover:bg-red-900 hover:text-white border border-red-900/30 text-[10px] transition-all">Yêu cầu xóa</button>`;
+                    ? `<button type="button" disabled title="Đang chờ Admin phê duyệt" class="px-2 py-1 rounded bg-amber-50 text-amber-600 text-[10px] cursor-not-allowed opacity-90"><i class="fa-solid fa-spinner animate-spin"></i> Chờ duyệt</button>`
+                    : `<button onclick="openRequestDeleteModal('${r.id}')" class="px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-600 hover:text-white text-[10px] transition-all">Yêu cầu xóa</button>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-bold text-white">${r.name}</td>
-                        <td class="p-3 text-stone-300">${r.relation || (r.isHouseholder ? 'Chủ hộ' : 'Thành viên')}</td>
-                        <td class="p-3 font-mono text-stone-300">${r.dob}</td>
-                        <td class="p-3 font-mono text-stone-400">${r.cccd}</td>
-                        <td class="p-3 font-mono text-stone-400">${r.phone || 'Chưa có SĐT'}</td>
-                        <td class="p-3 font-mono text-stone-500">${r.familyId}</td>
-                        <td class="p-3 text-stone-300">${r.group}</td>
-                        <td class="p-3 text-stone-400">${r.association === 'None' ? 'Không tham gia' : r.association}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-bold text-stone-900">${r.name}</td>
+                        <td class="p-3 text-stone-600">${r.relation || (r.isHouseholder ? 'Chủ hộ' : 'Thành viên')}</td>
+                        <td class="p-3 font-mono text-stone-600">${r.dob}</td>
+                        <td class="p-3 font-mono text-stone-500">${r.cccd}</td>
+                        <td class="p-3 font-mono text-stone-500">${r.phone || 'Chưa có SĐT'}</td>
+                        <td class="p-3 font-mono text-stone-400">${r.familyId}</td>
+                        <td class="p-3 text-stone-600">${r.group}</td>
+                        <td class="p-3 text-stone-500">${r.association === 'None' ? 'Không tham gia' : r.association}</td>
                         <td class="p-3 text-right space-x-2 whitespace-nowrap">
-                            <button onclick="openViewLocationModal('${r.familyId}')" class="px-2 py-1 rounded bg-stone-900 hover:bg-emerald-900 text-emerald-400 border border-emerald-900/30 text-[10px] font-semibold transition-all"><i class="fa-solid fa-location-dot"></i> Vị trí</button>
-                            <button onclick="openEditResidentModal('${r.id}')" class="px-2 py-1 rounded bg-stone-800 hover:bg-primary-600 text-stone-300 hover:text-white border border-stone-700 text-[10px] font-semibold transition-all"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
+                            <button onclick="openViewLocationModal('${r.familyId}')" class="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white text-[10px] font-semibold transition-all"><i class="fa-solid fa-location-dot"></i> Vị trí</button>
+                            <button onclick="openEditResidentModal('${r.id}')" class="px-2 py-1 rounded bg-stone-100 hover:bg-primary-600 text-stone-600 hover:text-white border border-stone-300 text-[10px] font-semibold transition-all"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
                             ${actionBtn}
                         </td>
                     </tr>
@@ -2728,24 +2885,24 @@
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Quản lý Toàn Thôn & Đệ Trình Xóa Nhân Khẩu</h4>
-                        <p class="text-xs text-stone-400">Giám sát tính toàn vẹn dữ liệu. Gửi đề xuất xóa nhân khẩu sai sót lên Admin.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Quản lý Toàn Thôn & Đệ Trình Xóa Nhân Khẩu</h4>
+                        <p class="text-xs text-stone-500">Giám sát tính toàn vẹn dữ liệu. Gửi đề xuất xóa nhân khẩu sai sót lên Admin.</p>
                     </div>
                 </div>
 
                 <!-- Citizen Directory with Request Delete -->
                 <div class="space-y-3 text-left">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Danh bạ cư dân toàn Thôn Đoàn Kết (${filteredResidents.length}/${villageDb.residents.length} nhân khẩu)</span>
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Danh bạ cư dân toàn Thôn Đoàn Kết (${filteredResidents.length}/${villageDb.residents.length} nhân khẩu)</span>
                         <div class="relative w-full sm:w-64">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs"></i>
-                            <input type="text" id="truong-thon-search-input" value="${truongThonSearchQuery}" oninput="filterTruongThonResidents(this.value)" placeholder="Tìm theo tên, Căn Cước, SĐT, mã hộ..." class="w-full pl-8 pr-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-white text-xs outline-none focus:border-primary-500 transition-colors">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                            <input type="text" id="truong-thon-search-input" value="${truongThonSearchQuery}" oninput="filterTruongThonResidents(this.value)" placeholder="Tìm theo tên, Căn Cước, SĐT, mã hộ..." class="w-full pl-8 pr-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Họ và Tên</th>
                                     <th class="p-3 font-semibold">Quan hệ với chủ hộ</th>
                                     <th class="p-3 font-semibold">Ngày sinh</th>
@@ -2757,7 +2914,7 @@
                                     <th class="p-3 font-semibold text-right">Quản lý dữ liệu</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
                                 ${rows}
                             </tbody>
                         </table>
@@ -2765,21 +2922,21 @@
                 </div>
 
                 <!-- Submit Delete Form Modal Overlay (Simulated via overlay card inside tab) -->
-                <div id="delete-request-modal" class="hidden p-5 rounded-2xl bg-stone-950 border border-red-900/50 space-y-4 text-left">
+                <div id="delete-request-modal" class="hidden p-5 rounded-2xl bg-stone-50 space-y-4 text-left">
                     <div class="flex items-center justify-between">
-                        <h5 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <h5 class="text-xs font-bold text-stone-900 uppercase tracking-wider flex items-center gap-2">
                             <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
                             <span>Đệ trình lý do xóa dữ liệu nhân khẩu</span>
                         </h5>
-                        <button onclick="closeRequestDeleteModal()" class="text-stone-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        <button onclick="closeRequestDeleteModal()" class="text-stone-400 hover:text-stone-900"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                     <input type="hidden" id="delete-target-id">
                     <div class="space-y-2">
-                        <p class="text-[11px] text-stone-400">Lưu ý: Dữ liệu sẽ không bị xóa ngay lập tức mà cần được duyệt bởi Admin hệ thống tối cao.</p>
-                        <input type="text" id="delete-reason-input" placeholder="Nhập lý do chi tiết (VD: Khai tử, Chuyển khẩu vĩnh viễn...)" required class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-red-500">
+                        <p class="text-[11px] text-stone-500">Lưu ý: Dữ liệu sẽ không bị xóa ngay lập tức mà cần được duyệt bởi Admin hệ thống tối cao.</p>
+                        <input type="text" id="delete-reason-input" placeholder="Nhập lý do chi tiết (VD: Khai tử, Chuyển khẩu vĩnh viễn...)" required class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-red-500">
                     </div>
                     <div class="flex justify-end gap-2">
-                        <button onclick="closeRequestDeleteModal()" class="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs">Hủy</button>
+                        <button onclick="closeRequestDeleteModal()" class="px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-600 text-xs">Hủy</button>
                         <button onclick="submitDeleteRequest()" class="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs text-center">Gửi yêu cầu duyệt</button>
                     </div>
                 </div>
@@ -2988,7 +3145,7 @@
             document.getElementById('vf-chi-fields').classList.toggle('hidden', type !== 'Chi');
 
             const activeClass = "px-4 py-1 rounded text-xs font-bold uppercase transition-all bg-primary-600 text-white";
-            const inactiveClass = "px-4 py-1 rounded text-xs font-bold uppercase transition-all text-stone-400 hover:text-white";
+            const inactiveClass = "px-4 py-1 rounded text-xs font-bold uppercase transition-all text-stone-500 hover:text-stone-900";
             document.getElementById('vf-tx-type-btn-Thu').className = type === 'Thu' ? activeClass : inactiveClass;
             document.getElementById('vf-tx-type-btn-Chi').className = type === 'Chi' ? activeClass : inactiveClass;
         }
@@ -3231,35 +3388,35 @@
                 const isConfirming = homeContentItemToDelete === o.id;
                 const deleteBtn = isConfirming
                     ? `<button onclick="deleteFundObligation('${o.id}')" class="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[10px] font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận?</button>`
-                    : `<button onclick="deleteFundObligation('${o.id}')" class="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
+                    : `<button onclick="deleteFundObligation('${o.id}')" class="px-2.5 py-1 rounded bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-semibold text-white">${o.name}</td>
-                        <td class="p-3 text-stone-300">${o.period}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-semibold text-stone-900">${o.name}</td>
+                        <td class="p-3 text-stone-600">${o.period}</td>
                         <td class="p-3 text-right font-mono font-bold text-primary-400">${o.amount.toLocaleString('vi-VN')} đ</td>
                         <td class="p-3 text-right space-x-2 whitespace-nowrap">
-                            <button onclick="openEditFundObligationModal('${o.id}')" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
+                            <button onclick="openEditFundObligationModal('${o.id}')" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
                             ${deleteBtn}
                         </td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-500">Chưa có khoản thu nào.</td></tr>';
+            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-400">Chưa có khoản thu nào.</td></tr>';
 
             const ledger = truongThonFundView === 'thu' ? vf.thu : vf.chi;
             const ledgerRows = ledger.map(t => {
                 const isConfirmingDelete = villageFundTxToDelete === t.id;
                 const deleteBtn = isConfirmingDelete
                     ? `<button onclick="deleteVillageFundTransaction('${t.id}')" class="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[10px] font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận xóa?</button>`
-                    : `<button onclick="deleteVillageFundTransaction('${t.id}')" class="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
+                    : `<button onclick="deleteVillageFundTransaction('${t.id}')" class="px-2.5 py-1 rounded bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-semibold text-white">${truongThonFundView === 'thu' ? (t.household || t.desc) : t.desc}</td>
-                        <td class="p-3 text-right font-mono font-bold ${truongThonFundView === 'thu' ? 'text-emerald-400' : 'text-red-400'}">${truongThonFundView === 'thu' ? '+' : '-'}${t.amount.toLocaleString('vi-VN')} đ</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-semibold text-stone-900">${truongThonFundView === 'thu' ? (t.household || t.desc) : t.desc}</td>
+                        <td class="p-3 text-right font-mono font-bold ${truongThonFundView === 'thu' ? 'text-emerald-600' : 'text-red-600'}">${truongThonFundView === 'thu' ? '+' : '-'}${t.amount.toLocaleString('vi-VN')} đ</td>
                         <td class="p-3 text-right">${deleteBtn}</td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="3" class="p-4 text-center text-stone-500">Chưa có dữ liệu.</td></tr>';
+            }).join('') || '<tr><td colspan="3" class="p-4 text-center text-stone-400">Chưa có dữ liệu.</td></tr>';
 
             const pendingPayments = [];
             Object.keys(villageDb.funds).forEach(fid => {
@@ -3271,82 +3428,82 @@
                 });
             });
             const pendingPaymentRows = pendingPayments.map(p => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
+                <tr class="hover:bg-stone-50 transition-colors">
                     <td class="p-3">
-                        <span class="font-bold text-white block">${p.headName}</span>
-                        <span class="text-[10px] text-stone-500 font-mono">${p.familyId}</span>
+                        <span class="font-bold text-stone-900 block">${p.headName}</span>
+                        <span class="text-[10px] text-stone-400 font-mono">${p.familyId}</span>
                     </td>
-                    <td class="p-3 text-stone-300">${p.fund.name}</td>
-                    <td class="p-3 text-right font-mono font-bold text-blue-400">${p.fund.amount.toLocaleString('vi-VN')} đ</td>
-                    <td class="p-3 font-mono text-stone-400 text-[11px]">${p.fund.date}</td>
+                    <td class="p-3 text-stone-600">${p.fund.name}</td>
+                    <td class="p-3 text-right font-mono font-bold text-blue-600">${p.fund.amount.toLocaleString('vi-VN')} đ</td>
+                    <td class="p-3 font-mono text-stone-500 text-[11px]">${p.fund.date}</td>
                     <td class="p-3 text-right whitespace-nowrap space-x-1.5">
                         <button onclick="approveResidentFundPayment('${p.familyId}', ${p.fundIdx})" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold">Duyệt</button>
-                        <button onclick="rejectResidentFundPayment('${p.familyId}', ${p.fundIdx})" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-400 border border-stone-800 text-[10px] font-bold">Từ chối</button>
+                        <button onclick="rejectResidentFundPayment('${p.familyId}', ${p.fundIdx})" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-500 border border-stone-200 text-[10px] font-bold">Từ chối</button>
                     </td>
                 </tr>
-            `).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Không có xác nhận chuyển khoản nào đang chờ duyệt.</td></tr>';
+            `).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Không có xác nhận chuyển khoản nào đang chờ duyệt.</td></tr>';
 
             const unpaidRows = (vf.unpaidHouseholdsList || []).map(h => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-3 font-mono text-stone-400">${h.familyId}</td>
-                    <td class="p-3 font-semibold text-white">${h.representative}</td>
-                    <td class="p-3 font-mono text-stone-400">${h.dob || 'Chưa cập nhật'}</td>
-                    <td class="p-3 text-stone-300">${h.group}</td>
-                    <td class="p-3 text-right font-mono font-bold text-amber-400">${(h.unpaidAmount || 0).toLocaleString('vi-VN')} đ</td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="p-3 font-mono text-stone-500">${h.familyId}</td>
+                    <td class="p-3 font-semibold text-stone-900">${h.representative}</td>
+                    <td class="p-3 font-mono text-stone-500">${h.dob || 'Chưa cập nhật'}</td>
+                    <td class="p-3 text-stone-600">${h.group}</td>
+                    <td class="p-3 text-right font-mono font-bold text-amber-600">${(h.unpaidAmount || 0).toLocaleString('vi-VN')} đ</td>
                 </tr>
             `).join('');
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Quản lý Quỹ Thôn</h4>
-                        <p class="text-xs text-stone-400">Ghi nhận và công khai thu chi quỹ thôn toàn xã với người dân.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Quản lý Quỹ Thôn</h4>
+                        <p class="text-xs text-stone-500">Ghi nhận và công khai thu chi quỹ thôn toàn xã với người dân.</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
-                    <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
-                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">Tổng thu</span>
-                        <span class="text-lg font-bold text-white block mt-1">${thuTotal.toLocaleString('vi-VN')} đ</span>
+                    <div class="p-4 rounded-xl bg-stone-50 border border-stone-200">
+                        <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest block">Tổng thu</span>
+                        <span class="text-lg font-bold text-stone-900 block mt-1">${thuTotal.toLocaleString('vi-VN')} đ</span>
                     </div>
-                    <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
-                        <span class="text-[10px] font-bold text-red-400 uppercase tracking-widest block">Tổng chi</span>
-                        <span class="text-lg font-bold text-white block mt-1">${chiTotal.toLocaleString('vi-VN')} đ</span>
+                    <div class="p-4 rounded-xl bg-stone-50 border border-stone-200">
+                        <span class="text-[10px] font-bold text-red-600 uppercase tracking-widest block">Tổng chi</span>
+                        <span class="text-lg font-bold text-stone-900 block mt-1">${chiTotal.toLocaleString('vi-VN')} đ</span>
                     </div>
-                    <div class="p-4 rounded-xl bg-stone-950/60 border border-stone-800">
+                    <div class="p-4 rounded-xl bg-stone-50 border border-stone-200">
                         <span class="text-[10px] font-bold text-primary-400 uppercase tracking-widest block">Số dư hiện tại</span>
-                        <span class="text-lg font-bold text-white block mt-1">${(thuTotal - chiTotal).toLocaleString('vi-VN')} đ</span>
+                        <span class="text-lg font-bold text-stone-900 block mt-1">${(thuTotal - chiTotal).toLocaleString('vi-VN')} đ</span>
                     </div>
                 </div>
 
-                <div class="p-4 rounded-xl border border-stone-800 bg-stone-950/40 space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Thông tin tài khoản ngân hàng nhận chuyển khoản quỹ thôn</span>
+                <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3 text-left">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Thông tin tài khoản ngân hàng nhận chuyển khoản quỹ thôn</span>
                     <form onsubmit="saveVillageFundBankInfo(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Ngân hàng</label>
-                            <select id="vf-bank-name-input" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Ngân hàng</label>
+                            <select id="vf-bank-name-input" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                                 <option value="">-- Chọn ngân hàng --</option>
                                 ${VIETNAM_BANKS.map(b => `<option value="${b}" ${vf.bankInfo && vf.bankInfo.bankName === b ? 'selected' : ''}>${b}</option>`).join('')}
                             </select>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Số tài khoản</label>
-                            <input type="text" id="vf-bank-account-input" value="${(vf.bankInfo && vf.bankInfo.accountNumber) || ''}" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Số tài khoản</label>
+                            <input type="text" id="vf-bank-account-input" value="${(vf.bankInfo && vf.bankInfo.accountNumber) || ''}" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Chủ tài khoản</label>
-                            <input type="text" id="vf-bank-holder-input" value="${(vf.bankInfo && vf.bankInfo.accountHolder) || ''}" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Chủ tài khoản</label>
+                            <input type="text" id="vf-bank-holder-input" value="${(vf.bankInfo && vf.bankInfo.accountHolder) || ''}" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                         </div>
                         <button type="submit" class="sm:col-span-3 w-full py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase">Lưu thông tin ngân hàng</button>
                     </form>
                 </div>
 
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Xác nhận chuyển khoản đang chờ duyệt (${pendingPayments.length})</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Xác nhận chuyển khoản đang chờ duyệt (${pendingPayments.length})</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Hộ</th>
                                     <th class="p-3 font-semibold">Khoản thu</th>
                                     <th class="p-3 font-semibold text-right">Số tiền</th>
@@ -3354,83 +3511,83 @@
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${pendingPaymentRows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${pendingPaymentRows}</tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="p-4 rounded-xl border border-stone-800 bg-stone-950/40 space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Tạo khoản thu quỹ thôn mới (áp dụng cho mọi hộ)</span>
+                <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3 text-left">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Tạo khoản thu quỹ thôn mới (áp dụng cho mọi hộ)</span>
                     <form onsubmit="createFundObligation(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
                         <div class="space-y-1 sm:col-span-2">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Tên khoản thu</label>
-                            <input type="text" id="fund-ob-name-input" placeholder="VD: Quỹ Nông thôn mới 2026" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Tên khoản thu</label>
+                            <input type="text" id="fund-ob-name-input" placeholder="VD: Quỹ Nông thôn mới 2026" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Chu kỳ</label>
-                            <select id="fund-ob-period-input" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">${buildYearSelectOptions()}</select>
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Chu kỳ</label>
+                            <select id="fund-ob-period-input" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">${buildYearSelectOptions()}</select>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Số tiền / hộ</label>
-                            <input type="number" id="fund-ob-amount-input" placeholder="Số tiền" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Số tiền / hộ</label>
+                            <input type="number" id="fund-ob-amount-input" placeholder="Số tiền" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                         </div>
                         <button type="submit" class="sm:col-span-4 w-full py-1.5 rounded bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase">Tạo khoản thu</button>
                     </form>
                 </div>
 
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Danh sách khoản thu quỹ thôn — Tổng mỗi hộ phải đóng: ${totalObligation.toLocaleString('vi-VN')} đ</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Danh sách khoản thu quỹ thôn — Tổng mỗi hộ phải đóng: ${totalObligation.toLocaleString('vi-VN')} đ</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Tên khoản thu</th>
                                     <th class="p-3 font-semibold">Chu kỳ</th>
                                     <th class="p-3 font-semibold text-right">Số tiền / hộ</th>
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
                                 ${obligationRows}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="p-4 rounded-xl border border-stone-800 bg-stone-950/40 space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Ghi nhận khoản thu/chi mới</span>
+                <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3 text-left">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Ghi nhận khoản thu/chi mới</span>
                     <form onsubmit="addVillageFundTransaction(event)" class="space-y-2">
                         <input type="hidden" id="vf-tx-type" value="Thu">
-                        <div class="inline-flex p-1 rounded-lg bg-stone-900 border border-stone-800">
+                        <div class="inline-flex p-1 rounded-lg bg-white border border-stone-200">
                             <button type="button" onclick="setVillageFundTxType('Thu')" id="vf-tx-type-btn-Thu" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all bg-primary-600 text-white">Thu</button>
-                            <button type="button" onclick="setVillageFundTxType('Chi')" id="vf-tx-type-btn-Chi" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all text-stone-400 hover:text-white">Chi</button>
+                            <button type="button" onclick="setVillageFundTxType('Chi')" id="vf-tx-type-btn-Chi" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all text-stone-500 hover:text-stone-900">Chi</button>
                         </div>
                         <div id="vf-thu-fields" class="space-y-2">
-                            <input type="text" id="vf-tx-household" list="vf-household-datalist" placeholder="Gõ để tìm chủ hộ..." autocomplete="off" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <input type="text" id="vf-tx-household" list="vf-household-datalist" placeholder="Gõ để tìm chủ hộ..." autocomplete="off" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                             <datalist id="vf-household-datalist">
                                 ${householdDatalistOptions}
                             </datalist>
 
-                            <span class="text-[9px] uppercase font-bold text-stone-500 block">Chọn khoản thu áp dụng</span>
+                            <span class="text-[9px] uppercase font-bold text-stone-400 block">Chọn khoản thu áp dụng</span>
                             <div class="space-y-1 max-h-32 overflow-y-auto">
                                 ${currentFundObligations.map(o => `
-                                    <label class="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-xs cursor-pointer">
-                                        <span class="flex items-center gap-2 text-stone-300">
+                                    <label class="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-white border border-stone-200 text-xs cursor-pointer">
+                                        <span class="flex items-center gap-2 text-stone-600">
                                             <input type="checkbox" class="vf-tx-obligation-checkbox" data-amount="${o.amount}" data-name="${o.name}" onchange="updateVillageFundThuTotal()">
                                             ${o.name}
                                         </span>
-                                        <span class="font-mono text-stone-400">${o.amount.toLocaleString('vi-VN')} đ</span>
+                                        <span class="font-mono text-stone-500">${o.amount.toLocaleString('vi-VN')} đ</span>
                                     </label>
-                                `).join('') || '<p class="text-[11px] text-stone-500">Chưa có khoản thu nào — hãy tạo ở mục phía trên.</p>'}
+                                `).join('') || '<p class="text-[11px] text-stone-400">Chưa có khoản thu nào — hãy tạo ở mục phía trên.</p>'}
                             </div>
                             <div class="flex justify-between items-center pt-1 text-xs">
-                                <span class="text-stone-500">Tổng tiền:</span>
-                                <span id="vf-tx-thu-total-display" class="font-mono font-bold text-emerald-400">0 đ</span>
+                                <span class="text-stone-400">Tổng tiền:</span>
+                                <span id="vf-tx-thu-total-display" class="font-mono font-bold text-emerald-600">0 đ</span>
                             </div>
                         </div>
                         <div id="vf-chi-fields" class="hidden space-y-2">
-                            <input type="text" id="vf-tx-desc" placeholder="Nội dung chi" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
-                            <input type="number" id="vf-tx-amount" placeholder="Số tiền" class="w-full px-2 py-1.5 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <input type="text" id="vf-tx-desc" placeholder="Nội dung chi" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
+                            <input type="number" id="vf-tx-amount" placeholder="Số tiền" class="w-full px-2 py-1.5 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                         </div>
                         <button type="submit" class="w-full py-1.5 rounded bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase">Ghi nhận</button>
                     </form>
@@ -3438,22 +3595,22 @@
 
                 <div class="space-y-3 text-left">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Sổ sách giao dịch</span>
-                        <div class="inline-flex p-1 rounded-lg bg-stone-900 border border-stone-800">
-                            <button onclick="switchTruongThonFundView('thu')" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all ${truongThonFundView === 'thu' ? 'bg-primary-600 text-white' : 'text-stone-400 hover:text-white'}">Thu</button>
-                            <button onclick="switchTruongThonFundView('chi')" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all ${truongThonFundView === 'chi' ? 'bg-primary-600 text-white' : 'text-stone-400 hover:text-white'}">Chi</button>
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Sổ sách giao dịch</span>
+                        <div class="inline-flex p-1 rounded-lg bg-white border border-stone-200">
+                            <button onclick="switchTruongThonFundView('thu')" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all ${truongThonFundView === 'thu' ? 'bg-primary-600 text-white' : 'text-stone-500 hover:text-white'}">Thu</button>
+                            <button onclick="switchTruongThonFundView('chi')" class="px-4 py-1 rounded text-xs font-bold uppercase transition-all ${truongThonFundView === 'chi' ? 'bg-primary-600 text-white' : 'text-stone-500 hover:text-white'}">Chi</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">${truongThonFundView === 'thu' ? 'Tên hộ đóng' : 'Nội dung chi'}</th>
                                     <th class="p-3 font-semibold text-right">Số tiền</th>
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
                                 ${ledgerRows}
                             </tbody>
                         </table>
@@ -3461,11 +3618,11 @@
                 </div>
 
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Hộ chưa đóng quỹ thôn (${vf.unpaidHouseholds}/${vf.totalHouseholds})</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Hộ chưa đóng quỹ thôn (${vf.unpaidHouseholds}/${vf.totalHouseholds})</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Mã hộ</th>
                                     <th class="p-3 font-semibold">Chủ hộ</th>
                                     <th class="p-3 font-semibold">Ngày sinh</th>
@@ -3473,8 +3630,8 @@
                                     <th class="p-3 font-semibold text-right">Số tiền chưa đóng</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
-                                ${unpaidRows || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Không có hộ nào chưa đóng.</td></tr>'}
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
+                                ${unpaidRows || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Không có hộ nào chưa đóng.</td></tr>'}
                             </tbody>
                         </table>
                     </div>
@@ -3490,14 +3647,14 @@
             let pendingRequests = villageDb.deleteRequests.filter(req => req.status === 'Chờ duyệt');
 
             let rows = pendingRequests.map(req => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-3 font-bold text-white text-xs">${req.residentName}</td>
-                    <td class="p-3 text-red-400 font-medium text-xs">${req.reason}</td>
-                    <td class="p-3 text-stone-400 font-mono text-[11px]">${req.time}</td>
-                    <td class="p-3 text-stone-300 font-medium text-xs">${req.submittedBy}</td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="p-3 font-bold text-stone-900 text-xs">${req.residentName}</td>
+                    <td class="p-3 text-red-600 font-medium text-xs">${req.reason}</td>
+                    <td class="p-3 text-stone-500 font-mono text-[11px]">${req.time}</td>
+                    <td class="p-3 text-stone-600 font-medium text-xs">${req.submittedBy}</td>
                     <td class="p-3 text-right space-x-2">
                         <button onclick="approveDeleteRequest('${req.id}')" class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-all">Duyệt xóa</button>
-                        <button onclick="rejectDeleteRequest('${req.id}')" class="px-3 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-400 border border-stone-800 text-[11px] font-bold transition-all">Từ chối</button>
+                        <button onclick="rejectDeleteRequest('${req.id}')" class="px-3 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-500 border border-stone-200 text-[11px] font-bold transition-all">Từ chối</button>
                     </td>
                 </tr>
             `).join('');
@@ -3506,18 +3663,18 @@
             let memberRows = pendingMemberRequests.map(req => {
                 const changeSummary = EDITABLE_MEMBER_FIELDS
                     .filter(f => String(req.newValues[f.key]) !== String(req.oldValues[f.key] || ''))
-                    .map(f => `<div><span class="text-stone-500">${f.label}:</span> <span class="text-stone-400">"${req.oldValues[f.key] || ''}"</span> → <span class="text-primary-400 font-semibold">"${req.newValues[f.key]}"</span></div>`)
+                    .map(f => `<div><span class="text-stone-400">${f.label}:</span> <span class="text-stone-500">"${req.oldValues[f.key] || ''}"</span> → <span class="text-primary-400 font-semibold">"${req.newValues[f.key]}"</span></div>`)
                     .join('');
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-bold text-white text-xs align-top">${req.residentName}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-bold text-stone-900 text-xs align-top">${req.residentName}</td>
                         <td class="p-3 text-xs align-top space-y-0.5">${changeSummary}</td>
-                        <td class="p-3 text-stone-400 font-mono text-[11px] align-top">${req.time}</td>
-                        <td class="p-3 text-stone-300 font-medium text-xs align-top">${req.submittedBy}</td>
+                        <td class="p-3 text-stone-500 font-mono text-[11px] align-top">${req.time}</td>
+                        <td class="p-3 text-stone-600 font-medium text-xs align-top">${req.submittedBy}</td>
                         <td class="p-3 text-right space-x-2 align-top whitespace-nowrap">
                             <button onclick="approveMemberEditRequest('${req.id}')" class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-all">Duyệt</button>
-                            <button onclick="rejectMemberEditRequest('${req.id}')" class="px-3 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-400 border border-stone-800 text-[11px] font-bold transition-all">Từ chối</button>
+                            <button onclick="rejectMemberEditRequest('${req.id}')" class="px-3 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-500 border border-stone-200 text-[11px] font-bold transition-all">Từ chối</button>
                         </td>
                     </tr>
                 `;
@@ -3525,16 +3682,16 @@
 
             const pendingNewMemberRequests = villageDb.newMemberRequests.filter(req => req.status === 'Chờ duyệt');
             let newMemberRows = pendingNewMemberRequests.map(req => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-3 font-bold text-white text-xs">${req.name}</td>
-                    <td class="p-3 text-stone-300 text-xs">${req.relation}</td>
-                    <td class="p-3 font-mono text-stone-400 text-xs">${req.dob}</td>
-                    <td class="p-3 font-mono text-stone-400 text-xs">${req.familyId}</td>
-                    <td class="p-3 text-stone-400 font-mono text-[11px]">${req.time}</td>
-                    <td class="p-3 text-stone-300 font-medium text-xs">${req.submittedBy}</td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="p-3 font-bold text-stone-900 text-xs">${req.name}</td>
+                    <td class="p-3 text-stone-600 text-xs">${req.relation}</td>
+                    <td class="p-3 font-mono text-stone-500 text-xs">${req.dob}</td>
+                    <td class="p-3 font-mono text-stone-500 text-xs">${req.familyId}</td>
+                    <td class="p-3 text-stone-500 font-mono text-[11px]">${req.time}</td>
+                    <td class="p-3 text-stone-600 font-medium text-xs">${req.submittedBy}</td>
                     <td class="p-3 text-right space-x-2 whitespace-nowrap">
                         <button onclick="approveNewMemberRequest('${req.id}')" class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-all">Duyệt</button>
-                        <button onclick="rejectNewMemberRequest('${req.id}')" class="px-3 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-400 border border-stone-800 text-[11px] font-bold transition-all">Từ chối</button>
+                        <button onclick="rejectNewMemberRequest('${req.id}')" class="px-3 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-500 border border-stone-200 text-[11px] font-bold transition-all">Từ chối</button>
                     </td>
                 </tr>
             `).join('');
@@ -3542,15 +3699,15 @@
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Kiểm duyệt & Phê duyệt yêu cầu xóa dữ liệu</h4>
-                        <p class="text-xs text-stone-400">Kiểm tra thông tin đệ trình từ Trưởng thôn và đưa ra quyết định phê duyệt tối cao.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Kiểm duyệt & Phê duyệt yêu cầu xóa dữ liệu</h4>
+                        <p class="text-xs text-stone-500">Kiểm tra thông tin đệ trình từ Trưởng thôn và đưa ra quyết định phê duyệt tối cao.</p>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-3 font-semibold">Nhân khẩu đề nghị</th>
                                 <th class="p-3 font-semibold">Lý do đính kèm</th>
                                 <th class="p-3 font-semibold">Thời gian lập</th>
@@ -3558,18 +3715,18 @@
                                 <th class="p-3 font-semibold text-right">Phê duyệt tối cao</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">
-                            ${rows || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Hiện không có yêu cầu xóa dữ liệu nào chờ phê duyệt.</td></tr>'}
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">
+                            ${rows || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Hiện không có yêu cầu xóa dữ liệu nào chờ phê duyệt.</td></tr>'}
                         </tbody>
                     </table>
                 </div>
 
-                <div class="space-y-3 text-left pt-6 border-t border-stone-800">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Yêu cầu sửa thông tin nhân khẩu</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                <div class="space-y-3 text-left pt-6 border-t border-stone-200">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Yêu cầu sửa thông tin nhân khẩu</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Nhân khẩu</th>
                                     <th class="p-3 font-semibold">Thay đổi đề nghị</th>
                                     <th class="p-3 font-semibold">Thời gian lập</th>
@@ -3577,19 +3734,19 @@
                                     <th class="p-3 font-semibold text-right">Phê duyệt</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
-                                ${memberRows || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Hiện không có yêu cầu sửa thông tin nào chờ phê duyệt.</td></tr>'}
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
+                                ${memberRows || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Hiện không có yêu cầu sửa thông tin nào chờ phê duyệt.</td></tr>'}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="space-y-3 text-left pt-6 border-t border-stone-800">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Yêu cầu thêm thành viên mới</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                <div class="space-y-3 text-left pt-6 border-t border-stone-200">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Yêu cầu thêm thành viên mới</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Họ và tên</th>
                                     <th class="p-3 font-semibold">Quan hệ</th>
                                     <th class="p-3 font-semibold">Ngày sinh</th>
@@ -3599,8 +3756,8 @@
                                     <th class="p-3 font-semibold text-right">Phê duyệt</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">
-                                ${newMemberRows || '<tr><td colspan="7" class="p-4 text-center text-stone-500">Hiện không có yêu cầu thêm thành viên nào chờ phê duyệt.</td></tr>'}
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">
+                                ${newMemberRows || '<tr><td colspan="7" class="p-4 text-center text-stone-400">Hiện không có yêu cầu thêm thành viên nào chờ phê duyệt.</td></tr>'}
                             </tbody>
                         </table>
                     </div>
@@ -3697,30 +3854,30 @@
                 if (editingAssocName === name) {
                     nameField = `
                         <div class="flex items-center gap-2">
-                            <input type="text" id="edit-assoc-input-${name.replace(/\s+/g, '-')}" value="${name}" class="px-2 py-1 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <input type="text" id="edit-assoc-input-${name.replace(/\s+/g, '-')}" value="${name}" class="px-2 py-1 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                             <button onclick="saveAssocName('${name}')" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-check"></i> Lưu</button>
-                            <button onclick="cancelEditAssocName()" class="px-2 py-1 bg-stone-800 hover:bg-stone-700 text-stone-400 rounded text-[10px] font-bold">Hủy</button>
+                            <button onclick="cancelEditAssocName()" class="px-2 py-1 bg-stone-100 hover:bg-stone-200 text-stone-500 rounded text-[10px] font-bold">Hủy</button>
                         </div>
                     `;
                 } else {
                     nameField = `
-                        <span class="font-bold text-white text-sm">${name}</span>
+                        <span class="font-bold text-stone-900 text-sm">${name}</span>
                     `;
                 }
 
                 const isConfirming = assocToDelete === name;
                 const deleteBtn = isConfirming
                     ? `<button onclick="confirmDeleteAssoc('${name}')" class="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[10px] font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận xóa?</button>`
-                    : `<button onclick="confirmDeleteAssoc('${name}')" class="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa hội</button>`;
+                    : `<button onclick="confirmDeleteAssoc('${name}')" class="px-2.5 py-1 rounded bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa hội</button>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
+                    <tr class="hover:bg-stone-50 transition-colors">
                         <td class="p-4">${nameField}</td>
                         <td class="p-4 text-primary-400 font-semibold text-xs">${leaderAcc ? leaderAcc.name : ''}</td>
-                        <td class="p-4 text-stone-300 font-semibold text-xs">${count} hội viên</td>
-                        <td class="p-4 font-mono text-emerald-400 font-bold">${q.balance.toLocaleString('vi-VN')} đ</td>
+                        <td class="p-4 text-stone-600 font-semibold text-xs">${count} hội viên</td>
+                        <td class="p-4 font-mono text-emerald-600 font-bold">${q.balance.toLocaleString('vi-VN')} đ</td>
                         <td class="p-4 text-right space-x-2">
-                            ${editingAssocName !== name ? `<button onclick="startEditAssocName('${name}')" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px] font-semibold"><i class="fa-solid fa-pen-to-square"></i> Đổi tên</button>` : ''}
+                            ${editingAssocName !== name ? `<button onclick="startEditAssocName('${name}')" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px] font-semibold"><i class="fa-solid fa-pen-to-square"></i> Đổi tên</button>` : ''}
                             ${deleteBtn}
                         </td>
                     </tr>
@@ -3730,36 +3887,36 @@
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Quản Lý Danh Sách Hội Đoàn Thể Toàn Thôn</h4>
-                        <p class="text-xs text-stone-400">Thiết lập cấu trúc hoạt động, tạo mới, sửa tên hoặc xóa giải thể các chi hội đoàn thể.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Quản Lý Danh Sách Hội Đoàn Thể Toàn Thôn</h4>
+                        <p class="text-xs text-stone-500">Thiết lập cấu trúc hoạt động, tạo mới, sửa tên hoặc xóa giải thể các chi hội đoàn thể.</p>
                     </div>
                 </div>
 
                 <!-- Create New Association Card -->
-                <div class="p-5 rounded-2xl bg-stone-950/40 border border-stone-800 text-left space-y-4">
-                    <h5 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <div class="p-5 rounded-2xl bg-stone-50 border border-stone-200 text-left space-y-4">
+                    <h5 class="text-xs font-bold text-stone-900 uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-folder-plus text-primary-400"></i>
                         <span>Thành Lập Chi Hội Mới</span>
                     </h5>
                     <form onsubmit="handleCreateAssoc(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Tên chi hội đoàn thể mới</label>
-                            <input type="text" id="new-assoc-name" required placeholder="Ví dụ: Chi hội Khuyến học" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Tên chi hội đoàn thể mới</label>
+                            <input type="text" id="new-assoc-name" required placeholder="Ví dụ: Chi hội Khuyến học" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Số dư ngân quỹ ban đầu (đ)</label>
-                            <input type="number" id="new-assoc-balance" required placeholder="0" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Số dư ngân quỹ ban đầu (đ)</label>
+                            <input type="number" id="new-assoc-balance" required placeholder="0" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                         </div>
                         <button type="submit" class="w-full py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase transition-colors">Kích hoạt chi hội</button>
                     </form>
-                    <p class="text-[11px] text-stone-500">Hội trưởng sẽ được gán khi tạo tài khoản Cán bộ Hội ở tab "Quản lý Tài khoản".</p>
+                    <p class="text-[11px] text-stone-400">Hội trưởng sẽ được gán khi tạo tài khoản Cán bộ Hội ở tab "Quản lý Tài khoản".</p>
                 </div>
 
                 <!-- Associations Table -->
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-4 font-semibold">Tên chi hội đoàn thể</th>
                                 <th class="p-4 font-semibold">Hội trưởng</th>
                                 <th class="p-4 font-semibold">Số lượng hội viên</th>
@@ -3767,8 +3924,8 @@
                                 <th class="p-4 font-semibold text-right">Quản lý cấu trúc</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">
-                            ${assocList || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Chưa có chi hội nào trong hệ thống.</td></tr>'}
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">
+                            ${assocList || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Chưa có chi hội nào trong hệ thống.</td></tr>'}
                         </tbody>
                     </table>
                 </div>
@@ -3882,7 +4039,7 @@
                     const currentVal = villageDb.permissions[role][header];
                     return `
                         <td class="p-4">
-                            <select onchange="updatePermissionMatrix('${role}', '${header}', this.value)" class="px-2 py-1 rounded bg-stone-900 border border-stone-800 text-white text-xs outline-none">
+                            <select onchange="updatePermissionMatrix('${role}', '${header}', this.value)" class="px-2 py-1 rounded bg-white border border-stone-200 text-stone-900 text-xs outline-none">
                                 <option value="Xem" ${currentVal === 'Xem' ? 'selected' : ''}>Xem</option>
                                 <option value="Xem/Sửa" ${currentVal === 'Xem/Sửa' ? 'selected' : ''}>Xem & Sửa</option>
                                 <option value="Khóa" ${currentVal === 'Khóa' ? 'selected' : ''}>Khóa quyền</option>
@@ -3892,8 +4049,8 @@
                 }).join('');
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-4 font-bold text-white">${role}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-4 font-bold text-stone-900">${role}</td>
                         ${cells}
                     </tr>
                 `;
@@ -3902,15 +4059,15 @@
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Bảng Ma Trận Cấu Hình Phân Quyền Dữ Liệu</h4>
-                        <p class="text-xs text-stone-400">Kiểm soát quyền truy cập chi tiết các trường thông tin nhạy cảm.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Bảng Ma Trận Cấu Hình Phân Quyền Dữ Liệu</h4>
+                        <p class="text-xs text-stone-500">Kiểm soát quyền truy cập chi tiết các trường thông tin nhạy cảm.</p>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-4 font-semibold">Nhóm vai trò (Role)</th>
                                 <th class="p-4 font-semibold">Trường Số Căn Cước</th>
                                 <th class="p-4 font-semibold">Trường Ngày sinh</th>
@@ -3918,7 +4075,7 @@
                                 <th class="p-4 font-semibold">Tọa độ Địa lý GPS</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">
                             ${rows}
                         </tbody>
                     </table>
@@ -3938,29 +4095,29 @@
 
             let rows = villageDb.accounts.map(acc => {
                 const statusBadge = acc.status === "Hoạt động"
-                    ? `<span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-bold text-[10px]">Đang mở</span>`
-                    : `<span class="px-2 py-0.5 rounded bg-red-950 text-red-400 font-bold text-[10px]">Đã khóa</span>`;
+                    ? `<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 font-bold text-[10px]">Đang mở</span>`
+                    : `<span class="px-2 py-0.5 rounded bg-red-50 text-red-600 font-bold text-[10px]">Đã khóa</span>`;
 
                 const actionBtn = acc.status === "Hoạt động"
-                    ? `<button onclick="toggleAccountStatus('${acc.id}', 'Khóa')" class="px-2 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-400 border border-stone-850 text-[10px]">Khóa tài khoản</button>`
-                    : `<button onclick="toggleAccountStatus('${acc.id}', 'Hoạt động')" class="px-2 py-1 rounded bg-emerald-600/20 text-emerald-400 border border-emerald-900/30 text-[10px]">Mở tài khoản</button>`;
+                    ? `<button onclick="toggleAccountStatus('${acc.id}', 'Khóa')" class="px-2 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-500 border border-stone-850 text-[10px]">Khóa tài khoản</button>`
+                    : `<button onclick="toggleAccountStatus('${acc.id}', 'Hoạt động')" class="px-2 py-1 rounded bg-emerald-600/20 text-emerald-600 text-[10px]">Mở tài khoản</button>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
+                    <tr class="hover:bg-stone-50 transition-colors">
                         <td class="p-3">
-                            <span class="font-bold text-white block">${acc.name}</span>
-                            <span class="text-[10px] text-stone-500 font-mono">ID: ${acc.id}</span>
+                            <span class="font-bold text-stone-900 block">${acc.name}</span>
+                            <span class="text-[10px] text-stone-400 font-mono">ID: ${acc.id}</span>
                         </td>
-                        <td class="p-3 font-mono text-stone-300">${acc.username}</td>
+                        <td class="p-3 font-mono text-stone-600">${acc.username}</td>
                         <td class="p-3">
-                            <span class="font-semibold text-white block">${acc.role}</span>
-                            ${acc.role === 'Cán bộ Hội' && acc.assoc ? `<span class="text-[10px] text-stone-500 block">Phụ trách: ${acc.assoc}</span>` : ''}
+                            <span class="font-semibold text-stone-900 block">${acc.role}</span>
+                            ${acc.role === 'Cán bộ Hội' && acc.assoc ? `<span class="text-[10px] text-stone-400 block">Phụ trách: ${acc.assoc}</span>` : ''}
                         </td>
-                        <td class="p-3 text-stone-400 font-mono text-[10px]">${acc.lastActive}</td>
+                        <td class="p-3 text-stone-500 font-mono text-[10px]">${acc.lastActive}</td>
                         <td class="p-3">${statusBadge}</td>
                         <td class="p-3 text-right space-x-2">
-                            <button onclick="openEditAccountModal('${acc.id}')" class="px-2 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
-                            <button onclick="resetAccountPassword('${acc.id}')" class="px-2 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px]">Reset Pass</button>
+                            <button onclick="openEditAccountModal('${acc.id}')" class="px-2 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
+                            <button onclick="resetAccountPassword('${acc.id}')" class="px-2 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px]">Reset Pass</button>
                             ${acc.role !== 'Admin' ? actionBtn : ''}
                         </td>
                     </tr>
@@ -3974,36 +4131,36 @@
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Quản lý tài khoản, Cấp quyền & Đổi mật khẩu</h4>
-                        <p class="text-xs text-stone-400">Bảo mật hệ điều hành thôn số, cấp phát tài khoản đặc thù cán bộ.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Quản lý tài khoản, Cấp quyền & Đổi mật khẩu</h4>
+                        <p class="text-xs text-stone-500">Bảo mật hệ điều hành thôn số, cấp phát tài khoản đặc thù cán bộ.</p>
                     </div>
                     <button onclick="syncAllResidentAccounts()" class="px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-primary-950/50 flex items-center gap-2 shrink-0">
                         <i class="fa-solid fa-arrows-rotate"></i> Đồng bộ tài khoản toàn bộ cư dân
                     </button>
                 </div>
-                <p class="text-[11px] text-stone-500 -mt-2">${availableResidents.length} / ${villageDb.residents.length} cư dân chưa có tài khoản đăng nhập.</p>
+                <p class="text-[11px] text-stone-400 -mt-2">${availableResidents.length} / ${villageDb.residents.length} cư dân chưa có tài khoản đăng nhập.</p>
 
                 <!-- Add Account Card -->
-                <div class="p-5 rounded-2xl bg-stone-950/40 border border-stone-800 text-left space-y-4">
-                    <h5 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <div class="p-5 rounded-2xl bg-stone-50 border border-stone-200 text-left space-y-4">
+                    <h5 class="text-xs font-bold text-stone-900 uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-user-plus text-primary-400"></i>
                         <span>Thêm Tài Khoản Mới</span>
                     </h5>
                     <form onsubmit="createNewAccount(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Chọn cư dân</label>
-                            <input type="text" id="new-account-resident" list="new-account-resident-datalist" oninput="updateNewAccountUsername()" placeholder="Gõ để tìm cư dân..." autocomplete="off" required class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Chọn cư dân</label>
+                            <input type="text" id="new-account-resident" list="new-account-resident-datalist" oninput="updateNewAccountUsername()" placeholder="Gõ để tìm cư dân..." autocomplete="off" required class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                             <datalist id="new-account-resident-datalist">
                                 ${residentDatalistOptions}
                             </datalist>
                         </div>
                         <div class="space-y-1 hidden">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Tên đăng nhập (Số Căn Cước)</label>
-                            <input type="text" id="new-account-username" readonly placeholder="Tự động điền" class="w-full px-3 py-2 rounded-lg bg-stone-950 border border-stone-800 text-stone-400 text-xs outline-none cursor-not-allowed">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Tên đăng nhập (Số Căn Cước)</label>
+                            <input type="text" id="new-account-username" readonly placeholder="Tự động điền" class="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-stone-500 text-xs outline-none cursor-not-allowed">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Vai trò</label>
-                            <select id="new-account-role" onchange="toggleNewAccountAssocField()" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Vai trò</label>
+                            <select id="new-account-role" onchange="toggleNewAccountAssocField()" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                                 <option value="Cư dân">Cư dân</option>
                                 <option value="Cán bộ Hội">Cán bộ Hội</option>
                                 <option value="Trưởng thôn">Trưởng thôn</option>
@@ -4012,8 +4169,8 @@
                             </select>
                         </div>
                         <div class="space-y-1 hidden" id="new-account-assoc-field">
-                            <label class="text-[9px] uppercase font-bold text-stone-500 block">Hội phụ trách (Hội trưởng)</label>
-                            <select id="new-account-assoc" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                            <label class="text-[9px] uppercase font-bold text-stone-400 block">Hội phụ trách (Hội trưởng)</label>
+                            <select id="new-account-assoc" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                                 ${Object.keys(villageDb.associationQuotas).map(n => `<option value="${n}">${n}</option>`).join('') || '<option disabled>Chưa có hội nào</option>'}
                             </select>
                         </div>
@@ -4021,10 +4178,10 @@
                     </form>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-3 font-semibold">Tên tài khoản cư dân</th>
                                 <th class="p-3 font-semibold">Tên đăng nhập</th>
                                 <th class="p-3 font-semibold">Nhóm vai trò</th>
@@ -4033,7 +4190,7 @@
                                 <th class="p-3 font-semibold text-right">Quản trị</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">
                             ${rows}
                         </tbody>
                     </table>
@@ -4325,9 +4482,9 @@
         }
 
         const NEWS_CATEGORIES = [
-            { slug: "hanh-chinh", label: "Hành chính", colorClass: "bg-red-950/70 text-red-400 border border-red-900/40" },
-            { slug: "san-xuat", label: "Sản xuất", colorClass: "bg-emerald-950/70 text-emerald-400 border border-emerald-900/40" },
-            { slug: "doan-the", label: "Đoàn thể", colorClass: "bg-amber-950/70 text-amber-400 border border-amber-900/40" }
+            { slug: "hanh-chinh", label: "Hành chính", colorClass: "bg-red-50 text-red-600 " },
+            { slug: "san-xuat", label: "Sản xuất", colorClass: "bg-emerald-50 text-emerald-600 " },
+            { slug: "doan-the", label: "Đoàn thể", colorClass: "bg-amber-50 text-amber-600 " }
         ];
         const LEADERSHIP_COLORS = ["red", "primary", "amber", "blue", "rose", "emerald", "slate", "lime", "purple", "cyan", "teal", "orange", "pink", "indigo"];
 
@@ -4349,19 +4506,19 @@
                 const isConfirming = homeContentItemToDelete === n.id;
                 const deleteBtn = isConfirming
                     ? `<button onclick="deleteHomeNews('${n.id}')" class="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[10px] font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận?</button>`
-                    : `<button onclick="deleteHomeNews('${n.id}')" class="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
+                    : `<button onclick="deleteHomeNews('${n.id}')" class="px-2.5 py-1 rounded bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
                 const actions = canManage
-                    ? `<button onclick="openNewsFormModal('${n.id}')" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>${deleteBtn}`
+                    ? `<button onclick="openNewsFormModal('${n.id}')" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>${deleteBtn}`
                     : `<span class="text-stone-600 text-[10px]">Chỉ ${n.createdBy || 'Admin'} có thể sửa</span>`;
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-semibold text-white">${n.title}</td>
-                        <td class="p-3 text-stone-300">${n.category}</td>
-                        <td class="p-3 font-mono text-stone-400">${n.date}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-semibold text-stone-900">${n.title}</td>
+                        <td class="p-3 text-stone-600">${n.category}</td>
+                        <td class="p-3 font-mono text-stone-500">${n.date}</td>
                         <td class="p-3 text-right space-x-2 whitespace-nowrap">${actions}</td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-500">Chưa có thông báo nào.</td></tr>';
+            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-400">Chưa có thông báo nào.</td></tr>';
         }
 
         function renderNewsManagement() {
@@ -4369,25 +4526,25 @@
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Tin tức & Thông báo</h4>
-                        <p class="text-xs text-stone-400">Đăng tin tức/thông báo hiển thị công khai ở mục "Bảng Tin & Thông Báo" trên trang chủ.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Tin tức & Thông báo</h4>
+                        <p class="text-xs text-stone-500">Đăng tin tức/thông báo hiển thị công khai ở mục "Bảng Tin & Thông Báo" trên trang chủ.</p>
                     </div>
                     <button onclick="openNewsFormModal(null)" class="px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-primary-950/50 flex items-center gap-2 shrink-0">
                         <i class="fa-solid fa-plus"></i> Thêm tin
                     </button>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-3 font-semibold">Tiêu đề</th>
                                 <th class="p-3 font-semibold">Danh mục</th>
                                 <th class="p-3 font-semibold">Ngày</th>
                                 <th class="p-3 font-semibold text-right">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">${buildNewsRowsHtml()}</tbody>
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">${buildNewsRowsHtml()}</tbody>
                     </table>
                 </div>
             `;
@@ -4398,10 +4555,10 @@
             const hc = villageDb.homeContent;
 
             const statRows = (hc.stats || []).map(s => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-3 font-semibold text-white">${s.label}</td>
-                    <td class="p-3 font-mono text-stone-300">${s.value} ${s.unit}</td>
-                    <td class="p-3 text-right"><button onclick="openEditStatModal('${s.id}')" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button></td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="p-3 font-semibold text-stone-900">${s.label}</td>
+                    <td class="p-3 font-mono text-stone-600">${s.value} ${s.unit}</td>
+                    <td class="p-3 text-right"><button onclick="openEditStatModal('${s.id}')" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button></td>
                 </tr>
             `).join('');
 
@@ -4411,76 +4568,76 @@
                 const isConfirming = homeContentItemToDelete === p.id;
                 const deleteBtn = isConfirming
                     ? `<button onclick="deleteHomeProduct('${p.id}')" class="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[10px] font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận?</button>`
-                    : `<button onclick="deleteHomeProduct('${p.id}')" class="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
+                    : `<button onclick="deleteHomeProduct('${p.id}')" class="px-2.5 py-1 rounded bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-semibold text-white">${p.name}</td>
-                        <td class="p-3 text-stone-300">${p.badge}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-semibold text-stone-900">${p.name}</td>
+                        <td class="p-3 text-stone-600">${p.badge}</td>
                         <td class="p-3 text-right space-x-2 whitespace-nowrap">
-                            <button onclick="openProductFormModal('${p.id}')" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
+                            <button onclick="openProductFormModal('${p.id}')" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
                             ${deleteBtn}
                         </td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="3" class="p-4 text-center text-stone-500">Chưa có nông sản nào.</td></tr>';
+            }).join('') || '<tr><td colspan="3" class="p-4 text-center text-stone-400">Chưa có nông sản nào.</td></tr>';
 
             const leadershipRows = (hc.leadership || []).map(l => {
                 const isConfirming = homeContentItemToDelete === l.id;
                 const deleteBtn = isConfirming
                     ? `<button onclick="deleteHomeLeadership('${l.id}')" class="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[10px] font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận?</button>`
-                    : `<button onclick="deleteHomeLeadership('${l.id}')" class="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
+                    : `<button onclick="deleteHomeLeadership('${l.id}')" class="px-2.5 py-1 rounded bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-semibold text-white">${l.name}</td>
-                        <td class="p-3 text-stone-300">${l.role}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-semibold text-stone-900">${l.name}</td>
+                        <td class="p-3 text-stone-600">${l.role}</td>
                         <td class="p-3 text-right space-x-2 whitespace-nowrap">
-                            <button onclick="openLeadershipFormModal('${l.id}')" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
+                            <button onclick="openLeadershipFormModal('${l.id}')" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
                             ${deleteBtn}
                         </td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="3" class="p-4 text-center text-stone-500">Chưa có nhân sự nào.</td></tr>';
+            }).join('') || '<tr><td colspan="3" class="p-4 text-center text-stone-400">Chưa có nhân sự nào.</td></tr>';
 
             const sec = hc.security || { hotline: '', hotlineDisplay: '', slogan: '', members: [] };
             const memberRows = (sec.members || []).map(m => {
                 const isConfirming = homeContentItemToDelete === m.id;
                 const deleteBtn = isConfirming
                     ? `<button onclick="deleteSecurityMember('${m.id}')" class="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[10px] font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận?</button>`
-                    : `<button onclick="deleteSecurityMember('${m.id}')" class="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
+                    : `<button onclick="deleteSecurityMember('${m.id}')" class="px-2.5 py-1 rounded bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-semibold text-white">${m.name}</td>
-                        <td class="p-3 text-stone-300">${m.title}</td>
-                        <td class="p-3 font-mono text-stone-400">${m.phoneDisplay}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-semibold text-stone-900">${m.name}</td>
+                        <td class="p-3 text-stone-600">${m.title}</td>
+                        <td class="p-3 font-mono text-stone-500">${m.phoneDisplay}</td>
                         <td class="p-3 text-right space-x-2 whitespace-nowrap">
-                            <button onclick="openSecurityMemberFormModal('${m.id}')" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-300 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
+                            <button onclick="openSecurityMemberFormModal('${m.id}')" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 border border-stone-850 text-[10px]"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa</button>
                             ${deleteBtn}
                         </td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-500">Chưa có thành viên nào.</td></tr>';
+            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-stone-400">Chưa có thành viên nào.</td></tr>';
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Quản lý Trang chủ</h4>
-                        <p class="text-xs text-stone-400">Chỉnh sửa nội dung hiển thị công khai trên trang chủ (index.html) mà không cần sửa mã nguồn.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Quản lý Trang chủ</h4>
+                        <p class="text-xs text-stone-500">Chỉnh sửa nội dung hiển thị công khai trên trang chủ (index.html) mà không cần sửa mã nguồn.</p>
                     </div>
                 </div>
 
                 <!-- Thống kê -->
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Số liệu thống kê (mục "Tầm Vóc Mới")</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Số liệu thống kê (mục "Tầm Vóc Mới")</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Chỉ tiêu</th>
                                     <th class="p-3 font-semibold">Giá trị</th>
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${statRows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${statRows}</tbody>
                         </table>
                     </div>
                 </div>
@@ -4488,20 +4645,20 @@
                 <!-- Tin tức -->
                 <div class="space-y-3 text-left">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Tin tức & Thông báo</span>
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Tin tức & Thông báo</span>
                         <button onclick="openNewsFormModal(null)" class="px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-bold text-[11px] uppercase"><i class="fa-solid fa-plus mr-1"></i> Thêm tin</button>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Tiêu đề</th>
                                     <th class="p-3 font-semibold">Danh mục</th>
                                     <th class="p-3 font-semibold">Ngày</th>
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${newsRows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${newsRows}</tbody>
                         </table>
                     </div>
                 </div>
@@ -4509,19 +4666,19 @@
                 <!-- Nông sản -->
                 <div class="space-y-3 text-left">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Nông sản đặc sản</span>
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Nông sản đặc sản</span>
                         <button onclick="openProductFormModal(null)" class="px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-bold text-[11px] uppercase"><i class="fa-solid fa-plus mr-1"></i> Thêm nông sản</button>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Tên nông sản</th>
                                     <th class="p-3 font-semibold">Nhãn</th>
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${productRows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${productRows}</tbody>
                         </table>
                     </div>
                 </div>
@@ -4529,54 +4686,54 @@
                 <!-- Ban tự quản -->
                 <div class="space-y-3 text-left">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Ban tự quản & Hệ thống chính trị</span>
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Ban tự quản & Hệ thống chính trị</span>
                         <button onclick="openLeadershipFormModal(null)" class="px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-bold text-[11px] uppercase"><i class="fa-solid fa-plus mr-1"></i> Thêm nhân sự</button>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Họ và tên</th>
                                     <th class="p-3 font-semibold">Chức vụ</th>
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${leadershipRows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${leadershipRows}</tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- Tổ An ninh -->
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Tổ An ninh trật tự</span>
-                    <div class="p-4 rounded-xl border border-stone-800 bg-stone-950/40 space-y-3">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Tổ An ninh trật tự</span>
+                    <div class="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3">
                         <form onsubmit="saveSecurityHotline(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                             <div class="space-y-1">
-                                <label class="text-[9px] uppercase font-bold text-stone-500 block">Số điện thoại đường dây nóng</label>
-                                <input type="text" id="security-hotline-input" value="${sec.hotline}" placeholder="0987533112" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                                <label class="text-[9px] uppercase font-bold text-stone-400 block">Số điện thoại đường dây nóng</label>
+                                <input type="text" id="security-hotline-input" value="${sec.hotline}" placeholder="0987533112" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                             </div>
                             <div class="space-y-1">
-                                <label class="text-[9px] uppercase font-bold text-stone-500 block">Khẩu hiệu (Phương châm)</label>
-                                <input type="text" id="security-slogan-input" value="${sec.slogan}" class="w-full px-3 py-2 rounded-lg bg-stone-900 border border-stone-800 text-white text-xs outline-none focus:border-primary-500">
+                                <label class="text-[9px] uppercase font-bold text-stone-400 block">Khẩu hiệu (Phương châm)</label>
+                                <input type="text" id="security-slogan-input" value="${sec.slogan}" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500">
                             </div>
                             <button type="submit" class="w-full py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs uppercase">Lưu</button>
                         </form>
                     </div>
                     <div class="flex items-center justify-between pt-2">
-                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Thành viên Tổ An ninh</span>
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Thành viên Tổ An ninh</span>
                         <button onclick="openSecurityMemberFormModal(null)" class="px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-bold text-[11px] uppercase"><i class="fa-solid fa-plus mr-1"></i> Thêm thành viên</button>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Họ và tên</th>
                                     <th class="p-3 font-semibold">Chức danh</th>
                                     <th class="p-3 font-semibold">Số điện thoại</th>
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${memberRows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${memberRows}</tbody>
                         </table>
                     </div>
                 </div>
@@ -4930,33 +5087,33 @@
             const container = document.getElementById('tab-content-container');
 
             let rows = villageDb.auditLogs.map(log => `
-                <tr class="hover:bg-stone-900/20 transition-colors text-[11px]">
-                    <td class="p-3 text-stone-500 font-mono">${log.time}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-stone-950 text-stone-300 font-bold border border-stone-850">${log.action}</span></td>
-                    <td class="p-3 text-stone-300 font-medium">${log.detail}</td>
-                    <td class="p-3 text-stone-400 font-mono text-right">${log.actor}</td>
+                <tr class="hover:bg-stone-50 transition-colors text-[11px]">
+                    <td class="p-3 text-stone-400 font-mono">${log.time}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-stone-50 text-stone-600 font-bold border border-stone-850">${log.action}</span></td>
+                    <td class="p-3 text-stone-600 font-medium">${log.detail}</td>
+                    <td class="p-3 text-stone-500 font-mono text-right">${log.actor}</td>
                 </tr>
             `).join('');
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Nhật Ký Kiểm Toán Toàn Bộ Hệ Thống</h4>
-                        <p class="text-xs text-stone-400">Ghi vết tự động mọi hành vi nhạy cảm để đối soát tuyệt đối khi phát sinh sự cố.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Nhật Ký Kiểm Toán Toàn Bộ Hệ Thống</h4>
+                        <p class="text-xs text-stone-500">Ghi vết tự động mọi hành vi nhạy cảm để đối soát tuyệt đối khi phát sinh sự cố.</p>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-3 font-semibold">Thời điểm</th>
                                 <th class="p-3 font-semibold">Hành động</th>
                                 <th class="p-3 font-semibold">Diễn giải chi tiết</th>
                                 <th class="p-3 font-semibold text-right">Người thực hiện</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">
                             ${rows}
                         </tbody>
                     </table>
@@ -4977,37 +5134,37 @@
                     ? `<a href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank" rel="noopener" class="text-primary-400 hover:underline"><i class="fa-solid fa-location-dot mr-1"></i>Xem bản đồ</a>`
                     : (r.locationText || '<span class="text-stone-600">Không có</span>');
                 const actionBtn = r.status === 'Mới'
-                    ? `<button onclick="markIncidentReportStatus('${r.id}', 'Đã tiếp nhận')" class="px-2.5 py-1 rounded bg-blue-950/40 hover:bg-blue-900 text-blue-400 hover:text-white border border-blue-900/30 text-[10px] font-semibold">Tiếp nhận</button>`
+                    ? `<button onclick="markIncidentReportStatus('${r.id}', 'Đã tiếp nhận')" class="px-2.5 py-1 rounded bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white text-[10px] font-semibold">Tiếp nhận</button>`
                     : r.status === 'Đã tiếp nhận'
                         ? `<button onclick="markIncidentReportStatus('${r.id}', 'Đã xử lý')" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold">Đánh dấu đã xử lý</button>`
                         : `<span class="text-stone-600 text-[10px]">—</span>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
+                    <tr class="hover:bg-stone-50 transition-colors">
                         <td class="p-3">
-                            <span class="font-bold text-white block">${head ? head.name : r.reporterName}</span>
-                            <span class="text-[10px] text-stone-500 font-mono">${r.familyId}</span>
+                            <span class="font-bold text-stone-900 block">${head ? head.name : r.reporterName}</span>
+                            <span class="text-[10px] text-stone-400 font-mono">${r.familyId}</span>
                         </td>
-                        <td class="p-3 text-stone-300">${r.content}</td>
+                        <td class="p-3 text-stone-600">${r.content}</td>
                         <td class="p-3 text-xs">${locationLink}</td>
-                        <td class="p-3 font-mono text-stone-400 text-[11px]">${r.time}</td>
+                        <td class="p-3 font-mono text-stone-500 text-[11px]">${r.time}</td>
                         <td class="p-3 text-right">${actionBtn}</td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Chưa có tin báo nào từ cư dân.</td></tr>';
+            }).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Chưa có tin báo nào từ cư dân.</td></tr>';
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Tin Báo Từ Cư Dân</h4>
-                        <p class="text-xs text-stone-400">Tiếp nhận và xử lý các tin báo an ninh trật tự gửi trực tiếp từ cư dân, kèm vị trí sự việc.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Tin Báo Từ Cư Dân</h4>
+                        <p class="text-xs text-stone-500">Tiếp nhận và xử lý các tin báo an ninh trật tự gửi trực tiếp từ cư dân, kèm vị trí sự việc.</p>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-3 font-semibold">Hộ báo cáo</th>
                                 <th class="p-3 font-semibold">Nội dung</th>
                                 <th class="p-3 font-semibold">Vị trí</th>
@@ -5015,7 +5172,7 @@
                                 <th class="p-3 font-semibold text-right">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">${rows}</tbody>
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">${rows}</tbody>
                     </table>
                 </div>
             `;
@@ -5036,46 +5193,46 @@
             const requests = [...villageDb.residenceRegistrations].sort((a, b) => b.time.localeCompare(a.time));
 
             const statusBadge = (status) => {
-                if (status === 'Đã duyệt') return `<span class="px-2 py-1 rounded-full bg-emerald-950 border border-emerald-900/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Đã duyệt</span>`;
-                if (status === 'Từ chối') return `<span class="px-2 py-1 rounded-full bg-red-950 border border-red-900/40 text-red-400 text-[10px] font-bold uppercase tracking-wider">Từ chối</span>`;
-                return `<span class="px-2 py-1 rounded-full bg-amber-950 border border-amber-900/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider">Chờ duyệt</span>`;
+                if (status === 'Đã duyệt') return `<span class="px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider">Đã duyệt</span>`;
+                if (status === 'Từ chối') return `<span class="px-2 py-1 rounded-full bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wider">Từ chối</span>`;
+                return `<span class="px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-wider">Chờ duyệt</span>`;
             };
 
             const rows = requests.map(r => {
                 const action = r.status === 'Chờ duyệt'
-                    ? `<button onclick="decideResidenceRequest('${r.id}', 'Đã duyệt')" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold mr-1.5">Duyệt</button><button onclick="decideResidenceRequest('${r.id}', 'Từ chối')" class="px-2.5 py-1 rounded bg-stone-950 hover:bg-stone-850 text-stone-400 border border-stone-800 text-[10px] font-bold">Từ chối</button>`
+                    ? `<button onclick="decideResidenceRequest('${r.id}', 'Đã duyệt')" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold mr-1.5">Duyệt</button><button onclick="decideResidenceRequest('${r.id}', 'Từ chối')" class="px-2.5 py-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-500 border border-stone-200 text-[10px] font-bold">Từ chối</button>`
                     : `<span class="text-stone-600 text-[10px]">—</span>`;
 
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
+                    <tr class="hover:bg-stone-50 transition-colors">
                         <td class="p-3">
-                            <span class="font-bold text-white block">${r.guestName}</span>
-                            <span class="text-[10px] text-stone-500 font-mono">${r.guestCccd || 'Chưa có Căn Cước'}</span>
+                            <span class="font-bold text-stone-900 block">${r.guestName}</span>
+                            <span class="text-[10px] text-stone-400 font-mono">${r.guestCccd || 'Chưa có Căn Cước'}</span>
                         </td>
-                        <td class="p-3 text-stone-300">${r.relationship}</td>
+                        <td class="p-3 text-stone-600">${r.relationship}</td>
                         <td class="p-3">
-                            <span class="text-white block">${r.hostName}</span>
-                            <span class="text-[10px] text-stone-500 font-mono">${r.familyId}</span>
+                            <span class="text-stone-900 block">${r.hostName}</span>
+                            <span class="text-[10px] text-stone-400 font-mono">${r.familyId}</span>
                         </td>
-                        <td class="p-3 font-mono text-stone-400">${r.fromDate} → ${r.toDate}</td>
+                        <td class="p-3 font-mono text-stone-500">${r.fromDate} → ${r.toDate}</td>
                         <td class="p-3 text-center">${statusBadge(r.status)}</td>
                         <td class="p-3 text-right whitespace-nowrap">${action}</td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="6" class="p-4 text-center text-stone-500">Chưa có đăng ký lưu trú nào.</td></tr>';
+            }).join('') || '<tr><td colspan="6" class="p-4 text-center text-stone-400">Chưa có đăng ký lưu trú nào.</td></tr>';
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Duyệt Đăng Ký Lưu Trú</h4>
-                        <p class="text-xs text-stone-400">Xét duyệt đăng ký tạm trú cho khách/người thân do các hộ gia đình gửi lên.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Duyệt Đăng Ký Lưu Trú</h4>
+                        <p class="text-xs text-stone-500">Xét duyệt đăng ký tạm trú cho khách/người thân do các hộ gia đình gửi lên.</p>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40 text-left">
+                <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50 text-left">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                            <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                 <th class="p-3 font-semibold">Người lưu trú</th>
                                 <th class="p-3 font-semibold">Quan hệ</th>
                                 <th class="p-3 font-semibold">Hộ đăng ký</th>
@@ -5084,7 +5241,7 @@
                                 <th class="p-3 font-semibold text-right">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-800/40 text-stone-300">${rows}</tbody>
+                        <tbody class="divide-y divide-stone-200/40 text-stone-600">${rows}</tbody>
                     </table>
                 </div>
             `;
@@ -5114,67 +5271,67 @@
                 const isConfirming = homeContentItemToDelete === m.id;
                 const deleteBtn = isConfirming
                     ? `<button onclick="deleteIncidentMinutes('${m.id}')" class="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white border border-red-500 text-[10px] font-bold">Xác nhận?</button>`
-                    : `<button onclick="deleteIncidentMinutes('${m.id}')" class="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900 text-red-400 hover:text-white border border-red-900/30 text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
+                    : `<button onclick="deleteIncidentMinutes('${m.id}')" class="px-2.5 py-1 rounded bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Xóa</button>`;
                 return `
-                    <tr class="hover:bg-stone-900/20 transition-colors">
-                        <td class="p-3 font-semibold text-white align-top">${m.title}</td>
-                        <td class="p-3 text-stone-300 align-top">${m.content}</td>
-                        <td class="p-3 text-stone-400 align-top">${m.location || '-'}</td>
-                        <td class="p-3 font-mono text-stone-400 text-[11px] align-top">${m.time}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="p-3 font-semibold text-stone-900 align-top">${m.title}</td>
+                        <td class="p-3 text-stone-600 align-top">${m.content}</td>
+                        <td class="p-3 text-stone-500 align-top">${m.location || '-'}</td>
+                        <td class="p-3 font-mono text-stone-500 text-[11px] align-top">${m.time}</td>
                         <td class="p-3 text-right align-top">${deleteBtn}</td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-500">Chưa có biên bản sự việc nào.</td></tr>';
+            }).join('') || '<tr><td colspan="5" class="p-4 text-center text-stone-400">Chưa có biên bản sự việc nào.</td></tr>';
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Biên Bản Sự Việc</h4>
-                        <p class="text-xs text-stone-400">Lập biên bản chính thức sau khi xử lý sự việc an ninh trật tự. Chỉ Tổ ANTT xem được mục này.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Biên Bản Sự Việc</h4>
+                        <p class="text-xs text-stone-500">Lập biên bản chính thức sau khi xử lý sự việc an ninh trật tự. Chỉ Tổ ANTT xem được mục này.</p>
                     </div>
                 </div>
 
-                <div class="p-5 rounded-2xl bg-stone-950/40 border border-stone-800 text-left space-y-4">
-                    <h5 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <div class="p-5 rounded-2xl bg-stone-50 border border-stone-200 text-left space-y-4">
+                    <h5 class="text-xs font-bold text-stone-900 uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-file-signature text-primary-400"></i>
                         <span>Lập biên bản mới</span>
                     </h5>
                     <form onsubmit="createIncidentMinutes(event)" class="space-y-3">
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Liên kết tin báo (nếu có)</label>
-                            <select id="minutes-related-report-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Liên kết tin báo (nếu có)</label>
+                            <select id="minutes-related-report-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                                 <option value="">Không liên kết tin báo nào</option>
                                 ${reportOptions}
                             </select>
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Tiêu đề biên bản</label>
-                            <input type="text" id="minutes-title-input" required class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Tiêu đề biên bản</label>
+                            <input type="text" id="minutes-title-input" required class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="space-y-1.5">
-                                <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Địa điểm xảy ra</label>
-                                <input type="text" id="minutes-location-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                                <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Địa điểm xảy ra</label>
+                                <input type="text" id="minutes-location-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                             </div>
                             <div class="space-y-1.5">
-                                <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Người liên quan</label>
-                                <input type="text" id="minutes-involved-input" placeholder="Họ tên các bên liên quan" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                                <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Người liên quan</label>
+                                <input type="text" id="minutes-involved-input" placeholder="Họ tên các bên liên quan" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                             </div>
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Nội dung diễn biến sự việc</label>
-                            <textarea id="minutes-content-input" rows="4" required class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Nội dung diễn biến sự việc</label>
+                            <textarea id="minutes-content-input" rows="4" required class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
                         </div>
                         <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">Lập biên bản</button>
                     </form>
                 </div>
 
                 <div class="space-y-3 text-left">
-                    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Danh sách biên bản đã lập</span>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Danh sách biên bản đã lập</span>
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Tiêu đề</th>
                                     <th class="p-3 font-semibold">Nội dung</th>
                                     <th class="p-3 font-semibold">Địa điểm</th>
@@ -5182,7 +5339,7 @@
                                     <th class="p-3 font-semibold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${rows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${rows}</tbody>
                         </table>
                     </div>
                 </div>
@@ -5249,37 +5406,37 @@
             );
 
             const rows = filtered.map(r => `
-                <tr class="hover:bg-stone-900/20 transition-colors">
-                    <td class="p-3 font-bold text-white">${r.name}</td>
-                    <td class="p-3 text-stone-300">${r.relation || (r.isHouseholder ? 'Chủ hộ' : 'Thành viên')}</td>
-                    <td class="p-3 font-mono text-stone-300">${r.dob}</td>
-                    <td class="p-3 font-mono text-stone-400">${r.phone || 'Chưa có SĐT'}</td>
-                    <td class="p-3 font-mono text-stone-500">${r.familyId}</td>
-                    <td class="p-3 text-stone-300">${r.group}</td>
-                    <td class="p-3 text-right"><button onclick="openViewLocationModal('${r.familyId}')" class="px-2 py-1 rounded bg-stone-900 hover:bg-emerald-900 text-emerald-400 border border-emerald-900/30 text-[10px] font-semibold transition-all"><i class="fa-solid fa-location-dot"></i> Vị trí</button></td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="p-3 font-bold text-stone-900">${r.name}</td>
+                    <td class="p-3 text-stone-600">${r.relation || (r.isHouseholder ? 'Chủ hộ' : 'Thành viên')}</td>
+                    <td class="p-3 font-mono text-stone-600">${r.dob}</td>
+                    <td class="p-3 font-mono text-stone-500">${r.phone || 'Chưa có SĐT'}</td>
+                    <td class="p-3 font-mono text-stone-400">${r.familyId}</td>
+                    <td class="p-3 text-stone-600">${r.group}</td>
+                    <td class="p-3 text-right"><button onclick="openViewLocationModal('${r.familyId}')" class="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white text-[10px] font-semibold transition-all"><i class="fa-solid fa-location-dot"></i> Vị trí</button></td>
                 </tr>
             `).join('');
 
             container.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
                     <div>
-                        <h4 class="font-serif text-lg font-bold text-white">Quản Lý Dân Cư (Chỉ xem)</h4>
-                        <p class="text-xs text-stone-400">Tra cứu thông tin nhân khẩu toàn thôn phục vụ công tác an ninh trật tự. Không có quyền chỉnh sửa.</p>
+                        <h4 class="font-serif text-lg font-bold text-stone-900">Quản Lý Dân Cư (Chỉ xem)</h4>
+                        <p class="text-xs text-stone-500">Tra cứu thông tin nhân khẩu toàn thôn phục vụ công tác an ninh trật tự. Không có quyền chỉnh sửa.</p>
                     </div>
                 </div>
 
                 <div class="space-y-3 text-left">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Danh bạ cư dân toàn Thôn Đoàn Kết (${filtered.length}/${villageDb.residents.length} nhân khẩu)</span>
+                        <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Danh bạ cư dân toàn Thôn Đoàn Kết (${filtered.length}/${villageDb.residents.length} nhân khẩu)</span>
                         <div class="relative w-full sm:w-64">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs"></i>
-                            <input type="text" id="antt-search-input" value="${anttSearchQuery}" oninput="filterAnttResidents(this.value)" placeholder="Tìm theo tên, Căn Cước, SĐT, mã hộ..." class="w-full pl-8 pr-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-white text-xs outline-none focus:border-primary-500 transition-colors">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                            <input type="text" id="antt-search-input" value="${anttSearchQuery}" oninput="filterAnttResidents(this.value)" placeholder="Tìm theo tên, Căn Cước, SĐT, mã hộ..." class="w-full pl-8 pr-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-xs outline-none focus:border-primary-500 transition-colors">
                         </div>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-stone-800 bg-stone-950/40">
+                    <div class="table-scroll overflow-x-auto rounded-xl border border-stone-200 bg-stone-50">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-stone-800 bg-stone-950/60 text-stone-400">
+                                <tr class="border-b border-stone-200 bg-stone-50 text-stone-500">
                                     <th class="p-3 font-semibold">Họ và Tên</th>
                                     <th class="p-3 font-semibold">Quan hệ với chủ hộ</th>
                                     <th class="p-3 font-semibold">Ngày sinh</th>
@@ -5289,7 +5446,7 @@
                                     <th class="p-3 font-semibold text-right">Vị trí</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-800/40 text-stone-300">${rows}</tbody>
+                            <tbody class="divide-y divide-stone-200/40 text-stone-600">${rows}</tbody>
                         </table>
                     </div>
                 </div>
@@ -5319,7 +5476,7 @@
                     </span>
                     <div class="min-w-0">
                         <p class="text-sm font-black text-stone-900 leading-none">${s.value} <span class="text-[10px] font-semibold text-primary-600">${s.unit}</span></p>
-                        <p class="text-[9px] text-stone-500 truncate">${s.label}</p>
+                        <p class="text-[9px] text-stone-400 truncate">${s.label}</p>
                     </div>
                 </div>
             `).join('');
@@ -5361,7 +5518,7 @@
                     <div class="text-3xl font-black text-stone-900 font-serif mb-3 flex items-baseline gap-1">
                         ${s.value} <span class="text-base text-primary-600 font-sans font-semibold">${s.unit}</span>
                     </div>
-                    <div class="space-y-1.5 text-xs text-stone-500 border-t border-stone-100 pt-3">
+                    <div class="space-y-1.5 text-xs text-stone-400 border-t border-stone-100 pt-3">
                         ${(s.breakdown || []).map(b => `
                             <div class="flex justify-between">
                                 <span>${b.label}</span>
@@ -5386,10 +5543,10 @@
                     </div>
                     <div class="min-w-0">
                         <p class="text-sm font-semibold text-stone-800 leading-snug line-clamp-2">${n.title}</p>
-                        <p class="text-[11px] text-stone-400 mt-1">${n.category} · ${n.date}</p>
+                        <p class="text-[11px] text-stone-500 mt-1">${n.category} · ${n.date}</p>
                     </div>
                 </button>
-            `).join('') || '<p class="text-stone-400 text-sm text-center py-8">Chưa có thông báo nào.</p>';
+            `).join('') || '<p class="text-stone-500 text-sm text-center py-8">Chưa có thông báo nào.</p>';
         }
 
         function filterNews(category) {
@@ -5400,7 +5557,7 @@
                 if (!b) return;
                 b.className = btn === category
                     ? "px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-primary-600 text-white transition-all"
-                    : "px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-500 hover:bg-stone-200 transition-all";
+                    : "px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-400 hover:bg-stone-200 transition-all";
             });
             renderHomeNews();
         }
@@ -5426,10 +5583,10 @@
                         </div>
                         <div class="min-w-0">
                             <p class="text-sm font-semibold text-stone-800 leading-snug line-clamp-2">${n.title}</p>
-                            <p class="text-[11px] text-stone-400 mt-1">${n.category} · ${n.date}</p>
+                            <p class="text-[11px] text-stone-500 mt-1">${n.category} · ${n.date}</p>
                         </div>
                     </button>
-                `).join('') : '<p class="text-stone-400 text-sm text-center py-8">Không tìm thấy kết quả phù hợp.</p>';
+                `).join('') : '<p class="text-stone-500 text-sm text-center py-8">Không tìm thấy kết quả phù hợp.</p>';
             }
             if (newsSection) newsSection.scrollIntoView({ behavior: 'smooth' });
         }
@@ -5460,7 +5617,7 @@
                     </div>
                     <span class="text-[11px] font-semibold text-stone-600 group-hover:text-primary-600 leading-tight">${p.name}</span>
                 </a>
-            `).join('') || '<p class="text-stone-400 text-xs col-span-3 text-center py-4">Chưa có nông sản nào.</p>';
+            `).join('') || '<p class="text-stone-500 text-xs col-span-3 text-center py-4">Chưa có nông sản nào.</p>';
         }
 
         function renderHomeLeadership() {
@@ -5473,11 +5630,11 @@
                     : l.name;
                 return `
                     <div class="flex items-center justify-between gap-2 py-2 border-b border-stone-100 last:border-0">
-                        <span class="text-stone-500">${l.role}:</span>
+                        <span class="text-stone-400">${l.role}:</span>
                         <span class="font-semibold text-stone-800 text-right">${name}</span>
                     </div>
                 `;
-            }).join('') || '<p class="text-stone-400 text-center py-4">Chưa có nhân sự nào.</p>';
+            }).join('') || '<p class="text-stone-500 text-center py-4">Chưa có nhân sự nào.</p>';
         }
 
         function renderHomeSecurity() {
@@ -5497,8 +5654,8 @@
                         <div class="flex items-start gap-3">
                             ${deputies.map(d => `<div class="px-3 py-2 rounded-lg bg-primary-50 text-primary-700 border border-primary-100 text-[11px] font-bold text-center">${d.title}<br><span class="font-normal">${d.name}</span></div>`).join('')}
                         </div>` : ''}
-                        ${others.length ? `<div class="text-[11px] text-stone-400 pt-1">Tổ viên (${others.length} người)</div>` : ''}
-                        ${sec.slogan ? `<p class="text-[11px] text-stone-400 italic pt-1 text-center">"${sec.slogan}"</p>` : ''}
+                        ${others.length ? `<div class="text-[11px] text-stone-500 pt-1">Tổ viên (${others.length} người)</div>` : ''}
+                        ${sec.slogan ? `<p class="text-[11px] text-stone-500 italic pt-1 text-center">"${sec.slogan}"</p>` : ''}
                     </div>
                 `;
             }
@@ -5532,7 +5689,7 @@
                         ? `<a href="tel:${l.phone}" class="shrink-0 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 text-xs font-bold hover:bg-primary-100 transition-colors"><i class="fa-solid fa-phone mr-1"></i>${l.phoneDisplay}</a>`
                         : `<span class="shrink-0 px-3 py-1.5 rounded-lg bg-${l.colorTheme}-50 text-${l.colorTheme}-600 text-xs font-bold"><i class="fa-solid ${l.tagIcon} mr-1"></i>${l.tagLabel}</span>`}
                 </div>
-            `).join('') || '<p class="text-stone-400 text-sm text-center py-6">Chưa có nhân sự nào.</p>';
+            `).join('') || '<p class="text-stone-500 text-sm text-center py-6">Chưa có nhân sự nào.</p>';
             openInfoModal('Ban Tự Quản & Hệ Thống Chính Trị');
         }
 
@@ -5540,7 +5697,7 @@
             const sec = (villageDb.homeContent && villageDb.homeContent.security) || { hotline: '', hotlineDisplay: '', slogan: '', members: [] };
             const body = document.getElementById('info-modal-body');
             body.innerHTML = `
-                ${sec.slogan ? `<p class="text-center text-xs italic text-stone-500 pb-2 border-b border-stone-100">"${sec.slogan}"</p>` : ''}
+                ${sec.slogan ? `<p class="text-center text-xs italic text-stone-400 pb-2 border-b border-stone-100">"${sec.slogan}"</p>` : ''}
                 <div class="divide-y divide-stone-100">
                     ${(sec.members || []).map(m => `
                         <div class="flex items-center justify-between gap-3 py-3">
@@ -5550,7 +5707,7 @@
                             </div>
                             <a href="tel:${m.phone}" class="shrink-0 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 text-xs font-bold hover:bg-primary-100 transition-colors"><i class="fa-solid fa-phone mr-1"></i>${m.phoneDisplay}</a>
                         </div>
-                    `).join('') || '<p class="text-stone-400 text-sm text-center py-6">Chưa có thành viên nào.</p>'}
+                    `).join('') || '<p class="text-stone-500 text-sm text-center py-6">Chưa có thành viên nào.</p>'}
                 </div>
                 <a href="tel:${sec.hotline}" class="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wide transition-colors">
                     <i class="fa-solid fa-phone"></i> Đường Dây Nóng 24/7 · ${sec.hotlineDisplay}

@@ -72,15 +72,25 @@
             </div>
         </div>
 
-        <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden bg-primary-800 border-t border-primary-600/50 px-4 pt-2 pb-6 space-y-1 text-xs font-bold uppercase tracking-wide text-primary-50">
-            <a href="#home" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Trang chủ</a>
-            <a href="#about" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Giới thiệu</a>
-            <a href="#news" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Tin tức - Thông báo</a>
-            <a href="#nong-san" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Sản vật đất lành</a>
-            <a href="#system" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Ban tự quản</a>
-            <a href="#security" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">An ninh trật tự</a>
-            <a href="#services" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Dịch vụ công</a>
+        <!-- Sidebar backdrop -->
+        <div id="mobile-menu-backdrop" onclick="toggleMobileMenu()" class="hidden fixed inset-0 z-40 bg-black/60"></div>
+
+        <!-- Mobile Menu Panel (slide-in sidebar, half-width) -->
+        <div id="mobile-menu" class="fixed inset-y-0 left-0 z-50 w-1/2 max-w-xs -translate-x-full transition-transform duration-300 ease-out bg-primary-800 border-r border-primary-600/50 overflow-y-auto p-5 space-y-1 text-xs font-bold uppercase tracking-wide text-primary-50">
+            <div class="flex items-center justify-between pb-4 mb-2 border-b border-primary-600/50">
+                <div class="flex items-center gap-2">
+                    <img src="logo.png" alt="Logo Thôn Đoàn Kết" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary-500/40">
+                    <span class="text-[11px] font-black text-white tracking-wide normal-case">Thôn Đoàn Kết</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="w-8 h-8 rounded-full bg-primary-700 flex items-center justify-center text-primary-100 hover:bg-primary-600 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <a href="#home" onclick="toggleMobileMenu()" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Trang chủ</a>
+            <a href="#about" onclick="toggleMobileMenu()" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Giới thiệu</a>
+            <a href="#news" onclick="toggleMobileMenu()" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Tin tức - Thông báo</a>
+            <a href="#nong-san" onclick="toggleMobileMenu()" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Sản vật địa phương</a>
+            <a href="#system" onclick="toggleMobileMenu()" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Ban tự quản</a>
+            <a href="#security" onclick="toggleMobileMenu()" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">An ninh trật tự</a>
+            <a href="#services" onclick="toggleMobileMenu()" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Dịch vụ công</a>
             <a href="dang-nhap.html" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Đăng nhập hệ thống</a>
         </div>
     </header>
@@ -117,7 +127,7 @@
                     <a href="#home" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Trang chủ</a>
                     <a href="#about" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Giới thiệu</a>
                     <a href="#news" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Tin tức - Thông báo</a>
-                    <a href="#nong-san" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Sản vật đất lành</a>
+                    <a href="#nong-san" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Sản vật địa phương</a>
                     <a href="#system" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Ban tự quản</a>
                     <a href="#security" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">An ninh trật tự</a>
                     <a href="#services" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Dịch vụ công</a>
@@ -174,7 +184,7 @@
             </a>
             <a href="#nong-san" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm">
                 <span class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-leaf"></i></span>
-                <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight">Sản vật đất lành</span>
+                <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight">Sản vật địa phương</span>
             </a>
             <a href="#system" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm">
                 <span class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-people-group"></i></span>
@@ -281,11 +291,11 @@
         <section class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
 
-                <!-- Sản vật đất lành -->
+                <!-- Sản vật địa phương -->
                 <div id="nong-san" class="bg-white border border-stone-200 rounded-3xl shadow-sm p-6 space-y-4 scroll-mt-20">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-seedling"></i></div>
-                        <h3 class="font-serif text-base font-bold text-stone-900">Sản Vật Đất Lành</h3>
+                        <h3 class="font-serif text-base font-bold text-stone-900">Sản vật địa phương</h3>
                     </div>
                     <p class="text-xs text-stone-500">5 nông sản chủ lực đạt chuẩn VietGAP</p>
                     <!-- Products Grid (populated by renderHomeProducts()) -->

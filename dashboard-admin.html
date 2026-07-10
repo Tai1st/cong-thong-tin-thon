@@ -51,33 +51,36 @@
     </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-stone-950 text-stone-100 font-sans antialiased overflow-x-hidden">
+<body class="bg-stone-50 text-stone-800 font-sans antialiased overflow-x-hidden pb-16 md:pb-0">
 
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
-        <div class="p-4 sm:p-6 border-b border-stone-800 flex items-center justify-between gap-3 bg-stone-950/60 shrink-0">
+        <div class="p-4 sm:p-6 border-b border-stone-200 flex items-center justify-between gap-3 bg-white shrink-0">
             <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-                <button onclick="toggleSidebar()" class="md:hidden w-9 h-9 shrink-0 rounded-xl bg-stone-900 border border-stone-800 flex items-center justify-center text-stone-300 hover:text-white hover:border-primary-500 transition-colors">
+                <button onclick="toggleSidebar()" class="md:hidden w-9 h-9 shrink-0 rounded-xl bg-white border border-stone-200 flex items-center justify-center text-stone-600 hover:text-stone-900 hover:border-primary-500 transition-colors">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0"></div>
+                <img src="logo.png" alt="Logo Thôn Đoàn Kết" class="hidden sm:block w-10 h-10 rounded-full object-cover ring-2 ring-primary-100 shrink-0">
                 <div class="min-w-0">
-                    <h3 class="font-serif text-sm sm:text-base md:text-lg font-bold text-white uppercase tracking-wider flex items-center gap-2 truncate">
-                        <a href="index.html" class="hover:text-primary-400 transition-colors truncate">HỆ THỐNG ĐIỀU HÀNH THÔN SỐ</a>
-                        <span id="role-badge" class="hidden px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-stone-800 text-white shrink-0"></span>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-primary-600 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Hệ Thống Điều Hành
+                    </p>
+                    <h3 class="font-sans text-sm sm:text-base md:text-lg font-bold text-red-600 uppercase tracking-wider flex items-center gap-2 truncate leading-tight">
+                        <a href="index.html" class="hover:text-red-700 transition-colors truncate">HỆ THỐNG ĐIỀU HÀNH THÔN SỐ</a>
+                        <span id="role-badge" class="hidden px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-stone-100 text-stone-900 shrink-0"></span>
                     </h3>
-                    <span class="hidden sm:block text-[10px] text-stone-400 -mt-1">Dữ liệu hợp nhất Thôn Đoàn Kết, Xã Dliê Ya, Đắk Lắk</span>
+                    <span class="hidden sm:block text-[10px] text-stone-500">Dữ liệu hợp nhất Thôn Đoàn Kết, Xã Dliê Ya, Đắk Lắk</span>
                 </div>
             </div>
             <div class="flex items-center gap-2 sm:gap-4 shrink-0">
             <div class="flex items-center gap-2.5">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary-600 to-amber-500 text-white flex items-center justify-center text-xs font-black font-serif" id="user-avatar-initials">CD</div>
                 <div class="hidden sm:block text-left">
-                    <h4 class="font-bold text-white text-xs leading-tight" id="user-display-name">Đang tải...</h4>
-                    <span class="text-[9px] text-stone-400 block" id="user-subtitle"></span>
+                    <h4 class="font-bold text-stone-900 text-xs leading-tight" id="user-display-name">Đang tải...</h4>
+                    <span class="text-[9px] text-stone-500 block" id="user-subtitle"></span>
                 </div>
             </div>
-            <button onclick="logout()" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-red-900/40 bg-red-950/45 text-red-400 hover:bg-red-900 hover:text-white transition-all text-xs font-bold flex items-center gap-1.5 shadow-lg">
+            <button onclick="logout()" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all text-xs font-bold flex items-center gap-1.5">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span class="hidden sm:inline">Đăng xuất</span>
             </button>
@@ -85,11 +88,17 @@
         </div>
 
         <!-- Content Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-stone-800 flex-grow">
+        <div class="grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-stone-200 flex-grow bg-stone-50">
             <!-- Sidebar -->
             <div id="sidebar-backdrop" onclick="toggleSidebar()" class="hidden md:hidden fixed inset-0 z-30 bg-black/60"></div>
-            <div class="fixed inset-y-0 left-0 z-40 w-1/2 max-w-xs -translate-x-full transition-transform duration-300 ease-out bg-stone-900/95 backdrop-blur-xl border-r border-stone-800 overflow-y-auto p-5 space-y-5 md:static md:z-auto md:w-auto md:max-w-none md:translate-x-0 md:transition-none md:bg-stone-900/30 md:backdrop-blur-none md:border-r-0 md:col-span-3" id="sidebar-panel">
-
+            <div class="fixed inset-y-0 left-0 z-40 w-1/2 max-w-xs -translate-x-full transition-transform duration-300 ease-out bg-white shadow-xl border-r border-stone-200 overflow-y-auto p-5 space-y-5 md:static md:z-auto md:w-auto md:max-w-none md:translate-x-0 md:transition-none md:bg-stone-50 md:shadow-none md:border-r-0 md:col-span-3" id="sidebar-panel">
+                <div class="flex items-center justify-between md:hidden pb-4 mb-2 border-b border-stone-100">
+                    <div class="flex items-center gap-2">
+                        <img src="logo.png" alt="Logo Thôn Đoàn Kết" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary-100">
+                        <span class="text-[11px] font-black text-stone-900 tracking-wide normal-case">Thôn Đoàn Kết</span>
+                    </div>
+                    <button onclick="toggleSidebar()" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 hover:bg-stone-200 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                </div>
                 <div class="space-y-1" id="portal-tabs"></div>
             </div>
 
@@ -100,46 +109,70 @@
                         <span id="notif-icon"></span>
                         <span id="notif-text"></span>
                     </div>
-                    <button onclick="this.parentElement.classList.add('hidden')" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="this.parentElement.classList.add('hidden')" class="text-stone-500 hover:text-stone-900"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div id="tab-content-container" class="space-y-6"></div>
             </div>
         </div>
     </div>
 
+    <!-- Mobile bottom tab bar -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.06)] grid grid-cols-5">
+        <button onclick="switchPortalTab('dashboard')" class="flex flex-col items-center justify-center gap-1 py-2 text-primary-600">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] font-semibold">Trang chủ</span>
+        </button>
+        <button onclick="switchPortalTab('duyệt-xóa')" class="flex flex-col items-center justify-center gap-1 py-2 text-stone-500">
+            <i class="fa-solid fa-trash-can-arrow-up text-lg"></i>
+            <span class="text-[10px] font-semibold">Duyệt xóa</span>
+        </button>
+        <button onclick="switchPortalTab('quản-lý-tài-khoản')" class="flex flex-col items-center justify-center -mt-5">
+            <span class="w-12 h-12 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-lg"><i class="fa-solid fa-user-gear text-lg"></i></span>
+            <span class="text-[9px] font-semibold text-primary-700 mt-0.5">Tài khoản</span>
+        </button>
+        <button onclick="switchPortalTab('quản-lý-trang-chủ')" class="flex flex-col items-center justify-center gap-1 py-2 text-stone-500">
+            <i class="fa-solid fa-globe text-lg"></i>
+            <span class="text-[10px] font-semibold">Trang chủ web</span>
+        </button>
+        <button onclick="logout()" class="flex flex-col items-center justify-center gap-1 py-2 text-stone-500">
+            <i class="fa-solid fa-right-from-bracket text-lg"></i>
+            <span class="text-[10px] font-semibold">Đăng xuất</span>
+        </button>
+    </nav>
+
     <!-- -->
-    <div id="custom-alert-box" class="fixed top-6 right-6 z-[100] max-w-sm w-full p-4 rounded-2xl bg-stone-900 border border-stone-800 shadow-2xl flex items-start gap-3 transition-all transform translate-x-96 hidden">
+    <div id="custom-alert-box" class="fixed top-6 right-6 z-[100] max-w-sm w-full p-4 rounded-2xl bg-white border border-stone-200 shadow-2xl flex items-start gap-3 transition-all transform translate-x-96 hidden">
         <div id="alert-box-icon" class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"></div>
         <div class="space-y-1">
-            <h4 id="alert-box-title" class="font-bold text-white text-xs">Thông báo</h4>
-            <p id="alert-box-message" class="text-[11px] text-stone-400 leading-normal"></p>
+            <h4 id="alert-box-title" class="font-bold text-stone-900 text-xs">Thông báo</h4>
+            <p id="alert-box-message" class="text-[11px] text-stone-500 leading-normal"></p>
         </div>
-        <button onclick="closeCustomAlert()" class="text-stone-500 hover:text-stone-300 text-sm ml-auto shrink-0"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="closeCustomAlert()" class="text-stone-400 hover:text-stone-600 text-sm ml-auto shrink-0"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
     <!-- -->
     <div id="edit-account-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 premium-blur hidden">
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="edit-account-modal-box">
-            <div class="p-6 border-b border-stone-800/80 flex items-center justify-between">
-                <h3 class="font-serif text-base font-bold text-white uppercase tracking-wider">Chỉnh sửa tài khoản</h3>
-                <button onclick="closeEditAccountModal()" class="w-8 h-8 rounded-full bg-stone-950/80 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-red-500 transition-colors">
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="edit-account-modal-box">
+            <div class="p-6 border-b border-stone-200 flex items-center justify-between">
+                <h3 class="font-serif text-base font-bold text-stone-900 uppercase tracking-wider">Chỉnh sửa tài khoản</h3>
+                <button onclick="closeEditAccountModal()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-300 transition-colors">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <form onsubmit="saveEditAccount(event)" class="p-6 space-y-4">
                 <div class="grid grid-cols-2 gap-3 text-xs">
-                    <div class="p-3 rounded-xl bg-stone-950/60 border border-stone-800">
-                        <span class="text-[9px] uppercase font-bold text-stone-500 block">Tên tài khoản</span>
-                        <span id="edit-account-name" class="font-bold text-white block mt-0.5"></span>
+                    <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+                        <span class="text-[9px] uppercase font-bold text-stone-400 block">Tên tài khoản</span>
+                        <span id="edit-account-name" class="font-bold text-stone-900 block mt-0.5"></span>
                     </div>
-                    <div class="p-3 rounded-xl bg-stone-950/60 border border-stone-800">
-                        <span class="text-[9px] uppercase font-bold text-stone-500 block">Tên đăng nhập</span>
-                        <span id="edit-account-username" class="font-mono font-bold text-white block mt-0.5"></span>
+                    <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+                        <span class="text-[9px] uppercase font-bold text-stone-400 block">Tên đăng nhập</span>
+                        <span id="edit-account-username" class="font-mono font-bold text-stone-900 block mt-0.5"></span>
                     </div>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Vai trò</label>
-                    <select id="edit-account-role-input" onchange="toggleEditAccountAssocField()" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Vai trò</label>
+                    <select id="edit-account-role-input" onchange="toggleEditAccountAssocField()" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         <option value="Cư dân">Cư dân</option>
                         <option value="Cán bộ Hội">Cán bộ Hội</option>
                         <option value="Trưởng thôn">Trưởng thôn</option>
@@ -148,10 +181,10 @@
                     </select>
                 </div>
                 <div class="space-y-1.5 hidden" id="edit-account-assoc-field">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Hội phụ trách (Hội trưởng)</label>
-                    <select id="edit-account-assoc-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors"></select>
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Hội phụ trách (Hội trưởng)</label>
+                    <select id="edit-account-assoc-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors"></select>
                 </div>
-                <p class="text-[11px] text-stone-500">Đổi vai trò sang Cán bộ Hội bắt buộc chọn hội phụ trách; đổi sang vai trò khác sẽ tự động gỡ hội phụ trách cũ.</p>
+                <p class="text-[11px] text-stone-400">Đổi vai trò sang Cán bộ Hội bắt buộc chọn hội phụ trách; đổi sang vai trò khác sẽ tự động gỡ hội phụ trách cũ.</p>
                 <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">
                     Lưu thay đổi
                 </button>
@@ -161,38 +194,38 @@
 
     <!-- -->
     <div id="edit-stat-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 premium-blur hidden">
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="edit-stat-modal-box">
-            <div class="p-6 border-b border-stone-800/80 flex items-center justify-between">
-                <h3 class="font-serif text-base font-bold text-white uppercase tracking-wider">Sửa số liệu thống kê</h3>
-                <button onclick="closeEditStatModal()" class="w-8 h-8 rounded-full bg-stone-950/80 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-red-500 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="edit-stat-modal-box">
+            <div class="p-6 border-b border-stone-200 flex items-center justify-between">
+                <h3 class="font-serif text-base font-bold text-stone-900 uppercase tracking-wider">Sửa số liệu thống kê</h3>
+                <button onclick="closeEditStatModal()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-300 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form onsubmit="saveEditStat(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Nhãn chỉ tiêu</label>
-                    <input type="text" id="edit-stat-label-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Nhãn chỉ tiêu</label>
+                    <input type="text" id="edit-stat-label-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Icon (FontAwesome, VD: fa-house-chimney)</label>
-                    <input type="text" id="edit-stat-icon-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Icon (FontAwesome, VD: fa-house-chimney)</label>
+                    <input type="text" id="edit-stat-icon-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Giá trị</label>
-                        <input type="text" id="edit-stat-value-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Giá trị</label>
+                        <input type="text" id="edit-stat-value-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Đơn vị</label>
-                        <input type="text" id="edit-stat-unit-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Đơn vị</label>
+                        <input type="text" id="edit-stat-unit-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                     </div>
                 </div>
-                <p class="text-[10px] uppercase font-bold tracking-wider text-stone-500">Chi tiết đối chiếu (2 dòng)</p>
+                <p class="text-[10px] uppercase font-bold tracking-wider text-stone-400">Chi tiết đối chiếu (2 dòng)</p>
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="edit-stat-breakdown1-label-input" placeholder="Nhãn dòng 1" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
-                    <input type="text" id="edit-stat-breakdown1-value-input" placeholder="Giá trị dòng 1" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <input type="text" id="edit-stat-breakdown1-label-input" placeholder="Nhãn dòng 1" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <input type="text" id="edit-stat-breakdown1-value-input" placeholder="Giá trị dòng 1" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="edit-stat-breakdown2-label-input" placeholder="Nhãn dòng 2" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
-                    <input type="text" id="edit-stat-breakdown2-value-input" placeholder="Giá trị dòng 2" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <input type="text" id="edit-stat-breakdown2-label-input" placeholder="Nhãn dòng 2" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <input type="text" id="edit-stat-breakdown2-value-input" placeholder="Giá trị dòng 2" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">Lưu thay đổi</button>
             </form>
@@ -201,37 +234,37 @@
 
     <!-- -->
     <div id="news-form-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 premium-blur hidden">
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-lg overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="news-form-modal-box">
-            <div class="p-6 border-b border-stone-800/80 flex items-center justify-between">
-                <h3 id="news-form-title" class="font-serif text-base font-bold text-white uppercase tracking-wider">Thêm/Sửa tin tức</h3>
-                <button onclick="closeNewsFormModal()" class="w-8 h-8 rounded-full bg-stone-950/80 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-red-500 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-lg overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="news-form-modal-box">
+            <div class="p-6 border-b border-stone-200 flex items-center justify-between">
+                <h3 id="news-form-title" class="font-serif text-base font-bold text-stone-900 uppercase tracking-wider">Thêm/Sửa tin tức</h3>
+                <button onclick="closeNewsFormModal()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-300 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form onsubmit="saveNewsForm(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div class="grid grid-cols-2 gap-3">
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Danh mục</label>
-                        <select id="news-form-category-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Danh mục</label>
+                        <select id="news-form-category-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                             <option value="hanh-chinh">Hành chính</option>
                             <option value="san-xuat">Sản xuất</option>
                             <option value="doan-the">Đoàn thể</option>
                         </select>
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Ngày (DD/MM/YYYY)</label>
-                        <input type="date" id="news-form-date-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Ngày (DD/MM/YYYY)</label>
+                        <input type="date" id="news-form-date-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                     </div>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Tiêu đề</label>
-                    <input type="text" id="news-form-title-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Tiêu đề</label>
+                    <input type="text" id="news-form-title-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Tóm tắt (hiển thị ở thẻ tin)</label>
-                    <textarea id="news-form-summary-input" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Tóm tắt (hiển thị ở thẻ tin)</label>
+                    <textarea id="news-form-summary-input" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Nội dung chi tiết</label>
-                    <textarea id="news-form-content-input" rows="6" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Nội dung chi tiết</label>
+                    <textarea id="news-form-content-input" rows="6" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
                 </div>
                 <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">Lưu tin tức</button>
             </form>
@@ -240,38 +273,38 @@
 
     <!-- -->
     <div id="product-form-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 premium-blur hidden">
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-lg overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="product-form-modal-box">
-            <div class="p-6 border-b border-stone-800/80 flex items-center justify-between">
-                <h3 id="product-form-title" class="font-serif text-base font-bold text-white uppercase tracking-wider">Thêm/Sửa nông sản</h3>
-                <button onclick="closeProductFormModal()" class="w-8 h-8 rounded-full bg-stone-950/80 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-red-500 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-lg overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="product-form-modal-box">
+            <div class="p-6 border-b border-stone-200 flex items-center justify-between">
+                <h3 id="product-form-title" class="font-serif text-base font-bold text-stone-900 uppercase tracking-wider">Thêm/Sửa nông sản</h3>
+                <button onclick="closeProductFormModal()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-300 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form onsubmit="saveProductForm(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div class="grid grid-cols-2 gap-3">
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Tên nông sản</label>
-                        <input type="text" id="product-form-name-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Tên nông sản</label>
+                        <input type="text" id="product-form-name-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Nhãn (VD: Chủ Lực)</label>
-                        <input type="text" id="product-form-badge-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Nhãn (VD: Chủ Lực)</label>
+                        <input type="text" id="product-form-badge-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                     </div>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Link hình ảnh</label>
-                    <input type="text" id="product-form-image-input" placeholder="https://..." class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Link hình ảnh</label>
+                    <input type="text" id="product-form-image-input" placeholder="https://..." class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Mô tả</label>
-                    <textarea id="product-form-desc-input" rows="3" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Mô tả</label>
+                    <textarea id="product-form-desc-input" rows="3" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Nhãn dòng cuối (VD: Sản lượng năm:)</label>
-                        <input type="text" id="product-form-footer-label-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Nhãn dòng cuối (VD: Sản lượng năm:)</label>
+                        <input type="text" id="product-form-footer-label-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Giá trị dòng cuối</label>
-                        <input type="text" id="product-form-footer-value-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Giá trị dòng cuối</label>
+                        <input type="text" id="product-form-footer-value-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                     </div>
                 </div>
                 <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">Lưu nông sản</button>
@@ -281,52 +314,52 @@
 
     <!-- -->
     <div id="leadership-form-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 premium-blur hidden">
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-lg overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="leadership-form-modal-box">
-            <div class="p-6 border-b border-stone-800/80 flex items-center justify-between">
-                <h3 id="leadership-form-title" class="font-serif text-base font-bold text-white uppercase tracking-wider">Thêm/Sửa nhân sự</h3>
-                <button onclick="closeLeadershipFormModal()" class="w-8 h-8 rounded-full bg-stone-950/80 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-red-500 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-lg overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="leadership-form-modal-box">
+            <div class="p-6 border-b border-stone-200 flex items-center justify-between">
+                <h3 id="leadership-form-title" class="font-serif text-base font-bold text-stone-900 uppercase tracking-wider">Thêm/Sửa nhân sự</h3>
+                <button onclick="closeLeadershipFormModal()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-300 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form onsubmit="saveLeadershipForm(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div class="grid grid-cols-2 gap-3">
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Chữ viết tắt (VD: ĐVT)</label>
-                        <input type="text" id="leadership-form-initials-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Chữ viết tắt (VD: ĐVT)</label>
+                        <input type="text" id="leadership-form-initials-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Màu chủ đạo</label>
-                        <select id="leadership-form-color-input" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors"></select>
+                        <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Màu chủ đạo</label>
+                        <select id="leadership-form-color-input" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors"></select>
                     </div>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Icon trang trí (FontAwesome, VD: fa-landmark)</label>
-                    <input type="text" id="leadership-form-decoricon-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Icon trang trí (FontAwesome, VD: fa-landmark)</label>
+                    <input type="text" id="leadership-form-decoricon-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Chức vụ</label>
-                    <input type="text" id="leadership-form-role-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Chức vụ</label>
+                    <input type="text" id="leadership-form-role-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Họ và tên</label>
-                    <input type="text" id="leadership-form-name-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Họ và tên</label>
+                    <input type="text" id="leadership-form-name-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Mô tả</label>
-                    <textarea id="leadership-form-desc-input" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Mô tả</label>
+                    <textarea id="leadership-form-desc-input" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors"></textarea>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Kiểu hành động hiển thị</label>
-                    <select id="leadership-form-actiontype-input" onchange="toggleLeadershipActionFields()" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Kiểu hành động hiển thị</label>
+                    <select id="leadership-form-actiontype-input" onchange="toggleLeadershipActionFields()" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                         <option value="phone">Số điện thoại liên hệ</option>
                         <option value="tag">Nhãn hành động (không có SĐT)</option>
                     </select>
                 </div>
                 <div id="leadership-form-phone-fields" class="grid grid-cols-2 gap-3">
-                    <input type="text" id="leadership-form-phone-input" placeholder="Số điện thoại (VD: 0978190440)" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
-                    <input type="text" id="leadership-form-phonedisplay-input" placeholder="Hiển thị (VD: 0978.190.440)" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <input type="text" id="leadership-form-phone-input" placeholder="Số điện thoại (VD: 0978190440)" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <input type="text" id="leadership-form-phonedisplay-input" placeholder="Hiển thị (VD: 0978.190.440)" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div id="leadership-form-tag-fields" class="grid grid-cols-2 gap-3 hidden">
-                    <input type="text" id="leadership-form-tagicon-input" placeholder="Icon (VD: fa-bolt)" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
-                    <input type="text" id="leadership-form-taglabel-input" placeholder="Nhãn (VD: Xung kích)" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <input type="text" id="leadership-form-tagicon-input" placeholder="Icon (VD: fa-bolt)" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
+                    <input type="text" id="leadership-form-taglabel-input" placeholder="Nhãn (VD: Xung kích)" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-xs outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">Lưu nhân sự</button>
             </form>
@@ -335,23 +368,23 @@
 
     <!-- -->
     <div id="security-member-form-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 premium-blur hidden">
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="security-member-form-modal-box">
-            <div class="p-6 border-b border-stone-800/80 flex items-center justify-between">
-                <h3 id="security-member-form-title" class="font-serif text-base font-bold text-white uppercase tracking-wider">Thêm/Sửa thành viên</h3>
-                <button onclick="closeSecurityMemberFormModal()" class="w-8 h-8 rounded-full bg-stone-950/80 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-red-500 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="security-member-form-modal-box">
+            <div class="p-6 border-b border-stone-200 flex items-center justify-between">
+                <h3 id="security-member-form-title" class="font-serif text-base font-bold text-stone-900 uppercase tracking-wider">Thêm/Sửa thành viên</h3>
+                <button onclick="closeSecurityMemberFormModal()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-300 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form onsubmit="saveSecurityMemberForm(event)" class="p-6 space-y-4">
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Chức danh (VD: Tổ Trưởng, Tổ Viên)</label>
-                    <input type="text" id="security-member-form-title-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Chức danh (VD: Tổ Trưởng, Tổ Viên)</label>
+                    <input type="text" id="security-member-form-title-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Họ và tên</label>
-                    <input type="text" id="security-member-form-name-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Họ và tên</label>
+                    <input type="text" id="security-member-form-name-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Số điện thoại</label>
-                    <input type="text" id="security-member-form-phone-input" placeholder="0987533112" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Số điện thoại</label>
+                    <input type="text" id="security-member-form-phone-input" placeholder="0987533112" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">Lưu thành viên</button>
             </form>
@@ -360,39 +393,39 @@
 
     <!-- -->
     <div id="request-member-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 premium-blur hidden">
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="request-member-modal-box">
-            <div class="p-6 border-b border-stone-800/80 flex items-center justify-between">
-                <h3 class="font-serif text-base font-bold text-white uppercase tracking-wider">Yêu cầu sửa thông tin</h3>
-                <button onclick="closeRequestMemberEditModal()" class="w-8 h-8 rounded-full bg-stone-950/80 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-red-500 transition-colors">
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="request-member-modal-box">
+            <div class="p-6 border-b border-stone-200 flex items-center justify-between">
+                <h3 class="font-serif text-base font-bold text-stone-900 uppercase tracking-wider">Yêu cầu sửa thông tin</h3>
+                <button onclick="closeRequestMemberEditModal()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-300 transition-colors">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <form onsubmit="submitMemberEditRequest(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Thành viên</label>
-                    <p id="request-member-name" class="text-sm font-bold text-white"></p>
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Thành viên</label>
+                    <p id="request-member-name" class="text-sm font-bold text-stone-900"></p>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Họ và tên</label>
-                    <input type="text" id="request-member-name-input" placeholder="Họ và tên" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Họ và tên</label>
+                    <input type="text" id="request-member-name-input" placeholder="Họ và tên" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Quan hệ với chủ hộ</label>
-                    <input type="text" id="request-member-relation-input" placeholder="VD: Con, Vợ, Chồng..." class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Quan hệ với chủ hộ</label>
+                    <input type="text" id="request-member-relation-input" placeholder="VD: Con, Vợ, Chồng..." class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Ngày sinh</label>
-                    <input type="date" id="request-member-dob-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Ngày sinh</label>
+                    <input type="date" id="request-member-dob-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Số Căn Cước</label>
-                    <input type="text" id="request-member-cccd-input" placeholder="Số Căn Cước" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Số Căn Cước</label>
+                    <input type="text" id="request-member-cccd-input" placeholder="Số Căn Cước" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Số điện thoại</label>
-                    <input type="text" id="request-member-phone-input" placeholder="Số điện thoại" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Số điện thoại</label>
+                    <input type="text" id="request-member-phone-input" placeholder="Số điện thoại" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
-                <p class="text-[11px] text-stone-500">Yêu cầu sẽ ở trạng thái "Chờ duyệt" cho đến khi Admin phê duyệt.</p>
+                <p class="text-[11px] text-stone-400">Yêu cầu sẽ ở trạng thái "Chờ duyệt" cho đến khi Admin phê duyệt.</p>
                 <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">
                     Gửi yêu cầu
                 </button>
@@ -402,35 +435,35 @@
 
     <!-- -->
     <div id="add-member-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 premium-blur hidden">
-        <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="add-member-modal-box">
-            <div class="p-6 border-b border-stone-800/80 flex items-center justify-between">
-                <h3 class="font-serif text-base font-bold text-white uppercase tracking-wider">Thêm thành viên mới</h3>
-                <button onclick="closeAddMemberModal()" class="w-8 h-8 rounded-full bg-stone-950/80 border border-stone-800 flex items-center justify-center text-stone-400 hover:text-white hover:border-red-500 transition-colors">
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl transition-all scale-95 duration-300" id="add-member-modal-box">
+            <div class="p-6 border-b border-stone-200 flex items-center justify-between">
+                <h3 class="font-serif text-base font-bold text-stone-900 uppercase tracking-wider">Thêm thành viên mới</h3>
+                <button onclick="closeAddMemberModal()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-300 transition-colors">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <form onsubmit="submitNewMemberRequest(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Họ và tên</label>
-                    <input type="text" id="add-member-name-input" placeholder="Họ và tên" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Họ và tên</label>
+                    <input type="text" id="add-member-name-input" placeholder="Họ và tên" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Quan hệ với chủ hộ</label>
-                    <input type="text" id="add-member-relation-input" placeholder="VD: Con, Vợ, Chồng..." class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Quan hệ với chủ hộ</label>
+                    <input type="text" id="add-member-relation-input" placeholder="VD: Con, Vợ, Chồng..." class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Ngày sinh</label>
-                    <input type="date" id="add-member-dob-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Ngày sinh</label>
+                    <input type="date" id="add-member-dob-input" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Số định danh cá nhân / Căn Cước</label>
-                    <input type="text" id="add-member-cccd-input" placeholder="Số định danh cá nhân (12 số)" required class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Số định danh cá nhân / Căn Cước</label>
+                    <input type="text" id="add-member-cccd-input" placeholder="Số định danh cá nhân (12 số)" required class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-400 block">Số điện thoại (nếu có)</label>
-                    <input type="text" id="add-member-phone-input" placeholder="Số điện thoại" class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm outline-none focus:border-primary-500 transition-colors">
+                    <label class="text-[10px] uppercase font-bold tracking-wider text-stone-500 block">Số điện thoại (nếu có)</label>
+                    <input type="text" id="add-member-phone-input" placeholder="Số điện thoại" class="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-800 text-sm outline-none focus:border-primary-500 transition-colors">
                 </div>
-                <p class="text-[11px] text-stone-500">Yêu cầu sẽ ở trạng thái "Chờ duyệt" cho đến khi Admin phê duyệt và tạo hồ sơ nhân khẩu mới.</p>
+                <p class="text-[11px] text-stone-400">Yêu cầu sẽ ở trạng thái "Chờ duyệt" cho đến khi Admin phê duyệt và tạo hồ sơ nhân khẩu mới.</p>
                 <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-lg shadow-primary-950/50">
                     Gửi yêu cầu
                 </button>
