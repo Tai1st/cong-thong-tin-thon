@@ -449,6 +449,15 @@
             } else if (currentRole === 'Admin') {
                 subtitle.innerText = "Quản trị hệ thống tối cao";
             }
+
+            // Cán bộ Hội's header (dashboard-canbo.html only) shows the
+            // specific association they manage instead of a generic title,
+            // since one account only ever represents one hội (Hội Nông dân,
+            // Hội Phụ nữ...).
+            const pageTitle = document.getElementById('header-page-title');
+            if (pageTitle && currentRole === 'Cán bộ Hội' && currentUser.assoc) {
+                pageTitle.innerText = `CỔNG ${currentUser.assoc.toUpperCase()}`;
+            }
         }
 
         function initDatabase() {
