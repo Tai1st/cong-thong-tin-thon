@@ -111,10 +111,10 @@
                 <a href="https://fb.me/thondoanket" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors">
                     <i class="fa-brands fa-facebook text-lg"></i> Fanpage Facebook
                 </a>
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm"></i>
-                    <input id="site-search-input" type="text" placeholder="Tìm kiếm thông tin..." onkeydown="if(event.key==='Enter') runSiteSearch()" class="w-56 pl-9 pr-3 py-2.5 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white transition-all">
-                </div>
+                <form onsubmit="event.preventDefault(); runSiteSearch('site-search-input');" class="relative">
+                    <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-primary-600 text-sm transition-colors"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <input id="site-search-input" type="text" placeholder="Tìm kiếm thông tin..." class="w-56 pl-9 pr-3 py-2.5 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white transition-all">
+                </form>
             </div>
         </div>
     </header>
@@ -204,10 +204,10 @@
             </button>
         </div>
         <div class="pt-3">
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm"></i>
-                <input id="mobile-search-input" type="text" placeholder="Tìm kiếm thông tin..." onkeydown="if(event.key==='Enter'){document.getElementById('site-search-input').value=this.value; runSiteSearch();}" class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-all">
-            </div>
+            <form onsubmit="event.preventDefault(); runSiteSearch('mobile-search-input');" class="relative">
+                <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-primary-600 text-sm transition-colors"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <input id="mobile-search-input" type="text" placeholder="Tìm kiếm thông tin..." class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-all">
+            </form>
         </div>
     </section>
 

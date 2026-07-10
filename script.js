@@ -5562,33 +5562,18 @@
             renderHomeNews();
         }
 
-        function runSiteSearch() {
-            const input = document.getElementById('site-search-input');
+        // Site-wide search: delegates to a Google "site:" search opened in a
+        // new tab, so it can surface any content on the site (not just news)
+        // without needing our own search index. Falls back to the real
+        // deployed domain if run somewhere window.location.hostname isn't
+        // meaningful (e.g. opened as a local file).
+        function runSiteSearch(inputId) {
+            const input = document.getElementById(inputId || 'site-search-input');
             if (!input) return;
-            const q = input.value.trim().toLowerCase();
-            const newsSection = document.getElementById('news');
-            if (!q) {
-                if (newsSection) newsSection.scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-            filterNews('all');
-            const news = (villageDb.homeContent && villageDb.homeContent.news) || [];
-            const matches = news.filter(n => n.title.toLowerCase().includes(q) || n.summary.toLowerCase().includes(q));
-            const grid = document.getElementById('news-grid');
-            if (grid) {
-                grid.innerHTML = matches.length ? matches.map(n => `
-                    <button onclick="openNewsDetail('${n.id}')" class="w-full text-left px-5 py-4 hover:bg-stone-50 transition-colors flex gap-3 items-start">
-                        <div class="w-9 h-9 rounded-lg ${n.colorClass} flex items-center justify-center shrink-0 mt-0.5">
-                            <i class="fa-solid fa-bullhorn text-xs"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-sm font-semibold text-stone-800 leading-snug line-clamp-2">${n.title}</p>
-                            <p class="text-[11px] text-stone-500 mt-1">${n.category} · ${n.date}</p>
-                        </div>
-                    </button>
-                `).join('') : '<p class="text-stone-500 text-sm text-center py-8">Không tìm thấy kết quả phù hợp.</p>';
-            }
-            if (newsSection) newsSection.scrollIntoView({ behavior: 'smooth' });
+            const q = input.value.trim();
+            if (!q) return;
+            const site = window.location.hostname || 'thondoanket.netlify.app';
+            window.open(`https://www.google.com/search?q=${encodeURIComponent('site:' + site + ' ' + q)}`, '_blank');
         }
 
         function openNewsDetail(id) {
