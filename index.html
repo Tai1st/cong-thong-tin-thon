@@ -51,16 +51,42 @@
     </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-stone-50 text-stone-800 font-sans antialiased overflow-x-hidden">
+<body class="bg-stone-50 text-stone-800 font-sans antialiased overflow-x-hidden pb-16 lg:pb-0">
 
     <!-- -->
     <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
-    <button id="music-toggle-btn" onclick="toggleBgMusic()" title="Bật/Tắt nhạc nền" class="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-white border border-stone-200 shadow-lg flex items-center justify-center text-primary-600 hover:text-primary-700 hover:border-primary-300 transition-all">
+    <button id="music-toggle-btn" onclick="toggleBgMusic()" title="Bật/Tắt nhạc nền" class="fixed bottom-20 lg:bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-white border border-stone-200 shadow-lg flex items-center justify-center text-primary-600 hover:text-primary-700 hover:border-primary-300 transition-all">
         <i class="fa-solid fa-music" id="music-toggle-icon"></i>
     </button>
 
-    <!-- Header: brand + contact actions -->
-    <header class="bg-white border-b border-stone-200">
+    <!-- ============ MOBILE HEADER (app-style, < lg) ============ -->
+    <header class="lg:hidden bg-white border-b border-stone-200 sticky top-0 z-40">
+        <div class="px-4 py-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <button id="mobile-menu-btn" class="text-stone-600 text-xl shrink-0"><i class="fa-solid fa-bars"></i></button>
+                <img src="logo.png" alt="Logo Thôn Đoàn Kết" class="w-11 h-11 rounded-full object-cover ring-2 ring-primary-100 shrink-0">
+                <div class="min-w-0">
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-primary-600 truncate">Cổng Thông Tin Điện Tử</p>
+                    <h1 class="font-sans text-sm font-bold text-red-600 uppercase leading-tight truncate">Thôn Đoàn Kết – Xã Dliê Ya, Đắk Lắk</h1>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden bg-primary-800 border-t border-primary-600/50 px-4 pt-2 pb-6 space-y-1 text-xs font-bold uppercase tracking-wide text-primary-50">
+            <a href="#home" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Trang chủ</a>
+            <a href="#about" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Giới thiệu</a>
+            <a href="#news" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Tin tức - Thông báo</a>
+            <a href="#nong-san" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Sản vật đất lành</a>
+            <a href="#system" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Ban tự quản</a>
+            <a href="#security" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">An ninh trật tự</a>
+            <a href="#services" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Dịch vụ công</a>
+            <a href="dang-nhap.html" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Đăng nhập hệ thống</a>
+        </div>
+    </header>
+
+    <!-- ============ DESKTOP HEADER + NAV (>= lg) ============ -->
+    <header class="hidden lg:block bg-white border-b border-stone-200">
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col lg:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <img src="logo.png" alt="Logo Thôn Đoàn Kết" class="w-14 h-14 rounded-full object-cover ring-2 ring-primary-100 shadow-sm">
@@ -75,9 +101,6 @@
                 <a href="https://fb.me/thondoanket" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors">
                     <i class="fa-brands fa-facebook text-lg"></i> Fanpage Facebook
                 </a>
-                <a href="tel:0987533112" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold uppercase tracking-wide shadow-sm hover:bg-red-700 transition-colors">
-                    <i class="fa-solid fa-phone"></i> Đường Dây Nóng 24/7 · 0987.533.112
-                </a>
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm"></i>
                     <input id="site-search-input" type="text" placeholder="Tìm kiếm thông tin..." onkeydown="if(event.key==='Enter') runSiteSearch()" class="w-56 pl-9 pr-3 py-2.5 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white transition-all">
@@ -86,11 +109,11 @@
         </div>
     </header>
 
-    <!-- Sticky navigation -->
-    <nav class="sticky top-0 left-0 w-full z-50 bg-primary-700 transition-shadow duration-300" id="main-nav">
+    <!-- Sticky navigation (desktop only) -->
+    <nav class="hidden lg:block sticky top-0 left-0 w-full z-50 bg-primary-700 transition-shadow duration-300" id="main-nav">
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-14">
-                <div class="hidden md:flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-primary-50">
+                <div class="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-primary-50">
                     <a href="#home" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Trang chủ</a>
                     <a href="#about" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Giới thiệu</a>
                     <a href="#news" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Tin tức - Thông báo</a>
@@ -101,43 +124,112 @@
                     <a href="#gallery" class="px-3 py-2 rounded-lg hover:bg-primary-600 transition-colors">Liên hệ</a>
                 </div>
 
-                <div class="hidden md:block">
-                    <a href="dang-nhap.html" class="px-5 py-2.5 rounded-xl bg-white text-primary-700 font-bold text-xs tracking-wider uppercase hover:bg-primary-50 shadow-sm transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-fingerprint"></i> Đăng Nhập <i class="fa-solid fa-chevron-down text-[9px]"></i>
-                    </a>
-                </div>
+                <a href="dang-nhap.html" class="px-5 py-2.5 rounded-xl bg-white text-primary-700 font-bold text-xs tracking-wider uppercase hover:bg-primary-50 shadow-sm transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-fingerprint"></i> Đăng Nhập <i class="fa-solid fa-chevron-down text-[9px]"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
 
-                <div class="md:hidden flex items-center gap-3 text-white">
-                    <a href="dang-nhap.html" class="p-2 rounded-lg bg-primary-600/60 text-sm">
-                        <i class="fa-solid fa-user-lock"></i>
-                    </a>
-                    <button id="mobile-menu-btn" class="p-2">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                    </button>
+    <!-- ============ MOBILE HERO CAROUSEL + QUICK ICONS (< lg) ============ -->
+    <section class="lg:hidden px-4 pt-4">
+        <div id="mobile-hero-track" class="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar rounded-2xl">
+            <!-- Slide 1: intro + stats -->
+            <div class="snap-center shrink-0 w-full grid grid-cols-2 gap-3">
+                <div class="bg-primary-800 text-white rounded-2xl p-4 space-y-2 flex flex-col justify-center">
+                    <span class="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-[11px]"><i class="fa-solid fa-star"></i></span>
+                    <h2 class="font-serif text-sm font-black leading-snug">TẦM VÓC MỚI – KHÁT VỌNG MỚI</h2>
+                    <p class="text-[11px] text-primary-100 leading-relaxed">Sau sáp nhập Thôn Đoàn Kết (cũ) và Thôn Yên Khánh (cũ), chúng ta cùng xây dựng cộng đồng đoàn kết – phát triển – văn minh – bền vững, hướng tới nông nghiệp công nghệ cao và hệ thống chính trị cơ sở vững mạnh.</p>
+                </div>
+                <div id="mobile-stats-grid" class="bg-white border border-stone-200 rounded-2xl p-3 grid grid-cols-1 gap-3"></div>
+            </div>
+            <!-- Slide 2: gallery highlight -->
+            <div class="snap-center shrink-0 w-full">
+                <div class="relative rounded-2xl overflow-hidden h-56">
+                    <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200" alt="Hoạt động thôn" class="absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-stone-950/85 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-primary-300">Hình ảnh hoạt động</span>
+                        <p class="text-white text-sm font-semibold leading-snug mt-1">Ra quân "Chủ Nhật Xanh" trồng hoa dọc trục giao thông thôn</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 3: security hotline -->
+            <div class="snap-center shrink-0 w-full">
+                <div class="bg-red-600 text-white rounded-2xl p-5 h-56 flex flex-col justify-center items-center text-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-3xl"></i>
+                    <h3 class="font-bold uppercase tracking-wide text-sm">Đường dây nóng An ninh trật tự</h3>
+                    <p class="text-[11px] text-red-100">Tiếp nhận thông tin – Xử lý kịp thời 24/7</p>
+                    <a href="tel:0987533112" class="mt-1 px-4 py-2 rounded-lg bg-white text-red-600 font-black text-sm">0987.533.112</a>
                 </div>
             </div>
         </div>
+        <div id="mobile-hero-dots" class="flex items-center justify-center gap-1.5 pt-3"></div>
 
-        <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden bg-primary-800 border-t border-primary-600/50 px-4 pt-2 pb-6 space-y-1 text-xs font-bold uppercase tracking-wide text-primary-50">
-            <a href="#home" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Trang chủ</a>
-            <a href="#about" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Giới thiệu</a>
-            <a href="#news" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Tin tức - Thông báo</a>
-            <a href="#nong-san" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Sản vật đất lành</a>
-            <a href="#system" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Ban tự quản</a>
-            <a href="#security" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">An ninh trật tự</a>
-            <a href="#services" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Dịch vụ công</a>
-            <a href="#gallery" class="block py-2.5 px-3 rounded-lg hover:bg-primary-700 transition-all">Liên hệ</a>
+        <!-- Quick icon grid -->
+        <div class="grid grid-cols-3 gap-3 pt-4">
+            <a href="#news" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm">
+                <span class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center"><i class="fa-solid fa-bullhorn"></i></span>
+                <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight">Thông báo</span>
+            </a>
+            <a href="#nong-san" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm">
+                <span class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-leaf"></i></span>
+                <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight">Sản vật đất lành</span>
+            </a>
+            <a href="#system" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm">
+                <span class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-people-group"></i></span>
+                <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight">Ban tự quản</span>
+            </a>
+            <a href="#security" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm">
+                <span class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-shield-halved"></i></span>
+                <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight">Tổ ANTT cơ sở</span>
+            </a>
+            <a href="#services" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm">
+                <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-building-shield"></i></span>
+                <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight">Dịch vụ công</span>
+            </a>
+            <button onclick="document.getElementById('mobile-search-input').focus()" class="flex flex-col items-center gap-2 bg-white border border-stone-200 rounded-2xl py-4 shadow-sm">
+                <span class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <span class="text-[11px] font-semibold text-stone-600 text-center leading-tight">Tra cứu</span>
+            </button>
         </div>
+        <div class="relative pt-3">
+            <i class="fa-solid fa-magnifying-glass absolute left-7 top-1/2 -translate-y-1/2 text-stone-400 text-sm"></i>
+            <input id="mobile-search-input" type="text" placeholder="Tìm kiếm thông tin..." onkeydown="if(event.key==='Enter'){document.getElementById('site-search-input').value=this.value; runSiteSearch();}" class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-all">
+        </div>
+    </section>
+
+    <!-- ============ MOBILE BOTTOM TAB BAR (< lg) ============ -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.06)] grid grid-cols-5">
+        <a href="#home" class="flex flex-col items-center justify-center gap-1 py-2 text-primary-600">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] font-semibold">Trang chủ</span>
+        </a>
+        <a href="#news" class="flex flex-col items-center justify-center gap-1 py-2 text-stone-500">
+            <i class="fa-regular fa-bell text-lg"></i>
+            <span class="text-[10px] font-semibold">Thông báo</span>
+        </a>
+        <a href="#security" onclick="showCustomAlert('info','Phản ánh ANTT','Vui lòng đăng nhập để gửi phản ánh an ninh trật tự trực tuyến.')" class="flex flex-col items-center justify-center -mt-5">
+            <span class="w-12 h-12 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-lg"><i class="fa-solid fa-shield-halved text-lg"></i></span>
+            <span class="text-[9px] font-semibold text-primary-700 mt-0.5">Phản ánh ANTT</span>
+        </a>
+        <button onclick="document.getElementById('mobile-search-input').scrollIntoView({behavior:'smooth', block:'center'}); document.getElementById('mobile-search-input').focus();" class="flex flex-col items-center justify-center gap-1 py-2 text-stone-500">
+            <i class="fa-solid fa-magnifying-glass text-lg"></i>
+            <span class="text-[10px] font-semibold">Tra cứu</span>
+        </button>
+        <a href="dang-nhap.html" class="flex flex-col items-center justify-center gap-1 py-2 text-stone-500">
+            <i class="fa-regular fa-user text-lg"></i>
+            <span class="text-[10px] font-semibold">Tài khoản</span>
+        </a>
     </nav>
 
     <main>
         <!-- Hero + Bảng tin -->
-        <section id="home" class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <section id="home" class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                <!-- Hero banner -->
-                <div class="lg:col-span-8 relative rounded-3xl overflow-hidden shadow-lg min-h-[460px] flex items-end">
+                <!-- Hero banner (desktop only — mobile has its own carousel above) -->
+                <div class="hidden lg:flex lg:col-span-8 relative rounded-3xl overflow-hidden shadow-lg min-h-[460px] items-end">
                     <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600" alt="Cánh đồng Tây Nguyên" class="absolute inset-0 w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/40 to-transparent"></div>
                     <div class="relative z-10 p-8 md:p-10 pb-16 lg:pb-20 space-y-4 max-w-xl">
@@ -176,8 +268,8 @@
                     </div>
                 </div>
 
-                <!-- Stats strip overlapping the hero's bottom edge -->
-                <div id="about" class="lg:col-span-8 relative -mt-14 lg:-mt-16 z-20 scroll-mt-24">
+                <!-- Stats strip overlapping the hero's bottom edge (desktop only — mobile has its own stats card in the carousel) -->
+                <div id="about" class="hidden lg:block lg:col-span-8 relative -mt-14 lg:-mt-16 z-20 scroll-mt-24">
                     <!-- Stats (populated by renderHomeStats() from villageDb.homeContent.stats) -->
                     <div id="home-stats-grid" class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-stone-100 bg-white border border-stone-200 rounded-2xl shadow-lg"></div>
                 </div>
@@ -209,7 +301,7 @@
                     </div>
                     <!-- Leadership list (populated by renderHomeLeadership()) -->
                     <div id="leadership-grid" class="text-xs"></div>
-                    <a href="#system" class="block text-xs font-semibold text-primary-600 hover:text-primary-700 text-center pt-3 border-t border-stone-100">Xem đầy đủ →</a>
+                    <button onclick="openLeadershipModal()" class="block w-full text-xs font-semibold text-primary-600 hover:text-primary-700 text-center pt-3 border-t border-stone-100">Xem đầy đủ →</button>
                 </div>
 
                 <!-- Tổ An ninh trật tự -->
@@ -225,7 +317,7 @@
                         <i class="fa-solid fa-phone"></i> Đường Dây Nóng 24/7
                     </a>
                     <p class="text-center text-[11px] text-stone-400">Tiếp nhận thông tin – Xử lý kịp thời</p>
-                    <a href="#security" class="block text-xs font-semibold text-primary-600 hover:text-primary-700 text-center pt-3 border-t border-stone-100">Xem chi tiết →</a>
+                    <button onclick="openSecurityModal()" class="block w-full text-xs font-semibold text-primary-600 hover:text-primary-700 text-center pt-3 border-t border-stone-100">Xem chi tiết →</button>
                 </div>
 
                 <!-- Cổng tra cứu & dịch vụ công dân số -->
@@ -336,6 +428,20 @@
                     Đã đọc và đóng
                 </button>
             </div>
+        </div>
+    </div>
+
+
+    <!-- Shared detail modal (Ban tự quản "Xem đầy đủ" / Tổ ANTT "Xem chi tiết") -->
+    <div id="info-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 premium-blur hidden">
+        <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-lg max-h-[85vh] overflow-hidden shadow-2xl relative flex flex-col">
+            <div class="p-6 border-b border-stone-100 flex items-center justify-between shrink-0">
+                <h3 id="info-modal-title" class="font-serif text-lg font-bold text-stone-900"></h3>
+                <button onclick="closeInfoModal()" class="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-400 hover:text-red-500 hover:border-red-200 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="info-modal-body" class="p-6 space-y-3 overflow-y-auto"></div>
         </div>
     </div>
 

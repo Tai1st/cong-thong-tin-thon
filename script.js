@@ -280,6 +280,7 @@
             initDatabase();
             renderHomeContent();
             trackVisit();
+            initMobileHeroCarousel();
 
             const nav = document.getElementById('main-nav');
             if (nav) {
@@ -5307,6 +5308,44 @@
         // SHARED LANDING PAGE CONTENT (index.html) — driven by villageDb.homeContent so
         // Admin can manage it from "Quản lý Trang chủ" instead of it being hardcoded HTML.
         // -----------------------------------------------------------------------------------
+        function renderMobileStats() {
+            const container = document.getElementById('mobile-stats-grid');
+            if (!container) return;
+            const stats = (villageDb.homeContent && villageDb.homeContent.stats) || [];
+            container.innerHTML = stats.map(s => `
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center text-xs shrink-0">
+                        <i class="fa-solid ${s.icon}"></i>
+                    </span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-black text-stone-900 leading-none">${s.value} <span class="text-[10px] font-semibold text-primary-600">${s.unit}</span></p>
+                        <p class="text-[9px] text-stone-500 truncate">${s.label}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function initMobileHeroCarousel() {
+            const track = document.getElementById('mobile-hero-track');
+            const dotsWrap = document.getElementById('mobile-hero-dots');
+            if (!track || !dotsWrap) return;
+            const slideCount = track.children.length;
+            const dotClass = (active) => `w-1.5 h-1.5 rounded-full transition-colors ${active ? 'bg-primary-600' : 'bg-stone-300'}`;
+            dotsWrap.innerHTML = Array.from({ length: slideCount }).map((_, i) => `<span class="${dotClass(i === 0)}" data-dot="${i}"></span>`).join('');
+            let ticking = false;
+            track.addEventListener('scroll', () => {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    const idx = Math.round(track.scrollLeft / track.clientWidth);
+                    dotsWrap.querySelectorAll('[data-dot]').forEach((d, i) => {
+                        d.className = dotClass(i === idx);
+                    });
+                    ticking = false;
+                });
+            });
+        }
+
         function renderHomeStats() {
             const container = document.getElementById('home-stats-grid');
             if (!container) return;
@@ -5471,6 +5510,55 @@
             }
         }
 
+        function openInfoModal(title) {
+            document.getElementById('info-modal-title').innerText = title;
+            document.getElementById('info-modal').classList.remove('hidden');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('info-modal').classList.add('hidden');
+        }
+
+        function openLeadershipModal() {
+            const list = (villageDb.homeContent && villageDb.homeContent.leadership) || [];
+            const body = document.getElementById('info-modal-body');
+            body.innerHTML = list.map(l => `
+                <div class="flex items-center justify-between gap-3 py-3 border-b border-stone-100 last:border-0">
+                    <div class="min-w-0">
+                        <p class="text-[11px] font-bold text-primary-600 uppercase tracking-wide">${l.role}</p>
+                        <p class="text-sm font-semibold text-stone-800">${l.name}</p>
+                    </div>
+                    ${l.actionType === 'phone'
+                        ? `<a href="tel:${l.phone}" class="shrink-0 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 text-xs font-bold hover:bg-primary-100 transition-colors"><i class="fa-solid fa-phone mr-1"></i>${l.phoneDisplay}</a>`
+                        : `<span class="shrink-0 px-3 py-1.5 rounded-lg bg-${l.colorTheme}-50 text-${l.colorTheme}-600 text-xs font-bold"><i class="fa-solid ${l.tagIcon} mr-1"></i>${l.tagLabel}</span>`}
+                </div>
+            `).join('') || '<p class="text-stone-400 text-sm text-center py-6">Chưa có nhân sự nào.</p>';
+            openInfoModal('Ban Tự Quản & Hệ Thống Chính Trị');
+        }
+
+        function openSecurityModal() {
+            const sec = (villageDb.homeContent && villageDb.homeContent.security) || { hotline: '', hotlineDisplay: '', slogan: '', members: [] };
+            const body = document.getElementById('info-modal-body');
+            body.innerHTML = `
+                ${sec.slogan ? `<p class="text-center text-xs italic text-stone-500 pb-2 border-b border-stone-100">"${sec.slogan}"</p>` : ''}
+                <div class="divide-y divide-stone-100">
+                    ${(sec.members || []).map(m => `
+                        <div class="flex items-center justify-between gap-3 py-3">
+                            <div class="min-w-0">
+                                <p class="text-[11px] font-bold text-emerald-600 uppercase tracking-wide">${m.title}</p>
+                                <p class="text-sm font-semibold text-stone-800">${m.name}</p>
+                            </div>
+                            <a href="tel:${m.phone}" class="shrink-0 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 text-xs font-bold hover:bg-primary-100 transition-colors"><i class="fa-solid fa-phone mr-1"></i>${m.phoneDisplay}</a>
+                        </div>
+                    `).join('') || '<p class="text-stone-400 text-sm text-center py-6">Chưa có thành viên nào.</p>'}
+                </div>
+                <a href="tel:${sec.hotline}" class="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wide transition-colors">
+                    <i class="fa-solid fa-phone"></i> Đường Dây Nóng 24/7 · ${sec.hotlineDisplay}
+                </a>
+            `;
+            openInfoModal('Tổ An Ninh Trật Tự Cơ Sở');
+        }
+
         function renderHomeGallery() {
             const track = document.getElementById('gallery-track');
             if (!track) return;
@@ -5510,6 +5598,7 @@
 
         function renderHomeContent() {
             renderHomeStats();
+            renderMobileStats();
             renderHomeNews();
             renderHomeProducts();
             renderHomeLeadership();
