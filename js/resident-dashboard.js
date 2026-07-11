@@ -487,39 +487,72 @@
             renderFamilyGpsMap(familyId, coords);
         }
 
-        // Bản đồ thật (Leaflet + OpenStreetMap, miễn phí, không cần API key) cho
-        // riêng khu vực Thôn Đoàn Kết — thay thế placeholder lưới chấm tĩnh cũ.
+        // Bản đồ thật (Leaflet + OpenStreetMap, miễn phí, không cần API key) —
+        // thay thế placeholder lưới chấm tĩnh cũ. Hiện đủ 24 thôn/buôn của xã
+        // (js/village-boundary.js, cùng nguồn geometry với tra-cuu.html) để
+        // thấy được bối cảnh xung quanh, nhưng chỉ tô màu riêng Thôn Đoàn Kết
+        // (thôn của hộ đang đăng nhập) — các thôn khác để trắng, chỉ có viền
+        // mờ. Bản đồ zoom khớp ranh giới Thôn Đoàn Kết (không zoom theo cả
+        // xã), và chỉ đặt 1 marker duy nhất: nhà của hộ mình.
         // DOM của #family-gps-map bị hủy mỗi lần renderResidentFamily() render
         // lại (innerHTML ghi đè), nên phải remove() map cũ trước khi tạo mới.
         let familyGpsMap = null;
         const DOAN_KET_CENTER = [13.125944, 108.324778]; // 13°07'33.4"N 108°19'29.2"E — tâm Thôn Đoàn Kết, dùng khi hộ chưa định vị
+        const OWN_VILLAGE_NAME = 'Thôn Đoàn kết';
+
+        function housePinIcon() {
+            var color = '#9c3000';
+            var html =
+                '<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">' +
+                '<path d="M15 0C6.716 0 0 6.716 0 15c0 10.5 15 23 15 23s15-12.5 15-23C30 6.716 23.284 0 15 0z" fill="' + color + '"></path>' +
+                '<circle cx="15" cy="14.5" r="10" fill="#fff"></circle>' +
+                '<g transform="translate(7.5,7) scale(0.625)" fill="none" stroke="' + color + '" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>' +
+                '</g></svg>';
+            return L.divIcon({ className: 'family-house-pin', html: html, iconSize: [30, 38], iconAnchor: [15, 38], popupAnchor: [0, -34] });
+        }
+
         function renderFamilyGpsMap(familyId, coords) {
             const el = document.getElementById('family-gps-map');
             if (!el) return;
             if (familyGpsMap) { familyGpsMap.remove(); familyGpsMap = null; }
 
-            const center = coords ? [coords.lat, coords.lng] : DOAN_KET_CENTER;
-            familyGpsMap = L.map(el, { scrollWheelZoom: false }).setView(center, coords ? 17 : 15);
+            // Phải setView() ngay khi tạo map — L.tileLayer().addTo(map) sẽ
+            // ném lỗi "Set map center and zoom first" nếu map chưa có view,
+            // làm dừng toàn bộ hàm giữa chừng (polygon/marker phía dưới sẽ
+            // không bao giờ chạy). fitBounds() ở cuối hàm sẽ chỉnh lại đúng
+            // khung nhìn theo ranh giới Thôn Đoàn Kết.
+            familyGpsMap = L.map(el, { scrollWheelZoom: false }).setView(DOAN_KET_CENTER, 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(familyGpsMap);
 
-            // Ranh giới thật của Thôn Đoàn Kết (js/village-boundary.js) — cùng
-            // nguồn geometry với bản đồ tổng ở tra-cuu.html, giúp thấy được
-            // hộ gia đình nằm ở đâu trong phạm vi thôn thay vì chỉ 1 chấm
-            // trơ trọi trên nền OSM.
-            if (typeof DOAN_KET_BOUNDARY !== 'undefined') {
-                L.polygon(DOAN_KET_BOUNDARY, {
-                    color: '#e11d48',
-                    weight: 2,
-                    fillColor: '#e11d48',
-                    fillOpacity: 0.06
-                }).addTo(familyGpsMap);
+            // Toàn bộ thôn/buôn trong xã — chỉ Thôn Đoàn Kết được tô màu
+            // thật, các thôn khác để trắng làm bối cảnh xung quanh.
+            var ownBounds = null;
+            if (typeof ALL_REGIONS !== 'undefined') {
+                ALL_REGIONS.forEach(function (r) {
+                    var isOwn = r.name === OWN_VILLAGE_NAME;
+                    var poly = L.polygon(r.latlngs, {
+                        color: isOwn ? r.color : '#cbd5e1',
+                        weight: isOwn ? 2 : 1,
+                        fillColor: isOwn ? r.color : '#ffffff',
+                        fillOpacity: isOwn ? 0.32 : 0.9,
+                        interactive: false
+                    }).addTo(familyGpsMap);
+                    if (isOwn) ownBounds = poly.getBounds();
+                });
+            }
+
+            if (ownBounds) {
+                familyGpsMap.fitBounds(ownBounds, { padding: [20, 20] });
+            } else {
+                familyGpsMap.setView(coords ? [coords.lat, coords.lng] : DOAN_KET_CENTER, 15);
             }
 
             if (coords) {
-                L.marker(center).addTo(familyGpsMap)
+                L.marker([coords.lat, coords.lng], { icon: housePinIcon() }).addTo(familyGpsMap)
                     .bindPopup(`Hộ gia đình ${familyId || ''}`)
                     .openPopup();
             }

@@ -194,6 +194,45 @@
         // on the resident's own "Thành viên Hộ & Vị trí GPS" tab.
         let viewingLocationFamilyId = null;
 
+        // Bản đồ Leaflet trong modal "Vị Trí Hộ Gia Đình" (Trưởng thôn/Cán bộ
+        // Hội/Tổ ANTT xem vị trí 1 hộ bất kỳ) — dùng lại đúng housePinIcon(),
+        // ALL_REGIONS, OWN_VILLAGE_NAME, DOAN_KET_CENTER đã định nghĩa trong
+        // js/resident-dashboard.js (cùng nạp trên mọi trang nên đã có sẵn ở
+        // global scope, không cần định nghĩa lại). Instance map riêng
+        // (viewLocationMap) vì modal này tách biệt với #family-gps-map.
+        let viewLocationMap = null;
+        function renderViewLocationMap(coords) {
+            const el = document.getElementById('view-location-map');
+            if (!el) return;
+            if (viewLocationMap) { viewLocationMap.remove(); viewLocationMap = null; }
+
+            viewLocationMap = L.map(el, { scrollWheelZoom: false }).setView(DOAN_KET_CENTER, 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(viewLocationMap);
+
+            var ownBounds = null;
+            if (typeof ALL_REGIONS !== 'undefined') {
+                ALL_REGIONS.forEach(function (r) {
+                    var isOwn = r.name === OWN_VILLAGE_NAME;
+                    var poly = L.polygon(r.latlngs, {
+                        color: isOwn ? r.color : '#cbd5e1',
+                        weight: isOwn ? 2 : 1,
+                        fillColor: isOwn ? r.color : '#ffffff',
+                        fillOpacity: isOwn ? 0.32 : 0.9,
+                        interactive: false
+                    }).addTo(viewLocationMap);
+                    if (isOwn) ownBounds = poly.getBounds();
+                });
+            }
+            if (ownBounds) viewLocationMap.fitBounds(ownBounds, { padding: [20, 20] });
+
+            if (coords) {
+                L.marker([coords.lat, coords.lng], { icon: housePinIcon() }).addTo(viewLocationMap).openPopup();
+            }
+        }
+
         function refreshViewLocationModal(familyId) {
             const head = villageDb.residents.find(r => r.familyId === familyId && r.isHouseholder)
                 || villageDb.residents.find(r => r.familyId === familyId);
@@ -204,6 +243,8 @@
             document.getElementById('view-location-house-number').innerText = villageDb.houseNumbers[familyId] || 'Chưa cập nhật';
 
             const coords = villageDb.gpsCoords[familyId];
+            renderViewLocationMap(coords);
+
             const mapsLink = document.getElementById('view-location-maps-link');
             if (mapsLink) {
                 if (coords) {
@@ -218,11 +259,15 @@
 
         function openViewLocationModal(familyId) {
             viewingLocationFamilyId = familyId;
-            refreshViewLocationModal(familyId);
 
+            // Modal phải hiện ra (bỏ class "hidden") TRƯỚC khi khởi tạo bản
+            // đồ Leaflet — nếu container còn display:none, Leaflet đo được
+            // kích thước 0x0 và render tile sai vị trí (ô xám/trống).
             const modal = document.getElementById('view-location-modal');
             const box = document.getElementById('view-location-modal-box');
             modal.classList.remove('hidden');
+            refreshViewLocationModal(familyId);
+            if (viewLocationMap) setTimeout(() => viewLocationMap.invalidateSize(), 0);
             setTimeout(() => {
                 box.classList.remove('scale-95');
                 box.classList.add('scale-100');

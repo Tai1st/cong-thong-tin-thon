@@ -13,6 +13,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Ephesis&family=Montserrat:wght@300;400;500;600;700;800;950&family=Charm:wght@400;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet (bản đồ vị trí hộ gia đình) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
         tailwind.config = {
@@ -310,14 +313,7 @@
                     <span class="text-[9px] uppercase font-bold text-stone-400 block">Số nhà / Địa chỉ cụ thể</span>
                     <span id="view-location-house-number" class="text-stone-900 block mt-0.5"></span>
                 </div>
-                <div class="relative w-full h-40 rounded-2xl border border-stone-200 bg-stone-50 overflow-hidden flex items-center justify-center">
-                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#22c55e_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-stone-950 z-10 pointer-events-none"></div>
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
-                        <span class="absolute w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500 animate-ping"></span>
-                        <span class="w-4 h-4 rounded-full bg-emerald-500 border-2 border-stone-950 shadow-lg flex items-center justify-center text-[7px] text-stone-900 font-bold"><i class="fa-solid fa-house-chimney"></i></span>
-                    </div>
-                </div>
+                <div id="view-location-map" class="w-full h-40 rounded-2xl border border-stone-200 overflow-hidden"></div>
                 <a id="view-location-maps-link" href="#" target="_blank" rel="noopener" class="w-full py-3 rounded-xl bg-emerald-50 opacity-40 pointer-events-none hover:bg-emerald-100 hover:border-emerald-500 text-emerald-600 hover:text-emerald-600 font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2">
                     <i class="fa-brands fa-google"></i> Xem trên Google Maps
                 </a>
@@ -367,6 +363,7 @@
 
     <!-- -->
     <script src="js/data.js"></script>
+    <script src="js/village-boundary.js"></script>
     <script src="js/app-init.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/resident-dashboard.js"></script>
