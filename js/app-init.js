@@ -213,7 +213,7 @@
                     : [...defaultFundObligations];
                 villageDb.gpsCoords = localStorage.getItem('village_gps_coords_db')
                     ? JSON.parse(localStorage.getItem('village_gps_coords_db'))
-                    : {};
+                    : {...defaultGpsCoords};
                 villageDb.homeContent = localStorage.getItem('village_home_content_db')
                     ? JSON.parse(localStorage.getItem('village_home_content_db'))
                     : JSON.parse(JSON.stringify(defaultHomeContent));
@@ -248,7 +248,7 @@
                 villageDb.newMemberRequests = [...defaultNewMemberRequests];
                 villageDb.houseNumbers = {};
                 villageDb.fundObligations = [...defaultFundObligations];
-                villageDb.gpsCoords = {};
+                villageDb.gpsCoords = {...defaultGpsCoords};
                 villageDb.homeContent = JSON.parse(JSON.stringify(defaultHomeContent));
                 villageDb.incidentReports = [];
                 villageDb.residenceRegistrations = [];

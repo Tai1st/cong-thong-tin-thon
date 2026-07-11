@@ -479,20 +479,50 @@
                     </div>
 
                     <div class="lg:col-span-7">
-                        <div class="relative w-full h-48 sm:h-64 rounded-2xl border border-stone-200 bg-stone-50 overflow-hidden flex items-center justify-center">
-                            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#22c55e_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                            <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-stone-950 z-10 pointer-events-none"></div>
-
-                            <!-- Flashing Household Marker -->
-                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
-                                <span class="absolute w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500 animate-ping"></span>
-                                <span class="w-4 h-4 rounded-full bg-emerald-500 border-2 border-stone-950 shadow-lg flex items-center justify-center text-[7px] text-stone-900 font-bold"><i class="fa-solid fa-house-chimney"></i></span>
-                                <span class="mt-1 px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-500/30 text-[8px] text-emerald-600 font-bold whitespace-nowrap">Hộ gia đình ${familyId || ''}</span>
-                            </div>
-                        </div>
+                        <div id="family-gps-map" class="w-full h-48 sm:h-64 rounded-2xl border border-stone-200 overflow-hidden"></div>
                     </div>
                 </div>
             `;
+
+            renderFamilyGpsMap(familyId, coords);
+        }
+
+        // Bản đồ thật (Leaflet + OpenStreetMap, miễn phí, không cần API key) cho
+        // riêng khu vực Thôn Đoàn Kết — thay thế placeholder lưới chấm tĩnh cũ.
+        // DOM của #family-gps-map bị hủy mỗi lần renderResidentFamily() render
+        // lại (innerHTML ghi đè), nên phải remove() map cũ trước khi tạo mới.
+        let familyGpsMap = null;
+        const DOAN_KET_CENTER = [13.125944, 108.324778]; // 13°07'33.4"N 108°19'29.2"E — tâm Thôn Đoàn Kết, dùng khi hộ chưa định vị
+        function renderFamilyGpsMap(familyId, coords) {
+            const el = document.getElementById('family-gps-map');
+            if (!el) return;
+            if (familyGpsMap) { familyGpsMap.remove(); familyGpsMap = null; }
+
+            const center = coords ? [coords.lat, coords.lng] : DOAN_KET_CENTER;
+            familyGpsMap = L.map(el, { scrollWheelZoom: false }).setView(center, coords ? 17 : 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(familyGpsMap);
+
+            // Ranh giới thật của Thôn Đoàn Kết (js/village-boundary.js) — cùng
+            // nguồn geometry với bản đồ tổng ở tra-cuu.html, giúp thấy được
+            // hộ gia đình nằm ở đâu trong phạm vi thôn thay vì chỉ 1 chấm
+            // trơ trọi trên nền OSM.
+            if (typeof DOAN_KET_BOUNDARY !== 'undefined') {
+                L.polygon(DOAN_KET_BOUNDARY, {
+                    color: '#e11d48',
+                    weight: 2,
+                    fillColor: '#e11d48',
+                    fillOpacity: 0.06
+                }).addTo(familyGpsMap);
+            }
+
+            if (coords) {
+                L.marker(center).addTo(familyGpsMap)
+                    .bindPopup(`Hộ gia đình ${familyId || ''}`)
+                    .openPopup();
+            }
         }
 
         // Member-edit request modal: a resident can propose changes to any of a

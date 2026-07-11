@@ -5,10 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tra cứu Thôn/Buôn - Xã Dliê Ya</title>
 <link rel="icon" type="image/png" href="logo.png">
+<!-- Google Fonts: Montserrat & Playfair Display — đồng bộ font với index.html -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,500&family=Montserrat:wght@300;400;500;600;700;800;950&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
   :root {
-    --font-sans: "Segoe UI", Roboto, Arial, "Helvetica Neue", sans-serif;
+    --font-sans: "Montserrat", "Segoe UI", Roboto, Arial, "Helvetica Neue", sans-serif;
+    --font-serif: "Playfair Display", "Segoe UI", serif;
     --text-xs: 12px;
     --text-sm: 13px;
     --text-md: 14px;
@@ -59,7 +64,7 @@
     border: 1px solid #fed7aa;
   }
   .brand-copy { min-width: 0; }
-  .brand h1 { margin: 0; color: var(--brand); font-size: 28px; line-height: 1.25; font-weight: 800; }
+  .brand h1 { margin: 0; color: var(--brand); font-size: 28px; line-height: 1.25; font-weight: 800; font-family: var(--font-serif); }
   .brand span { display: block; color: var(--muted); font-size: var(--text-base); line-height: 1.4; margin-top: 4px; }
   .back-link {
     display: inline-flex;
@@ -164,6 +169,10 @@
     min-height: 420px;
     background: #eef2f7;
   }
+  /* leaflet.css tự set font Helvetica Neue/Arial cho .leaflet-container,
+     đè lên font chữ mặc định của trang (Segoe UI) — trả lại đúng font-sans
+     của trang cho toàn bộ bản đồ (popup, control, attribution...). */
+  .leaflet-container { font-family: var(--font-sans) !important; }
   .leaflet-interactive.region-poly { cursor: pointer; }
   .leaflet-interactive.area-border-selected {
     stroke-dasharray: 14 7;
@@ -229,6 +238,60 @@
     border: 3px solid #fff;
     box-shadow: 0 0 0 2px #2563eb, 0 2px 6px rgba(0,0,0,.35);
   }
+  .pin-marker {
+    filter: drop-shadow(0 3px 3px rgba(15, 23, 42, .35));
+    transition: transform .12s ease;
+  }
+  .pin-marker:hover { transform: scale(1.08) translateY(-1px); }
+  .pin-marker-with-logo { position: relative; }
+  .pin-marker-logo {
+    position: absolute;
+    top: 5.5px;
+    left: 6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+  .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, .18);
+  }
+  .leaflet-popup-content { margin: 13px 16px; min-width: 190px; }
+  .leaflet-popup-tip-container { width: 24px; height: 12px; }
+  .map-popup-title {
+    font-weight: 800;
+    font-size: var(--text-base);
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 3px;
+    font-family: var(--font-serif);
+  }
+  .map-popup-meta {
+    font-size: var(--text-sm);
+    color: var(--muted);
+    line-height: 1.4;
+    margin-bottom: 9px;
+  }
+  .map-popup-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--blue);
+    text-decoration: none;
+  }
+  .map-popup-link:hover { text-decoration: underline; }
+  .map-popup-link svg { width: 14px; height: 14px; flex: 0 0 auto; }
+  .leaflet-popup-close-button {
+    color: var(--muted) !important;
+    font-size: 20px !important;
+    top: 8px !important;
+    right: 10px !important;
+  }
+  .leaflet-popup-close-button:hover { color: var(--brand) !important; }
   aside {
     border-left: 1px solid var(--line);
     background: #fff;
@@ -248,10 +311,11 @@
     font-size: var(--text-md);
     font-weight: 700;
     color: var(--brand);
+    font-family: var(--font-serif);
   }
   .panel-body { padding: 16px; }
   .muted { color: var(--muted); font-size: var(--text-sm); line-height: 1.55; }
-  .selected-title { margin: 0 0 16px; font-size: var(--text-xl); line-height: 1.25; font-weight: 800; color: var(--brand); }
+  .selected-title { margin: 0 0 16px; font-size: var(--text-xl); line-height: 1.25; font-weight: 800; color: var(--brand); font-family: var(--font-serif); }
   .info-table { width: 100%; border-collapse: collapse; font-size: var(--text-md); line-height: 1.5; }
   .info-table th, .info-table td { border-bottom: 1px solid #eef2f7; padding: 11px 0; vertical-align: top; text-align: left; }
   .info-table tr:last-child th, .info-table tr:last-child td { border-bottom: 0; }
@@ -386,6 +450,8 @@
   <div class="toast" id="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<!-- defaultResidents/defaultGpsCoords — dùng chung nguồn dữ liệu dân cư với các dashboard -->
+<script src="js/data.js"></script>
 <script>
   // Dữ liệu thật lấy từ API công khai https://tracuudlieya.io.vn/api/communes/dlieya/geojson
   // (ranh giới thật từng thôn/buôn + thông tin Bí thư/Trưởng thôn/Trưởng ban CTMT).
@@ -503,6 +569,98 @@
   });
   if (polyGroup.length) map.fitBounds(L.featureGroup(polyGroup).getBounds(), { padding: [12, 12] });
 
+  // ---------------------------------------------------------------------
+  // Vị trí hộ gia đình đã định vị GPS — ưu tiên đọc từ localStorage cùng
+  // origin (dữ liệu thật sau khi ai đó đã dùng dashboard Cư dân/Trưởng
+  // thôn trên trình duyệt này); nếu chưa có thì lùi về defaultGpsCoords/
+  // defaultResidents từ js/data.js (đã nạp ở <head>) — cùng 1 nguồn dữ
+  // liệu dân cư với toàn bộ app, không còn số liệu demo tách riêng.
+  function readLocalJson(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  // Nội dung popup marker dùng chung (tiêu đề đậm + dòng phụ mờ + link
+  // Google Maps có icon) — thay cho chuỗi "<b>...</b><br>..." nối tay,
+  // style riêng ở .map-popup-* trong CSS thay vì để mặc định của Leaflet.
+  function mapPopupHtml(title, metaLine, mapsUrl) {
+    return (
+      '<div class="map-popup-title">' + title + '</div>' +
+      (metaLine ? '<div class="map-popup-meta">' + metaLine + '</div>' : '') +
+      '<a class="map-popup-link" href="' + mapsUrl + '" target="_blank" rel="noopener noreferrer">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8-8-2z"></path></svg>' +
+      'Xem trên Google Maps</a>'
+    );
+  }
+
+  // Pin dạng giọt nước (kiểu Google Maps) dựng bằng SVG thuần thay vì
+  // emoji — nhất quán trên mọi hệ điều hành/trình duyệt, có drop-shadow
+  // và hover scale (xem .pin-marker ở CSS). `glyph` là 1 đoạn <path>/
+  // <polyline> con (viewBox 24x24, stroke) được vẽ giữa vòng tròn trắng.
+  function pinIcon(color, glyph) {
+    var html =
+      '<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M15 0C6.716 0 0 6.716 0 15c0 10.5 15 23 15 23s15-12.5 15-23C30 6.716 23.284 0 15 0z" fill="' + color + '"></path>' +
+      '<circle cx="15" cy="14.5" r="10" fill="#fff"></circle>' +
+      '<g transform="translate(7.5,7) scale(0.625)" fill="none" stroke="' + color + '" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">' + glyph + '</g>' +
+      '</svg>';
+    return L.divIcon({ className: "pin-marker", html: html, iconSize: [30, 38], iconAnchor: [15, 38], popupAnchor: [0, -34] });
+  }
+  var HOUSE_GLYPH = '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>';
+  var LANDMARK_GLYPH = '<path d="M3 21h18"></path><path d="M4 10h16"></path><path d="M4 10l8-6 8 6"></path><path d="M6 10v11"></path><path d="M10 10v11"></path><path d="M14 10v11"></path><path d="M18 10v11"></path>';
+
+  // Cùng khung pin giọt nước, nhưng thay glyph vẽ tay bằng logo thật của
+  // từng cơ quan (ảnh clip tròn) — dùng cho marker trụ sở cơ quan xã.
+  function pinIconWithImage(color, imgUrl) {
+    var html =
+      '<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M15 0C6.716 0 0 6.716 0 15c0 10.5 15 23 15 23s15-12.5 15-23C30 6.716 23.284 0 15 0z" fill="' + color + '"></path>' +
+      '<circle cx="15" cy="14.5" r="10" fill="#fff"></circle>' +
+      '</svg>' +
+      '<img src="' + imgUrl + '" class="pin-marker-logo" alt="">';
+    return L.divIcon({ className: "pin-marker pin-marker-with-logo", html: html, iconSize: [30, 38], iconAnchor: [15, 38], popupAnchor: [0, -34] });
+  }
+
+  var householdMarkerGroup = L.layerGroup();
+  function renderHouseholdMarkers() {
+    householdMarkerGroup.clearLayers();
+    var gpsCoords = readLocalJson("village_gps_coords_db", null) || defaultGpsCoords;
+    var houseNumbers = readLocalJson("village_house_numbers_db", {});
+    var residents = readLocalJson("village_residents_db", null) || defaultResidents;
+
+    var headByFamilyId = {};
+    residents.forEach(function (r) {
+      if (r.isHouseholder || !headByFamilyId[r.familyId]) headByFamilyId[r.familyId] = r;
+    });
+
+    var count = 0;
+    Object.keys(gpsCoords).forEach(function (familyId) {
+      var coords = gpsCoords[familyId];
+      if (!coords || typeof coords.lat !== "number" || typeof coords.lng !== "number") return;
+      var head = headByFamilyId[familyId];
+      var houseNumber = houseNumbers[familyId];
+      var label = "Hộ " + (head ? head.name : "(chưa rõ chủ hộ)");
+      var marker = L.marker([coords.lat, coords.lng], {
+        icon: pinIcon("#9c3000", HOUSE_GLYPH)
+      }).bindPopup(
+        mapPopupHtml(
+          label,
+          houseNumber ? "Địa chỉ: " + houseNumber : "",
+          "https://www.google.com/maps?q=" + coords.lat + "," + coords.lng
+        )
+      );
+      householdMarkerGroup.addLayer(marker);
+      count++;
+    });
+    return count;
+  }
+  var householdCount = renderHouseholdMarkers();
+  if (householdCount > 0) householdMarkerGroup.addTo(map);
+
   var currentSelected = null;
   function highlightSelected(name) {
     if (currentSelected && layerByName[currentSelected]) {
@@ -614,7 +772,7 @@
   searchInput.addEventListener("keydown", function (e) { if (e.key === "Enter") runSearch(); });
 
 
-  var UNITS = [{"name":"Trụ sở Đảng ủy xã","logo":"https://tracuudlieya.io.vn/dlieya-co-dang.jpg","url":"https://www.google.com/maps/@13.0348038,108.3259734,20z?entry=ttu&g_ep=EgoyMDI2MDYyOS4wIKXMDSoASAFQAw%3D%3D"},{"name":"Trụ sở Hội đồng nhân dân - Ủy ban Nhân dân xã","logo":"https://tracuudlieya.io.vn/dlieya-ubnd.jpg","url":"https://www.google.com/maps/place/UBND+X%C3%A3+%C4%90li%C3%AA+Ya/@13.0589474,108.3549545,17z/data=!3m1!4b1!4m6!3m5!1s0x316e170019b4fd0d:0xc4cdce60a6346cd!8m2!3d13.0589474!4d108.3575294!16s%2Fg%2F11xmj28zn2?entry=ttu&g_ep=EgoyMDI2MDYyOS4wIKXMDSoASAFQAw%3D%3D"},{"name":"Trụ sở Ủy ban Mặt trận tổ quốc và các tổ chức chính trị xã hội xã","logo":"https://tracuudlieya.io.vn/dlieya-mat-tran-to-quoc.jpg","url":"https://www.google.com/maps/@13.0348038,108.3259734,20z?entry=ttu&g_ep=EgoyMDI2MDYyOS4wIKXMDSoASAFQAw%3D%3D"},{"name":"Trụ sở Công an xã","logo":"https://tracuudlieya.io.vn/dlieya-logocongan.jpg","url":"https://www.google.com/maps/search/c%C3%B4ng+an+x%C3%A3+ea+t%C3%A2n/@13.1162735,108.3291873,19z?entry=ttu&g_ep=EgoyMDI2MDYyOS4wIKXMDSoASAFQAw%3D%3D"}];
+  var UNITS = [{"name":"Trụ sở Đảng ủy xã","logo":"https://tracuudlieya.io.vn/dlieya-co-dang.jpg","url":"https://www.google.com/maps/@13.0348038,108.3259734,20z?entry=ttu&g_ep=EgoyMDI2MDYyOS4wIKXMDSoASAFQAw%3D%3D"},{"name":"Trụ sở Hội đồng nhân dân - Ủy ban Nhân dân xã","logo":"https://tracuudlieya.io.vn/dlieya-ubnd.jpg","url":"https://www.google.com/maps/place/UBND+X%C3%A3+%C4%90li%C3%AA+Ya/@13.0589474,108.3549545,17z/data=!3m1!4b1!4m6!3m5!1s0x316e170019b4fd0d:0xc4cdce60a6346cd!8m2!3d13.0589474!4d108.3575294!16s%2Fg%2F11xmj28zn2?entry=ttu&g_ep=EgoyMDI2MDYyOS4wIKXMDSoASAFQAw%3D%3D"},{"name":"Trụ sở Ủy ban Mặt trận tổ quốc và các tổ chức chính trị xã hội xã","logo":"https://tracuudlieya.io.vn/dlieya-mat-tran-to-quoc.jpg","url":"https://www.google.com/maps/@13.0348038,108.3259734,20z?entry=ttu&g_ep=EgoyMDI2MDYyOS4wIKXMDSoASAFQAw%3D%3D"},{"name":"Trụ sở Công an xã","logo":"logo-cong-an.png","url":"https://www.google.com/maps/search/c%C3%B4ng+an+x%C3%A3+ea+t%C3%A2n/@13.1162735,108.3291873,19z?entry=ttu&g_ep=EgoyMDI2MDYyOS4wIKXMDSoASAFQAw%3D%3D"}];
   var unitsEl = document.getElementById("units");
   UNITS.forEach(function (u) {
     var card = document.createElement("article");
@@ -624,6 +782,37 @@
       '<svg class="icon" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"></path></svg>Xem định vị</a></div>';
     unitsEl.appendChild(card);
   });
+
+  // Định vị trụ sở các cơ quan xã lên bản đồ — tọa độ lấy trực tiếp từ
+  // chính link Google Maps thật của từng đơn vị (u.url), không hardcode
+  // riêng lat/lng để tránh lệch nếu link đổi. Ưu tiên dạng "!3d..!4d.."
+  // (điểm place chính xác) trước dạng "@lat,lng" (tâm khung nhìn).
+  function extractLatLngFromMapsUrl(url) {
+    var place = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+    if (place) return [parseFloat(place[1]), parseFloat(place[2])];
+    var at = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (at) return [parseFloat(at[1]), parseFloat(at[2])];
+    return null;
+  }
+
+  UNITS.forEach(function (u) {
+    var latlng = extractLatLngFromMapsUrl(u.url);
+    if (!latlng) return;
+    L.marker(latlng, {
+      icon: pinIconWithImage("#2563eb", u.logo)
+    }).addTo(map).bindPopup(
+      mapPopupHtml(u.name, "", u.url)
+    );
+  });
+
+  // Thôn Đoàn Kết dùng logo riêng của thôn (logo.png) thay vì logo cấp xã —
+  // đặt tại đúng tâm thôn (13°07'33.4"N 108°19'29.2"E, cùng điểm đã dùng
+  // làm DOAN_KET_CENTER trong dashboard Cư dân).
+  L.marker([13.125944, 108.324778], {
+    icon: pinIconWithImage("#e11d48", "logo.png")
+  }).addTo(map).bindPopup(
+    mapPopupHtml("Thôn Đoàn Kết", "", "https://www.google.com/maps?q=13.125944,108.324778")
+  );
 
   selectVillage("Thôn Đoàn kết");
 </script>

@@ -368,6 +368,34 @@ const defaultResidents = [
   },
 ];
 
+// Seed GPS locations for every household in defaultResidents so the demo
+// data already shows located households instead of "Chưa định vị" for
+// all of them — also the single source of truth tra-cuu.html's public
+// lookup map merges in so household pins stay in sync between the two
+// without duplicating coordinates. Every point below was verified with a
+// point-in-polygon test against the real "Thôn Đoàn kết" boundary
+// (geometry from https://tracuudlieya.io.vn/api/communes/dlieya/geojson),
+// not guessed by eye, so all pins land inside the actual thôn, not just
+// near it. FAM-082 (tài khoản Cư dân mẫu) keeps the specific coordinate
+// given directly: 13°07'33.4"N 108°19'29.2"E.
+const defaultGpsCoords = {
+  "FAM-082": { lat: 13.125944, lng: 108.324778 },
+  "FAM-001": { lat: 13.138258, lng: 108.334595 },
+  "FAM-002": { lat: 13.136811, lng: 108.334150 },
+  "FAM-003": { lat: 13.125001, lng: 108.323917 },
+  "FAM-004": { lat: 13.141536, lng: 108.338301 },
+  "FAM-005": { lat: 13.128028, lng: 108.324530 },
+  "FAM-006": { lat: 13.138699, lng: 108.341344 },
+  "FAM-007": { lat: 13.124158, lng: 108.333612 },
+  "FAM-008": { lat: 13.129849, lng: 108.336541 },
+  "FAM-050": { lat: 13.121934, lng: 108.330334 },
+  "FAM-051": { lat: 13.131550, lng: 108.333659 },
+  "FAM-052": { lat: 13.136527, lng: 108.338643 },
+  "FAM-053": { lat: 13.140281, lng: 108.323268 },
+  "FAM-054": { lat: 13.141065, lng: 108.328148 },
+  "FAM-055": { lat: 13.143840, lng: 108.321036 },
+};
+
 // Village-wide fund obligation templates ("khoản thu") — the amount/hộ that
 // every household owes. IDs match the legacy per-household fund entry ids
 // below so they represent the same obligations, and new obligations created
